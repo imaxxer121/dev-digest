@@ -24,13 +24,16 @@ From PowerShell, run Docker Compose first, then the package scripts separately.
 - DB integration tests: `pnpm exec vitest run .it.test` (requires Docker).
 - Reviewer-core: `npm test`.
 
-## Conventions
+## Naming conventions
 
 Keep feature components in their existing `_components/<Component>/` folders.
 Use `@devdigest/ui` and theme variables. Put translated UI copy in
 `client/messages/<locale>/`. Shared Zod contracts are vendored in client and
 server: changing a contract requires checking both copies and all consumers.
 Use Node path/url helpers for OS paths; use POSIX paths only for GitHub URLs.
+
+There is no separate lint script in these packages; run their configured typechecks.
+Reviewer-core and e2e also expose `npm run typecheck`.
 
 Do not edit generated migrations or lockfiles as a side effect of a UI feature.
 Keep keys, local runtime files and `.env` out of commits. Tests use mocks or

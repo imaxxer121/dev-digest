@@ -1,22 +1,19 @@
 # Client engineering insights
 
-## 2026-10-12 — Counts and visible findings have different inputs
+## 2026-10-12 — Per-run filtering and visible counters
 
-PR severity totals must use the complete set of persisted findings across runs,
-before severity or confidence filtering. Otherwise a selection erases the other
-categories' totals. Keep the selection in `FindingsTab` and pass it down through
-the accordion to `FindingsPanel`; expand matching runs so results are visible.
-Evidence: `src/app/repos/[repoId]/pulls/[number]/_components/FindingsTab/FindingsTab.tsx:48`,
-`src/app/repos/[repoId]/pulls/[number]/_components/ReviewRunAccordion/ReviewRunAccordion.tsx:48`
-and `src/app/repos/[repoId]/pulls/[number]/_components/FindingsPanel/helpers.ts:11`.
+The separate homework rubric requires each run to own its selection and the
+pills to count the cards actually rendered. Keep state in FindingsPanel, after
+confidence and severity filtering. Evidence:
+`src/app/repos/[repoId]/pulls/[number]/_components/FindingsPanel/FindingsPanel.tsx:30`
+and `src/app/repos/[repoId]/pulls/[number]/_components/SeverityFilter/SeverityFilter.tsx:30`.
 
-Five new interaction tests cover multiple runs, stable counts, category changes,
-reset, empty categories, no findings and confidence filtering. The full client
-suite passed 26 tests and TypeScript checking passed. The no-request assertion
-is in `src/app/repos/[repoId]/pulls/[number]/_components/FindingsTab/FindingsTab.test.tsx:96`.
-Browser checks on the seeded PR confirmed all three levels, repeat-click reset,
-All, keyboard Enter and selection at 768 px. Database `agent_runs` stayed 0
-before and after these interactions; the demo is a UI fixture, not a model run.
+Five interaction tests cover run isolation, repeat-click reset, an absent level,
+no runs, confidence-adjusted counts and zero network requests. The full client
+suite passed 42 tests and typechecking passed. Browser checks on the seeded PR
+confirmed Critical/Warning/Suggestion and repeat-click reset. The demo is a UI
+fixture, not a model run. The hover component's four tests also passed after adding
+focus/click support (`src/components/FindingsHoverCard/FindingsHoverCard.tsx:166`).
 
 ## 2026-10-12 — Starter layout limits phone-size validation
 

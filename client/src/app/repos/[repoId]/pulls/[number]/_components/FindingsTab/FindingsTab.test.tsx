@@ -1,6 +1,6 @@
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { FindingRecord, ReviewRecord, Severity } from "@devdigest/shared";
 import messages from "../../../../../../../../messages/en/prReview.json";
@@ -78,64 +78,54 @@ function renderFindings(runs = RUNS) {
   );
 }
 
-describe("PR severity filter", () => {
-  it("counts findings across runs and opens only matching findings without requests", () => {
+describe("per-run severity filters", () => {
+  it("filters only the selected run, preserves the other run, and makes no requests", () => {
     const fetch = vi.fn();
     vi.stubGlobal("fetch", fetch);
     renderFindings();
-    expect(screen.getByRole("button", { name: "All (4)" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "1 WARNING" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "1 SUGGESTION" })).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "2 CRITICAL" }));
-    expect(screen.getByText("Missing access check")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /General reviewer/ }));
+    const groups = screen.getAllByRole("group", { name: "Filter findings by severity" });
+    fireEvent.click(within(groups[0]!).getByRole("button", { name: "Warning" }));
+    expect(screen.queryByText("Missing access check")).not.toBeInTheDocument();
+    expect(screen.getByText("Uncertain warning")).toBeInTheDocument();
     expect(screen.getByText("Unchecked input")).toBeInTheDocument();
-    expect(screen.queryByText("Uncertain warning")).not.toBeInTheDocument();
-    expect(screen.queryByText("Simplify condition")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "2 CRITICAL" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Simplify condition")).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("switches severity and restores all findings by clicking the active filter", () => {
+  it("restores the run by clicking its selected filter again", () => {
     renderFindings();
-    fireEvent.click(screen.getByRole("button", { name: "1 SUGGESTION" }));
-    expect(screen.getByText("Simplify condition")).toBeInTheDocument();
-    expect(screen.queryByText("Missing access check")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "1 WARNING" }));
+    fireEvent.click(screen.getByRole("button", { name: "Critical" }));
+    expect(screen.queryByText("Uncertain warning")).not.toBeInTheDocument();
+    expect(screen.queryByText("1 WARNING")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Critical" }));
     expect(screen.getByText("Uncertain warning")).toBeInTheDocument();
-    expect(screen.queryByText("Simplify condition")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "1 WARNING" }));
-    expect(screen.getByRole("button", { name: "All (4)" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText("Missing access check")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /General reviewer/ })).toBeInTheDocument();
+    expect(screen.getByText("1 WARNING")).toBeInTheDocument();
   });
 
-  it("handles an empty level and lets All restore the list", () => {
+  it("shows the empty state for an absent level and resets by repeat-click", () => {
     renderFindings([RUNS[0]!]);
-    fireEvent.click(screen.getByRole("button", { name: "0 SUGGESTION" }));
+    fireEvent.click(screen.getByRole("button", { name: "Suggestion" }));
     expect(screen.getByText("No findings match")).toBeInTheDocument();
-    expect(screen.queryByText("Missing access check")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "1 CRITICAL" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "All (2)" }));
+    expect(screen.queryByText("1 CRITICAL")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Suggestion" }));
     expect(screen.getByText("Missing access check")).toBeInTheDocument();
   });
 
-  it("shows zero counters for a PR with no findings", () => {
+  it("keeps a PR with no runs empty", () => {
     renderFindings([]);
-    expect(screen.getByRole("button", { name: "All (0)" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "0 CRITICAL" })).toBeInTheDocument();
+    expect(screen.queryByRole("group")).not.toBeInTheDocument();
     expect(screen.getByText("No findings yet")).toBeInTheDocument();
   });
 
-  it("keeps severity totals when the confidence toggle hides a matching finding", () => {
+  it("counts only rendered cards after confidence filtering", () => {
     renderFindings();
-    fireEvent.click(screen.getByRole("button", { name: "1 WARNING" }));
-    expect(screen.getByText("Uncertain warning")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Warning" }));
     fireEvent.click(screen.getByRole("switch"));
     expect(screen.queryByText("Uncertain warning")).not.toBeInTheDocument();
+    expect(screen.queryByText("1 WARNING")).not.toBeInTheDocument();
     expect(screen.getByText("No findings match")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "1 WARNING" })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByRole("switch"));
-    expect(screen.getByText("Uncertain warning")).toBeInTheDocument();
+    expect(screen.getByText("1 WARNING")).toBeInTheDocument();
   });
 });

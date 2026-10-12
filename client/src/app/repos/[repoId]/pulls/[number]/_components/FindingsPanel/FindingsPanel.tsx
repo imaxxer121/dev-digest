@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { Toggle, EmptyState } from "@devdigest/ui";
 import type { FindingRecord, Severity } from "@devdigest/shared";
 import { FindingCard } from "../FindingCard";
+import { SeverityFilter } from "../SeverityFilter";
 import { useFindingAction } from "../../../../../../../lib/hooks/reviews";
 import { KEY_TO_ACTION } from "./constants";
 import { visibleFindings } from "./helpers";
@@ -14,13 +15,11 @@ import { s } from "./styles";
 
 export function FindingsPanel({
   findings,
-  severity = null,
   prId,
   repoFullName,
   headSha,
 }: {
   findings: FindingRecord[];
-  severity?: Severity | null;
   prId: string;
   repoFullName?: string | null;
   headSha?: string | null;
@@ -28,6 +27,7 @@ export function FindingsPanel({
   const t = useTranslations("prReview");
   const action = useFindingAction();
   const [hideLow, setHideLow] = React.useState(false);
+  const [severity, setSeverity] = React.useState<Severity | null>(null);
   const [focusIdx, setFocusIdx] = React.useState(0);
 
   const shown = React.useMemo(
@@ -53,6 +53,7 @@ export function FindingsPanel({
 
   return (
     <div>
+      <SeverityFilter findings={visibleFindings(findings, hideLow)} shown={shown} value={severity} onChange={setSeverity} />
       <div style={s.toolbar}>
         <div style={s.toggleGroup}>
           {t("panel.hideLowConfidence")}

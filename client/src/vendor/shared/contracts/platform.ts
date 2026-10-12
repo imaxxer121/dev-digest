@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Provider } from './knowledge.js';
+import { Finding } from './findings.js';
 
 /**
  * Platform / scaffolding DTOs owned by F1:
@@ -170,6 +171,12 @@ export const PrMeta = z.object({
   updated_at: z.string().nullish(),
   // Latest-review score (list endpoint only; null/absent until reviewed).
   score: z.number().int().nullish(),
+  // Total cost (USD) of all successful runs (list endpoint only). null/absent
+  // when the PR has no priced run yet; UI shows "—", not "$0".
+  cost_usd: z.number().nullish(),
+  // Findings of the latest persisted review run (list endpoint only).
+  // Preview chips derive their counts from these records without inference.
+  findings: z.array(Finding).nullish(),
 });
 export type PrMeta = z.infer<typeof PrMeta>;
 

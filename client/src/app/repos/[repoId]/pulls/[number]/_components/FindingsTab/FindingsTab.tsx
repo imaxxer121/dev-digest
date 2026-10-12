@@ -6,9 +6,8 @@ import { Icon, Badge, Button, SectionLabel, EmptyState } from "@devdigest/ui";
 import { RunStatus } from "../RunStatus";
 import { RunHistory } from "../RunHistory/RunHistory";
 import { ReviewRunAccordion } from "../ReviewRunAccordion";
-import { SeverityFilter } from "../SeverityFilter";
 import { s } from "./styles";
-import type { FindingRecord, ReviewRecord, RunSummary, PrCommit, Severity } from "@devdigest/shared";
+import type { FindingRecord, ReviewRecord, RunSummary, PrCommit } from "@devdigest/shared";
 import type { UseMutationResult } from "@tanstack/react-query";
 
 interface FindingsTabProps {
@@ -44,11 +43,6 @@ export function FindingsTab({
   onRunDone,
 }: FindingsTabProps) {
   const t = useTranslations("prReview");
-  const [severity, setSeverity] = React.useState<Severity | null>(null);
-  const allFindings = React.useMemo(() => runs.flatMap((run) => run.findings), [runs]);
-  const visibleRuns = severity
-    ? runs.filter((run) => run.findings.some((finding) => finding.severity === severity))
-    : runs;
 
   const handleCancelAll = useCallback(() => {
     liveRunIds.forEach((id) => cancelMutation.mutate(id));
@@ -153,7 +147,6 @@ export function FindingsTab({
       >
         Review runs
       </SectionLabel>
-      <SeverityFilter findings={allFindings} value={severity} onChange={setSeverity} />
       {runs.length === 0 ? (
         reviewRunning || liveRunIds.length > 0 ? null : (
           <EmptyState
@@ -162,21 +155,14 @@ export function FindingsTab({
             body="Run a review to generate findings. Use Run Review ▾ above (run all enabled agents or a specific one)."
           />
         )
-      ) : visibleRuns.length === 0 ? (
-        <EmptyState
-          icon="Filter"
-          title={t("panel.noMatchTitle")}
-          body={t("panel.noMatchBody")}
-        />
       ) : (
         prId &&
-        visibleRuns.map((review) => (
+        runs.map((review) => (
           <ReviewRunAccordion
             key={review.id}
             review={review}
             prId={prId}
-            defaultOpen={review.id === visibleRuns[0]?.id}
-            severity={severity}
+            defaultOpen={review.id === runs[0]?.id}
             repoFullName={repoFullName}
             headSha={headSha}
             targetRunId={target?.runId ?? null}
