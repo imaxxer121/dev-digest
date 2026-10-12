@@ -63,7 +63,7 @@ export const RunStats = z.object({
   tokens_in: z.number().int(),
   tokens_out: z.number().int(),
   /** Generation cost in USD; null when un-priced (UI shows "—", not "$0"). */
-  cost_usd: z.number().nullable(),
+  cost_usd: z.number().nullable().default(null),
   findings: z.number().int(),
   grounding: z.string(),
 });
