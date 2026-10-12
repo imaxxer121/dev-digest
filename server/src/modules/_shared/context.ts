@@ -19,5 +19,7 @@ export async function getContext(
     container.auth.currentUser(req),
     container.auth.currentWorkspace(req),
   ]);
-  return { workspaceId: workspace.id, userId: user.id };
+  const workspaceId = workspace.id;
+  const userId = user.id;
+  return { workspaceId, userId };
 }
