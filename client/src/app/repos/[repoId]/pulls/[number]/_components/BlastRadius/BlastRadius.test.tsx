@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { BlastRadius as BlastRadiusData } from "@devdigest/shared";
 import messages from "../../../../../../../../messages/en/blast.json";
+import brief from "../../../../../../../../messages/en/brief.json";
 import { api } from "@/lib/api";
 import { BlastRadius } from "./BlastRadius";
 import { OverviewTab } from "../OverviewTab";
@@ -27,7 +28,7 @@ const payload: BlastRadiusData = {
 
 function mount(ui = <BlastRadius prId={PR_ID} repoFullName="owner/repo" headSha="different-head" />) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(<QueryClientProvider client={client}><NextIntlClientProvider locale="en" messages={{ blast: messages }}>{ui}</NextIntlClientProvider></QueryClientProvider>);
+  return render(<QueryClientProvider client={client}><NextIntlClientProvider locale="en" messages={{ blast: messages, brief }}>{ui}</NextIntlClientProvider></QueryClientProvider>);
 }
 function stat(container: HTMLElement, key: string) {
   return container.querySelector(`[data-blast-stat="${key}"]`) as HTMLElement;
@@ -96,7 +97,8 @@ describe("Blast radius on PR Overview", () => {
   it("keeps loading and HTTP failure separate from empty results and retries without losing the description", async () => {
     let rejectRead!: (error: Error) => void;
     vi.mocked(api.get).mockReturnValueOnce(new Promise((_resolve, reject) => { rejectRead = reject; }));
-    mount(<OverviewTab prId={PR_ID} repoFullName="owner/repo" headSha={SHA} prBody="Preserved PR description" />);
+    mount(<OverviewTab prId={PR_ID} repoFullName="owner/repo" headSha={SHA} prBody="Preserved PR description"
+      brief={{ repoId: "repo1", loading: false, pending: false, onRetry: vi.fn(), onGenerate: vi.fn(), onFocus: vi.fn() }} />);
     expect(screen.getByText("Preserved PR description")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Loading the indexed impact map");
     expect(screen.queryByText(/no downstream callers/)).not.toBeInTheDocument();

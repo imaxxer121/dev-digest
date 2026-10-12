@@ -8,15 +8,21 @@ import { FileCard } from "../FileCard";
 import { hasOpenDraftFor, type DiffCommentApi } from "../comments";
 import { findingFileCount, type DiffFindingsApi } from "../findings";
 import { s, chevronFor } from "../styles";
+import type { DiffFocusTarget } from "../focus";
 
-export function RoleGroup({ role, files, commenting, reviewing }: {
+export function RoleGroup({ role, files, commenting, reviewing, focusTarget }: {
   role: SmartDiffRole;
   files: PrFile[];
   commenting?: DiffCommentApi;
   reviewing?: DiffFindingsApi;
+  focusTarget?: DiffFocusTarget | null;
 }) {
   const t = useTranslations("prReview.smartDiff");
-  const [open, setOpen] = React.useState((role !== "docs" && role !== "boilerplate") || files.some((file) => hasOpenDraftFor(file.path, commenting?.drafts)));
+  const containsTarget = files.some((file) => file.path === focusTarget?.file);
+  const [open, setOpen] = React.useState(containsTarget || (role !== "docs" && role !== "boilerplate") || files.some((file) => hasOpenDraftFor(file.path, commenting?.drafts)));
+  React.useEffect(() => {
+    if (containsTarget) setOpen(true);
+  }, [containsTarget, focusTarget?.file, focusTarget?.line]);
   const count = findingFileCount(files, reviewing?.findings ?? []);
   return (
     <section data-diff-role={role} style={s.group}>
@@ -27,7 +33,7 @@ export function RoleGroup({ role, files, commenting, reviewing }: {
         <span style={s.groupCount}>{t("findingFiles", { count })}</span>
       </button>
       {open && <div style={s.list}>
-        {files.map((file) => <FileCard key={file.path} file={file} commenting={commenting} reviewing={reviewing} />)}
+        {files.map((file) => <FileCard key={file.path} file={file} commenting={commenting} reviewing={reviewing} focusTarget={focusTarget} />)}
         {files.length === 0 && <div style={s.empty}>{t("emptyGroup")}</div>}
       </div>}
     </section>

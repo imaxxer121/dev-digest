@@ -123,10 +123,63 @@ export const SmartDiff = z.object({
 export type SmartDiff = z.infer<typeof SmartDiff>;
 
 // ---- Composed PR Brief (pr_brief.json) ----
+export const ReviewFocus = z.object({
+  file: z.string().min(1).max(1024),
+  line: z.number().int().positive(),
+  reason: z.string().min(1).max(1024),
+}).strict();
+export type ReviewFocus = z.infer<typeof ReviewFocus>;
+
+export const BriefOutput = z.object({
+  summary: z.string().min(1).max(1600),
+  risks: z.array(Risk.extend({
+    kind: z.string().min(1).max(80), title: z.string().min(1).max(180),
+    explanation: z.string().min(1).max(2048),
+    file_refs: z.array(z.string().min(1).max(1024)).min(1).max(16),
+  }).strict()).max(8),
+  review_focus: z.array(ReviewFocus).max(8),
+}).strict();
+export type BriefOutput = z.infer<typeof BriefOutput>;
+
+export const BriefSource = z.object({
+  source: z.string(), status: z.enum(['available', 'missing', 'unavailable']),
+  reason: z.string().nullable(), truncated: z.boolean(),
+  total_count: z.number().int().nonnegative(), included_count: z.number().int().nonnegative(),
+});
+export type BriefSource = z.infer<typeof BriefSource>;
+export const BriefSpecSource = z.object({
+  path: z.string(), digest: z.string().length(64),
+  original_bytes: z.number().int().nonnegative(), included_bytes: z.number().int().nonnegative(),
+});
+export const BriefProvenance = z.object({
+  description: BriefSource, intent: BriefSource, blast: BriefSource, files: BriefSource,
+  linked_issue: BriefSource, specs: BriefSource,
+  intent_sha_coverage: z.literal('unknown'), indexed_sha: z.string().nullable(),
+  specs_included: z.array(BriefSpecSource),
+});
+export type BriefProvenance = z.infer<typeof BriefProvenance>;
+export const BriefGeneration = z.object({
+  call_id: z.string().uuid(), provider: z.string(), model: z.string(),
+  application_calls: z.literal(1), attempts: z.literal(1),
+  measured_payload_bytes: z.number().int().nonnegative(), adapter_framing_allowance_bytes: z.literal(1024),
+  budgeted_input_bytes: z.number().int().max(32000), input_budget_bytes: z.literal(32000), budget_unit: z.literal('utf8_bytes'),
+  tokens_in: z.number().int().nonnegative(), tokens_out: z.number().int().nonnegative(),
+  cost_usd: z.number().nonnegative().nullable(), duration_ms: z.number().int().nonnegative(),
+  discarded_refs: z.number().int().nonnegative(), discarded_risks: z.number().int().nonnegative(),
+  discarded_focus: z.number().int().nonnegative(),
+});
+export type BriefGeneration = z.infer<typeof BriefGeneration>;
 export const PrBrief = z.object({
-  intent: Intent,
-  blast: BlastRadius,
+  version: z.literal(1), head_sha: z.string().min(1), generated_at: z.string().datetime(),
+  summary: BriefOutput.shape.summary, review_focus: z.array(ReviewFocus).max(8),
+  intent: Intent.nullable(),
+  blast: BlastRadius.nullable(),
   risks: Risks,
   history: PrHistory,
+  provenance: BriefProvenance, generation: BriefGeneration,
 });
 export type PrBrief = z.infer<typeof PrBrief>;
+export const BriefResponse = z.object({
+  brief: PrBrief.nullable(), current_head_sha: z.string().min(1), stale: z.boolean(),
+});
+export type BriefResponse = z.infer<typeof BriefResponse>;

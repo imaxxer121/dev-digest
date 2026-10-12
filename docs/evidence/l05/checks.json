@@ -1,0 +1,25 @@
+{
+  "server": {
+    "typecheck": "PASS",
+    "tests": 230,
+    "files": 39,
+    "command": "pnpm test",
+    "duration_seconds": 19.85,
+    "real_postgresql": true
+  },
+  "client": {
+    "typecheck": "PASS",
+    "tests": 103,
+    "files": 26,
+    "command": "node node_modules/vitest/vitest.mjs run",
+    "production_build": "pnpm build PASS (Next.js 15.5.19)"
+  },
+  "independent_verifier": {
+    "server_unit_tests": 10,
+    "postgresql_tests": 23,
+    "client_tests": 26,
+    "typechecks": "both PASS"
+  },
+  "contract_copies_identical": true,
+  "whitespace_passed": true
+}

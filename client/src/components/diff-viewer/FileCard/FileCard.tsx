@@ -20,6 +20,7 @@ import { s, chevronFor } from "../styles";
 import { CodeLine } from "../CodeLine";
 import { OutdatedComments } from "../OutdatedComments";
 import { partitionFindings, type DiffFindingsApi } from "../findings";
+import type { DiffFocusTarget } from "../focus";
 
 /** Threads anchored to a given parsed line (RIGHT=new, LEFT=old). */
 function threadsForLine(ln: Line, matched: Map<string, CommentThread[]>): CommentThread[] {
@@ -32,13 +33,27 @@ function threadsForLine(ln: Line, matched: Map<string, CommentThread[]>): Commen
   return out;
 }
 
-export function FileCard({ file, commenting, reviewing }: { file: PrFile; commenting?: DiffCommentApi; reviewing?: DiffFindingsApi }) {
+export function FileCard({ file, commenting, reviewing, focusTarget }: { file: PrFile; commenting?: DiffCommentApi; reviewing?: DiffFindingsApi; focusTarget?: DiffFocusTarget | null }) {
   const t = useTranslations("shell");
   const smart = useTranslations("prReview.smartDiff");
+  const brief = useTranslations("brief");
+  const isTarget = focusTarget?.file === file.path;
   const [open, setOpen] = React.useState(
-    (file.additions ?? 0) + (file.deletions ?? 0) <= AUTO_EXPAND_MAX_LINES || hasOpenDraftFor(file.path, commenting?.drafts)
+    isTarget || (file.additions ?? 0) + (file.deletions ?? 0) <= AUTO_EXPAND_MAX_LINES || hasOpenDraftFor(file.path, commenting?.drafts)
   );
   const lines = React.useMemo(() => parsePatch(file.patch), [file.patch]);
+  const headerRef = React.useRef<HTMLButtonElement>(null);
+  const rowRef = React.useRef<HTMLDivElement>(null);
+  const targetRowIndex = isTarget ? lines.findIndex((line) => line.newNo === focusTarget?.line) : -1;
+  React.useEffect(() => {
+    if (isTarget) setOpen(true);
+  }, [isTarget, focusTarget?.line]);
+  React.useEffect(() => {
+    if (!isTarget || !open) return;
+    const element = targetRowIndex >= 0 ? rowRef.current : headerRef.current;
+    element?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+    element?.focus({ preventScroll: true });
+  }, [isTarget, focusTarget?.line, open, targetRowIndex]);
   const fileFindings = (reviewing?.findings ?? []).filter((f) => f.file === file.path);
   const { byRow, outside } = partitionFindings(lines, fileFindings);
   const dotSeverity = (["CRITICAL", "WARNING", "SUGGESTION", "INFO"] as Severity[])
@@ -61,7 +76,7 @@ export function FileCard({ file, commenting, reviewing }: { file: PrFile; commen
 
   return (
     <div style={s.fileCard} data-diff-file={file.path}>
-      <button type="button" aria-expanded={open} aria-label={file.path} onClick={() => setOpen((o) => !o)} style={s.fileHeader}>
+      <button ref={headerRef} type="button" aria-expanded={open} aria-label={file.path} onClick={() => setOpen((o) => !o)} style={s.fileHeader}>
         <Icon.ChevronRight size={13} style={chevronFor(open)} />
         <Icon.FileText size={14} style={s.fileIcon} />
         <span className="mono" style={s.filePath}>
@@ -88,6 +103,9 @@ export function FileCard({ file, commenting, reviewing }: { file: PrFile; commen
       </button>
       {open && (
         <div style={s.fileBody}>
+          {isTarget && targetRowIndex < 0 && <p role="status" style={{ padding: "8px 14px", color: "var(--warn)", fontSize: 13 }}>
+            {brief("focus.lineMissing", { file: file.path, line: focusTarget!.line })}
+          </p>}
           {lines.length === 0 ? (
             <div style={s.noDiff}>{t("diffViewer.noDiffText")}</div>
           ) : (
@@ -100,6 +118,7 @@ export function FileCard({ file, commenting, reviewing }: { file: PrFile; commen
                 commenting={commenting}
                 findings={byRow.get(i) ?? []}
                 reviewing={reviewing}
+                focusRef={i === targetRowIndex ? rowRef : undefined}
               />
             ))
           )}

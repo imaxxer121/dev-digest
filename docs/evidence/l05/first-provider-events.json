@@ -1,0 +1,27 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a131c4-8c36-7f53-a77b-940194bf920f"
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "agent_message",
+      "text": "{\"summary\":\"PR #10 describes a behavior-preserving refactor of shared getContext in server/src/modules/_shared/context.ts. The cached impact map matches the PR head and reports 2 symbols, 8 route callers and 27 endpoints. No saved intent or linked issue explains a broader motivation; the supplied specification is a truncated acceptance plan, not validation evidence.\",\"risks\":[{\"kind\":\"regression\",\"title\":\"Shared context changes may affect multiple routes\",\"explanation\":\"An unintended behavior change could propagate through the 8 indexed route callers and 27 affected endpoints. The supplied facts establish potential reach, but do not verify implementation behavior or test coverage.\",\"severity\":\"medium\",\"file_refs\":[\"server/src/modules/_shared/context.ts\",\"server/src/modules/agents/routes.ts\",\"server/src/modules/polling/routes.ts\",\"server/src/modules/pulls/routes.ts\",\"server/src/modules/repo-intel/routes.ts\",\"server/src/modules/repos/routes.ts\",\"server/src/modules/reviews/routes.ts\",\"server/src/modules/settings/routes.ts\",\"server/src/modules/workspace/routes.ts\"]}],\"review_focus\":[{\"file\":\"server/src/modules/_shared/context.ts\",\"line\":19,\"reason\":\"Review the shared getContext refactor for preservation of its existing caller contract; this is the sole supplied changed file.\"},{\"file\":\"server/src/modules/pulls/routes.ts\",\"line\":27,\"reason\":\"Check an indexed route caller for compatibility with the refactored shared context.\"}]}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 13822,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 300,
+      "reasoning_output_tokens": 0
+    }
+  }
+]

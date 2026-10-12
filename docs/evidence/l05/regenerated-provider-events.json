@@ -1,0 +1,27 @@
+[
+  {
+    "type": "thread.started",
+    "thread_id": "01a131cb-91ae-7c40-9f67-d6daaa1f8f48"
+  },
+  {
+    "type": "turn.started"
+  },
+  {
+    "type": "item.completed",
+    "item": {
+      "id": "item_0",
+      "type": "agent_message",
+      "text": "{\"summary\":\"The PR describes a behavior-preserving refactor of shared getContext for an L04 blast-radius demo, changing server/src/modules/_shared/context.ts. The cached index matches PR head and reports 2 symbols, 8 route callers and 27 endpoints. Implementation and behavior preservation cannot be verified from the supplied metadata.\",\"risks\":[{\"kind\":\"regression\",\"title\":\"Shared context changes could affect multiple routes\",\"explanation\":\"An unintended behavior change in getContext could propagate across the 8 indexed route callers and 27 reported endpoints. This is potential exposure, not evidence of a defect; no diff or test results were supplied.\",\"severity\":\"medium\",\"file_refs\":[\"server/src/modules/_shared/context.ts\",\"server/src/modules/agents/routes.ts\",\"server/src/modules/polling/routes.ts\",\"server/src/modules/pulls/routes.ts\",\"server/src/modules/repo-intel/routes.ts\",\"server/src/modules/repos/routes.ts\",\"server/src/modules/reviews/routes.ts\",\"server/src/modules/settings/routes.ts\",\"server/src/modules/workspace/routes.ts\"]}],\"review_focus\":[{\"file\":\"server/src/modules/_shared/context.ts\",\"line\":19,\"reason\":\"Review the shared getContext refactor for preservation of existing behavior, given its indexed reach across 8 route callers.\"}]}"
+    }
+  },
+  {
+    "type": "turn.completed",
+    "usage": {
+      "input_tokens": 13824,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 266,
+      "reasoning_output_tokens": 0
+    }
+  }
+]

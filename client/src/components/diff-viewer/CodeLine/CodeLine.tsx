@@ -20,6 +20,7 @@ export function CodeLine({
   commenting,
   findings = [],
   reviewing,
+  focusRef,
 }: {
   ln: Line;
   path: string;
@@ -27,6 +28,7 @@ export function CodeLine({
   commenting?: DiffCommentApi;
   findings?: FindingRecord[];
   reviewing?: DiffFindingsApi;
+  focusRef?: React.Ref<HTMLDivElement>;
 }) {
   const [hover, setHover] = React.useState(false);
   const [composing, setComposing] = React.useState(false);
@@ -56,6 +58,9 @@ export function CodeLine({
 
   return (
     <div
+      ref={focusRef}
+      tabIndex={focusRef ? -1 : undefined}
+      data-diff-focused={focusRef ? true : undefined}
       data-diff-row={ln.newNo != null ? `RIGHT:${ln.newNo}` : `LEFT:${ln.oldNo}`}
       style={cs.rowWrap}
       onMouseEnter={() => setHover(true)}

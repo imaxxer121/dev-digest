@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from "next-intl";
 import type { FindingRecord, ReviewRecord, SmartDiffResponse } from "@devdigest/shared";
 import messages from "../../../../../../../../messages/en/prReview.json";
 import shell from "../../../../../../../../messages/en/shell.json";
+import brief from "../../../../../../../../messages/en/brief.json";
 import { api } from "@/lib/api";
 import { DiffTab, latestReview } from "./DiffTab";
 
@@ -42,7 +43,7 @@ beforeEach(() => {
 });
 function mount() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
-  render(<QueryClientProvider client={client}><NextIntlClientProvider locale="en" messages={{ prReview: messages, shell }}><DiffTab prId="p1" files={[file]} filesCount={1} repoFullName="owner/repo" headSha="abc123" /></NextIntlClientProvider></QueryClientProvider>);
+  render(<QueryClientProvider client={client}><NextIntlClientProvider locale="en" messages={{ prReview: messages, shell, brief }}><DiffTab prId="p1" files={[file]} filesCount={1} repoFullName="owner/repo" headSha="abc123" /></NextIntlClientProvider></QueryClientProvider>);
   return client;
 }
 

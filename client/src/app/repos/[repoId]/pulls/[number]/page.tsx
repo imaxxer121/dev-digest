@@ -22,6 +22,9 @@ import { useActiveRepo, useRepoNotFound } from "../../../../../lib/repo-context"
 import { ApiError } from "../../../../../lib/api";
 import { githubPrUrl } from "../../../../../lib/github-urls";
 import type { FindingRecord } from "@devdigest/shared";
+import { usePrBrief, useGeneratePrBrief } from "@/lib/hooks/brief";
+import { readDiffFocus, diffFocusHref } from "./focus";
+import type { DiffFocusTarget } from "@/components/diff-viewer";
 
 export default function PRDetailPage() {
   const params = useParams<{ repoId: string; number: string }>();
@@ -35,6 +38,8 @@ export default function PRDetailPage() {
   const { data: pulls, isLoading: pullsLoading } = usePulls(repoId);
   const prId = pulls?.find((p) => p.number === Number(number))?.id ?? null;
   const { data: pr, isLoading: detailLoading, isError, error, refetch } = usePullDetail(prId);
+  const brief = usePrBrief(prId);
+  const generateBrief = useGeneratePrBrief(prId);
 
   const isLoading = pullsLoading || (prId != null && detailLoading);
   const { data: reviews, refetch: refetchReviews } = usePrReviews(prId);
@@ -42,6 +47,9 @@ export default function PRDetailPage() {
   // Live run tracking is SERVER-SOURCED (agent_runs status='running'): survives
   // navigation AND reload, and self-clears via polling when runs finish.
   const qc = useQueryClient();
+  React.useEffect(() => {
+    if (prId && pr?.head_sha) qc.invalidateQueries({ queryKey: ["pr-brief", prId] });
+  }, [qc, prId, pr?.head_sha]);
   const { data: activeRuns } = usePrActiveRuns(prId);
   const { data: prRuns } = usePrRuns(prId);
   usePrReviewRefresh(prId, prRuns, activeRuns);
@@ -67,6 +75,9 @@ export default function PRDetailPage() {
     router.replace(`/repos/${repoId}/pulls/${number}${sp.toString() ? `?${sp.toString()}` : ""}`);
   };
   const setTab = (t: string) => setParam("tab", t);
+  const focusTarget = readDiffFocus(new URLSearchParams(search.toString()));
+  const focusFile = (target: DiffFocusTarget) =>
+    router.replace(diffFocusHref(repoId, number, new URLSearchParams(search.toString()), target));
 
   // Reviews come newest-first; each is its own run (grouped into accordions).
   const runs = reviews ?? [];
@@ -135,7 +146,9 @@ export default function PRDetailPage() {
       />
 
       <div style={{ padding: "24px 32px 44px", display: "flex", flexDirection: "column", gap: 24, maxWidth: 1080, margin: "0 auto" }}>
-        {tab === "overview" && <OverviewTab prBody={pr.body} prId={prId} repoFullName={repoFullName} headSha={pr.head_sha} />}
+        {tab === "overview" && <OverviewTab prBody={pr.body} prId={prId} repoFullName={repoFullName} headSha={pr.head_sha}
+          brief={{ response: brief.data, loading: brief.isLoading, loadError: brief.error, pending: generateBrief.isPending,
+            generationError: generateBrief.error, repoId, onRetry: () => void brief.refetch(), onGenerate: () => generateBrief.mutate(), onFocus: focusFile }} />}
 
         {tab === "findings" && (
           <FindingsTab
@@ -170,6 +183,7 @@ export default function PRDetailPage() {
             prId={prId}
             filesCount={pr.files_count}
             files={pr.files}
+            focusTarget={focusTarget}
             canComment={pr.status === "open"}
             repoFullName={repoFullName}
             headSha={pr.head_sha}

@@ -1,5 +1,32 @@
 # Client engineering insights
 
+## 2026-10-12 — PR Brief is explicit and focus follows real RIGHT rows
+
+Runtime Zod imports must target the contract directly: the shared barrel's
+`.js` exports failed Next.js resolution when introduced by the Brief hook.
+`src/lib/hooks/brief.ts:4` imports the root-owned DTO schema directly; GET
+validates the cached envelope and POST alone generates. Capture the original
+PR/repository in mutation context before awaiting, so navigation during a
+generation/save cannot put its result in the next route's cache
+(`src/lib/hooks/brief.ts:26`, `src/lib/hooks/core.ts:160`). List reads that find
+a changed head invalidate detail, Brief, Smart Diff and Blast queries without
+generating (`src/lib/hooks/core.ts:117`).
+
+Diff focus opens the target's group/file on mount or target change, then uses
+the actual RIGHT-row ref; LEFT-only/missing lines scroll to the header with an
+explicit notice (`src/components/diff-viewer/FileCard/FileCard.tsx:47`).
+Exact path identity handles Unicode, brackets and quotes without interpolated
+selectors. Users can collapse a handled target; mode switches retain existing
+comment drafts. Caller-only paths show the indexed-snapshot limitation.
+
+`pnpm typecheck` passed, and `node node_modules/vitest/vitest.mjs run` passed
+103 tests across 26 files. The latter used approved escalation because the
+local sandbox denied Vitest config resolution; it is the package test script's
+configured runner. New tests prove explicit Generate/Regenerate, error cache
+retention, scoped context save/reload, navigation races, stale-head GET refresh,
+and precise grouped/original focus and fallbacks. These are fixture/API-mock
+checks; actual inference and browser evidence are owned by the primary agent.
+
 ## 2026-10-12 — Per-run filtering and visible counters
 
 The separate homework rubric requires each run to own its selection and the

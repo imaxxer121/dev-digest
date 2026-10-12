@@ -90,6 +90,7 @@ export function useRefreshRepo() {
         qc.invalidateQueries({ queryKey: ["pull", pull.id] });
         qc.invalidateQueries({ queryKey: ["smart-diff", pull.id] });
         qc.invalidateQueries({ queryKey: ["blast-radius", pull.id] });
+        qc.invalidateQueries({ queryKey: ["pr-brief", pull.id] });
       }
     },
   });
@@ -105,9 +106,23 @@ export function useDeleteRepo() {
 
 // ---- Pull requests (F1: GET /repos/:id/pulls, GET /pulls/:id) ----
 export function usePulls(repoId: string | null | undefined) {
+  const qc = useQueryClient();
   return useQuery({
     queryKey: ["pulls", repoId],
-    queryFn: () => api.get<PrMeta[]>(`/repos/${repoId}/pulls`),
+    queryFn: async () => {
+      const before = qc.getQueryData<PrMeta[]>(["pulls", repoId]);
+      const pulls = await api.get<PrMeta[]>(`/repos/${repoId}/pulls`);
+      for (const pull of pulls) {
+        const previous = before?.find((item) => item.id === pull.id);
+        if (previous && previous.head_sha !== pull.head_sha) {
+          qc.invalidateQueries({ queryKey: ["pull", pull.id] });
+          qc.invalidateQueries({ queryKey: ["pr-brief", pull.id] });
+          qc.invalidateQueries({ queryKey: ["smart-diff", pull.id] });
+          qc.invalidateQueries({ queryKey: ["blast-radius", pull.id] });
+        }
+      }
+      return pulls;
+    },
     enabled: !!repoId,
     // Auto-refresh PR statuses: re-sync from GitHub every 60s while the page is
     // open, and whenever the window regains focus.
@@ -130,6 +145,26 @@ export function useContextFiles(repoId: string | null | undefined) {
     queryKey: ["context", repoId],
     queryFn: () => api.get<SpecFile[]>(`/repos/${repoId}/context`),
     enabled: !!repoId,
+  });
+}
+
+export function useSaveContextFile(repoId: string | null | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: ["save-context", repoId],
+    mutationFn: (input: { path: string; content: string }) => {
+      if (!repoId) throw new Error("Repository identity is unavailable");
+      return api.put<SpecFile>(`/repos/${repoId}/context`, input);
+    },
+    retry: false,
+    onMutate: () => ({ repoId }),
+    onSuccess: (saved, _variables, context) => {
+      const savedRepo = context?.repoId;
+      qc.setQueryData<SpecFile[]>(["context", savedRepo], (before) =>
+        [...(before ?? []).filter((file) => file.path !== saved.path), saved]
+          .sort((a, b) => a.path.localeCompare(b.path)));
+      qc.invalidateQueries({ queryKey: ["context", savedRepo] });
+    },
   });
 }
 

@@ -1,0 +1,230 @@
+{
+  "brief": {
+    "version": 1,
+    "head_sha": "674794b9af6a7592251755c134441ee589a72134",
+    "generated_at": "2026-10-12T20:26:36.616Z",
+    "summary": "The PR describes a behavior-preserving refactor of shared getContext for an L04 blast-radius demo, changing server/src/modules/_shared/context.ts. The cached index matches PR head and reports 2 symbols, 8 route callers and 27 endpoints. Implementation and behavior preservation cannot be verified from the supplied metadata.",
+    "review_focus": [
+      {
+        "file": "server/src/modules/_shared/context.ts",
+        "line": 19,
+        "reason": "Review the shared getContext refactor for preservation of existing behavior, given its indexed reach across 8 route callers."
+      }
+    ],
+    "intent": null,
+    "blast": {
+      "changed_symbols": [
+        {
+          "name": "getContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "function"
+        },
+        {
+          "name": "RequestContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "interface"
+        }
+      ],
+      "downstream": [
+        {
+          "symbol": "getContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [
+            {
+              "name": "repoIntelRoutes",
+              "file": "server/src/modules/repo-intel/routes.ts",
+              "line": 38
+            },
+            {
+              "name": "agentsRoutes",
+              "file": "server/src/modules/agents/routes.ts",
+              "line": 75
+            },
+            {
+              "name": "pollingRoutes",
+              "file": "server/src/modules/polling/routes.ts",
+              "line": 21
+            },
+            {
+              "name": "pullsRoutes",
+              "file": "server/src/modules/pulls/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reposRoutes",
+              "file": "server/src/modules/repos/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reviewsRoutes",
+              "file": "server/src/modules/reviews/routes.ts",
+              "line": 31
+            },
+            {
+              "name": "settingsRoutes",
+              "file": "server/src/modules/settings/routes.ts",
+              "line": 29
+            },
+            {
+              "name": "workspaceRoutes",
+              "file": "server/src/modules/workspace/routes.ts",
+              "line": 17
+            }
+          ],
+          "endpoints_affected": [
+            "DELETE /agents/:id",
+            "DELETE /repos/:id",
+            "DELETE /reviews/:id",
+            "DELETE /runs/:id",
+            "GET /agents",
+            "GET /agents/:id",
+            "GET /agents/:id/models",
+            "GET /agents/:id/skills",
+            "GET /agents/:id/versions",
+            "GET /providers/:id/models",
+            "GET /pulls/:id",
+            "GET /pulls/:id/reviews",
+            "GET /pulls/:id/runs",
+            "GET /pulls/:id/runs/active",
+            "GET /repos",
+            "GET /repos/:id/pulls",
+            "GET /runs/:id/trace",
+            "GET /settings",
+            "GET /settings/secrets-status",
+            "GET /workspace",
+            "POST /agents",
+            "POST /findings/:id/${action}",
+            "POST /repos",
+            "POST /repos/:id/poll",
+            "POST /repos/:id/refresh",
+            "POST /runs/:id/cancel",
+            "PUT /settings"
+          ],
+          "crons_affected": []
+        },
+        {
+          "symbol": "RequestContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [],
+          "endpoints_affected": [],
+          "crons_affected": []
+        }
+      ],
+      "summary": "2 symbols · 8 callers · 27 endpoints · 0 cron/jobs",
+      "degraded": false,
+      "reason": null,
+      "indexed_sha": "674794b9af6a7592251755c134441ee589a72134",
+      "counts": {
+        "symbols": 2,
+        "callers": 8,
+        "endpoints": 27,
+        "crons": 0
+      }
+    },
+    "risks": {
+      "risks": [
+        {
+          "kind": "regression",
+          "title": "Shared context changes could affect multiple routes",
+          "explanation": "An unintended behavior change in getContext could propagate across the 8 indexed route callers and 27 reported endpoints. This is potential exposure, not evidence of a defect; no diff or test results were supplied.",
+          "severity": "medium",
+          "file_refs": [
+            "server/src/modules/_shared/context.ts",
+            "server/src/modules/agents/routes.ts",
+            "server/src/modules/polling/routes.ts",
+            "server/src/modules/pulls/routes.ts",
+            "server/src/modules/repo-intel/routes.ts",
+            "server/src/modules/repos/routes.ts",
+            "server/src/modules/reviews/routes.ts",
+            "server/src/modules/settings/routes.ts",
+            "server/src/modules/workspace/routes.ts"
+          ]
+        }
+      ]
+    },
+    "history": {
+      "history": []
+    },
+    "provenance": {
+      "description": {
+        "source": "persisted-pr",
+        "status": "available",
+        "reason": null,
+        "truncated": false,
+        "total_count": 1,
+        "included_count": 1
+      },
+      "intent": {
+        "source": "pr_intent",
+        "status": "missing",
+        "reason": "No saved Intent",
+        "truncated": false,
+        "total_count": 0,
+        "included_count": 0
+      },
+      "blast": {
+        "source": "persisted-repo-intel",
+        "status": "available",
+        "reason": null,
+        "truncated": false,
+        "total_count": 8,
+        "included_count": 8
+      },
+      "files": {
+        "source": "pr_files",
+        "status": "available",
+        "reason": null,
+        "truncated": false,
+        "total_count": 1,
+        "included_count": 1
+      },
+      "linked_issue": {
+        "source": "github-issue",
+        "status": "missing",
+        "reason": "not_linked",
+        "truncated": false,
+        "total_count": 0,
+        "included_count": 0
+      },
+      "specs": {
+        "source": "project-context/spec",
+        "status": "available",
+        "reason": null,
+        "truncated": true,
+        "total_count": 1,
+        "included_count": 1
+      },
+      "intent_sha_coverage": "unknown",
+      "indexed_sha": "674794b9af6a7592251755c134441ee589a72134",
+      "specs_included": [
+        {
+          "path": "specs/l04-blast-radius.md",
+          "digest": "29fe52449d321b40caf137206a591fb2702a488d92f7bd75fb06c473a50d6bb3",
+          "original_bytes": 14387,
+          "included_bytes": 7365
+        }
+      ]
+    },
+    "generation": {
+      "call_id": "a42a3859-08e4-45eb-834c-dc114c05dbc9",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "application_calls": 1,
+      "attempts": 1,
+      "measured_payload_bytes": 12314,
+      "adapter_framing_allowance_bytes": 1024,
+      "budgeted_input_bytes": 13338,
+      "input_budget_bytes": 32000,
+      "budget_unit": "utf8_bytes",
+      "tokens_in": 13824,
+      "tokens_out": 266,
+      "cost_usd": null,
+      "duration_ms": 9957,
+      "discarded_refs": 0,
+      "discarded_risks": 0,
+      "discarded_focus": 0
+    }
+  },
+  "current_head_sha": "674794b9af6a7592251755c134441ee589a72134",
+  "stale": false
+}
