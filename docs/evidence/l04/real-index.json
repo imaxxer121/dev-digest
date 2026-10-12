@@ -1,0 +1,197 @@
+{
+  "result": {
+    "status": "full",
+    "filesIndexed": 312,
+    "filesSkipped": 0,
+    "durationMs": 2688
+  },
+  "state": {
+    "repoId": "7b59db39-cd55-4c11-8690-faf47a579983",
+    "status": "full",
+    "filesIndexed": 312,
+    "filesSkipped": 0,
+    "durationMs": 2686,
+    "lastIndexedSha": "674794b9af6a7592251755c134441ee589a72134",
+    "indexerVersion": 2,
+    "updatedAt": "2026-10-12T18:55:17.088Z"
+  },
+  "blast": {
+    "changedSymbols": [
+      {
+        "file": "server/src/modules/_shared/context.ts",
+        "name": "getContext",
+        "kind": "function"
+      },
+      {
+        "file": "server/src/modules/_shared/context.ts",
+        "name": "RequestContext",
+        "kind": "interface"
+      }
+    ],
+    "callers": [
+      {
+        "file": "server/src/modules/repo-intel/routes.ts",
+        "symbol": "repoIntelRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 38,
+        "rank": 0.0020571774371397253
+      },
+      {
+        "file": "server/src/modules/agents/routes.ts",
+        "symbol": "agentsRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 75,
+        "rank": 0.001790593698583974
+      },
+      {
+        "file": "server/src/modules/polling/routes.ts",
+        "symbol": "pollingRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 21,
+        "rank": 0.001790593698583974
+      },
+      {
+        "file": "server/src/modules/pulls/routes.ts",
+        "symbol": "pullsRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 27,
+        "rank": 0.001790593698583974
+      },
+      {
+        "file": "server/src/modules/repos/routes.ts",
+        "symbol": "reposRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 27,
+        "rank": 0.001790593698583974
+      },
+      {
+        "file": "server/src/modules/reviews/routes.ts",
+        "symbol": "reviewsRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 31,
+        "rank": 0.001790593698583974
+      },
+      {
+        "file": "server/src/modules/settings/routes.ts",
+        "symbol": "settingsRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 29,
+        "rank": 0.001790593698583974
+      },
+      {
+        "file": "server/src/modules/workspace/routes.ts",
+        "symbol": "workspaceRoutes",
+        "viaSymbol": "getContext",
+        "viaFile": "server/src/modules/_shared/context.ts",
+        "line": 17,
+        "rank": 0.001790593698583974
+      }
+    ],
+    "impactedEndpoints": [
+      "DELETE /agents/:id",
+      "DELETE /repos/:id",
+      "DELETE /reviews/:id",
+      "DELETE /runs/:id",
+      "GET /agents",
+      "GET /agents/:id",
+      "GET /agents/:id/models",
+      "GET /agents/:id/skills",
+      "GET /agents/:id/versions",
+      "GET /providers/:id/models",
+      "GET /pulls/:id",
+      "GET /pulls/:id/reviews",
+      "GET /pulls/:id/runs",
+      "GET /pulls/:id/runs/active",
+      "GET /repos",
+      "GET /repos/:id/pulls",
+      "GET /runs/:id/trace",
+      "GET /settings",
+      "GET /settings/secrets-status",
+      "GET /workspace",
+      "POST /agents",
+      "POST /findings/:id/${action}",
+      "POST /repos",
+      "POST /repos/:id/poll",
+      "POST /repos/:id/refresh",
+      "POST /runs/:id/cancel",
+      "PUT /settings"
+    ],
+    "factsByFile": {
+      "server/src/modules/repo-intel/routes.ts": {
+        "endpoints": [],
+        "crons": []
+      },
+      "server/src/modules/agents/routes.ts": {
+        "endpoints": [
+          "DELETE /agents/:id",
+          "GET /agents",
+          "GET /agents/:id",
+          "GET /agents/:id/models",
+          "GET /agents/:id/skills",
+          "GET /agents/:id/versions",
+          "GET /providers/:id/models",
+          "POST /agents"
+        ],
+        "crons": []
+      },
+      "server/src/modules/polling/routes.ts": {
+        "endpoints": [
+          "POST /repos/:id/poll"
+        ],
+        "crons": []
+      },
+      "server/src/modules/pulls/routes.ts": {
+        "endpoints": [
+          "GET /pulls/:id",
+          "GET /repos/:id/pulls"
+        ],
+        "crons": []
+      },
+      "server/src/modules/repos/routes.ts": {
+        "endpoints": [
+          "DELETE /repos/:id",
+          "GET /repos",
+          "POST /repos",
+          "POST /repos/:id/refresh"
+        ],
+        "crons": []
+      },
+      "server/src/modules/reviews/routes.ts": {
+        "endpoints": [
+          "DELETE /reviews/:id",
+          "DELETE /runs/:id",
+          "GET /pulls/:id/reviews",
+          "GET /pulls/:id/runs",
+          "GET /pulls/:id/runs/active",
+          "GET /runs/:id/trace",
+          "POST /findings/:id/${action}",
+          "POST /runs/:id/cancel"
+        ],
+        "crons": []
+      },
+      "server/src/modules/settings/routes.ts": {
+        "endpoints": [
+          "GET /settings",
+          "GET /settings/secrets-status",
+          "PUT /settings"
+        ],
+        "crons": []
+      },
+      "server/src/modules/workspace/routes.ts": {
+        "endpoints": [
+          "GET /workspace"
+        ],
+        "crons": []
+      }
+    },
+    "indexedSha": "674794b9af6a7592251755c134441ee589a72134",
+    "degraded": false
+  }
+}

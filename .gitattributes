@@ -1,0 +1,2 @@
+# The original adapter contained a literal NUL; keep its corrected source diff reviewable.
+server/src/adapters/depgraph/index.ts text diff

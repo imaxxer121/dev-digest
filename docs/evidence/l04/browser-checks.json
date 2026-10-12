@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-12",
+  "source": "Actual local DevDigest and GitHub browser interactions by the primary agent",
+  "helper_pr": "https://github.com/imaxxer121/dev-digest/pull/10",
+  "local_pr_uuid": "6c5fdc55-3bf4-4e45-a678-f1c9a60de1bc",
+  "indexed_sha": "674794b9af6a7592251755c134441ee589a72134",
+  "overview_counts": { "symbols": 2, "callers": 8, "endpoints": 27, "crons": 0 },
+  "callers_and_endpoint_chips_visible": true,
+  "caller_links_clicked_and_source_verified": [
+    "https://github.com/imaxxer121/dev-digest/blob/674794b9af6a7592251755c134441ee589a72134/server/src/modules/pulls/routes.ts#L27",
+    "https://github.com/imaxxer121/dev-digest/blob/674794b9af6a7592251755c134441ee589a72134/server/src/modules/repos/routes.ts#L27"
+  ],
+  "caller_source_imports_and_calls_getContext": true,
+  "symbol_collapse_checked": true,
+  "RequestContext_zero_callers_text_visible": true,
+  "empty_fixture_pr": "https://github.com/imaxxer121/dev-digest/pull/11",
+  "empty_fixture_counts": { "symbols": 0, "callers": 0, "endpoints": 0, "crons": 0 },
+  "empty_state_and_index_coverage_text_visible": true,
+  "partial_state": {
+    "controlled_status_fixture": true,
+    "only_persisted_index_status_changed": true,
+    "actual_cached_rows_preserved": true,
+    "reason_displayed": "index_partial",
+    "counts_preserved": true,
+    "original_full_state_restored": true
+  },
+  "mcp_evidence_screen": "Static rendering of the actual completed Codex CLI JSONL tool event and model answer",
+  "claude_code_used": false,
+  "remote_embedded_video_playback_verified": false,
+  "remote_media_limitation": "In-app browser blocks GitHub media CDN playback; local MP4 playback and full decode checked separately.",
+  "continuous_screencast": false
+}

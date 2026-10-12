@@ -91,3 +91,20 @@ confirmed three grounded findings below RIGHT:173/176/186, one finding-bearing
 file, persisted Accept/Reject and new-comment draft survival during mode changes
 (`../docs/evidence/l03/browser-checks.json`). Off-patch and external comment
 posting remain deterministic-test evidence, distinct from this real run.
+
+## 2026-10-12 — Blast Radius links belong to the indexed snapshot
+
+Repository caller line numbers refer to the persisted index, which can differ
+from PR head. `src/app/repos/[repoId]/pulls/[number]/_components/BlastRadius/BlastRadius.tsx:13`
+uses indexed SHA for source links and plain text when that revision is absent;
+it never guesses from PR head. The UI also explains snapshot coverage.
+Same-named changed symbols match downstream groups by declaration file and
+symbol name, keeping their endpoint and cron attribution separate. Top totals
+come from server counts rather than summing duplicated caller relationships.
+
+`src/lib/hooks/blast.ts:8` reads the scoped PR map. A partial map retains
+available callers plus the degradation reason; loading and HTTP failure remain
+distinct from a successful empty index. `pnpm test` passed 77 tests across 21
+files, including eight Blast Radius query/interaction tests, and
+`pnpm typecheck` passed. The tests use API fixtures; actual repository indexing,
+browser checks and MCP parity are separate evidence owned by the primary agent.

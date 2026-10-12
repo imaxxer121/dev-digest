@@ -1,0 +1,64 @@
+{
+  "format": "H.264 Constrained Baseline / MP4, AAC silence, 1280x720, 12fps, faststart",
+  "duration_seconds": 107.0,
+  "bytes": 985083,
+  "full_decode_passed": true,
+  "edited_real_browser_captures": true,
+  "continuous_screencast": false,
+  "timeline": [
+    {
+      "start_s": 0,
+      "end_s": 10,
+      "capture": "l04-overview.png",
+      "caption": "Overview: 2 символи, 8 викликачів, 27 потенційних HTTP-ендпоінтів, 0 кронів"
+    },
+    {
+      "start_s": 10,
+      "end_s": 25,
+      "capture": "l04-endpoints.png",
+      "caption": "getContext: реальні викликачі файл:рядок; ендпоінти з готових фактів індексу"
+    },
+    {
+      "start_s": 25,
+      "end_s": 37,
+      "capture": "l04-caller-pulls.png",
+      "caption": "Клік на pulls/routes.ts:27 відкрив справжній getContext у GitHub на indexed_sha"
+    },
+    {
+      "start_s": 37,
+      "end_s": 49,
+      "capture": "l04-caller-repos.png",
+      "caption": "Другий перевірений викликач: repos/routes.ts:27 імпортує та викликає getContext"
+    },
+    {
+      "start_s": 49,
+      "end_s": 57,
+      "capture": "l04-collapsed.png",
+      "caption": "Групи згортаються; RequestContext показує 0 відомих викликачів"
+    },
+    {
+      "start_s": 57,
+      "end_s": 67,
+      "capture": "l04-empty.png",
+      "caption": "Окремий docs-only PR: повний індекс, 0 символів і чіткий порожній стан"
+    },
+    {
+      "start_s": 67,
+      "end_s": 79,
+      "capture": "l04-partial.png",
+      "caption": "Контрольний стан index_partial: попередження з причиною; реальні дані збережені"
+    },
+    {
+      "start_s": 79,
+      "end_s": 97,
+      "capture": "l04-mcp-real-call.png",
+      "caption": "Реальний Codex CLI MCP-виклик = HTTP JSON; Claude Code недоступний"
+    },
+    {
+      "start_s": 97,
+      "end_s": 107,
+      "capture": "l04-overview.png",
+      "caption": "GET /blast читає готову БД: без LLM, AST-парсингу чи перебудови графа"
+    }
+  ]
+}

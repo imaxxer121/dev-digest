@@ -1,0 +1,14 @@
+{
+  "pr_id": "6c5fdc55-3bf4-4e45-a678-f1c9a60de1bc",
+  "github_url": "https://github.com/imaxxer121/dev-digest/pull/10",
+  "base": "c3c804216fb4b954315c544280d68110ec1e5b05",
+  "head": "674794b9af6a7592251755c134441ee589a72134",
+  "files": [
+    {
+      "path": "server/src/modules/_shared/context.ts",
+      "additions": 3,
+      "deletions": 1,
+      "patch": "@@ -19,5 +19,7 @@ export async function getContext(\n     container.auth.currentUser(req),\n     container.auth.currentWorkspace(req),\n   ]);\n-  return { workspaceId: workspace.id, userId: user.id };\n+  const workspaceId = workspace.id;\n+  const userId = user.id;\n+  return { workspaceId, userId };\n }\n"
+    }
+  ]
+}

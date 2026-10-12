@@ -89,6 +89,7 @@ export function useRefreshRepo() {
       for (const pull of qc.getQueryData<PrMeta[]>(["pulls", repoId]) ?? []) {
         qc.invalidateQueries({ queryKey: ["pull", pull.id] });
         qc.invalidateQueries({ queryKey: ["smart-diff", pull.id] });
+        qc.invalidateQueries({ queryKey: ["blast-radius", pull.id] });
       }
     },
   });
