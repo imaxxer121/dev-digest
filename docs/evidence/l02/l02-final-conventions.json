@@ -1,0 +1,101 @@
+[
+  {
+    "id": "5db0f1da-8859-4cb9-b069-a7c31833ed53",
+    "category": "naming",
+    "rule": "Use camelCase for exported helpers, as demonstrated by buildRunTrace.",
+    "evidence_path": "server/src/platform/trace-builder.ts",
+    "evidence_line": 37,
+    "evidence_snippet": "export function buildRunTrace(input: BuildTraceInput): RunTrace {",
+    "confidence": 0.93,
+    "status": "accepted",
+    "accepted": true
+  },
+  {
+    "id": "834e4c4b-a37b-4e36-a746-daf7eac11624",
+    "category": "structure",
+    "rule": "Expose shared review-engine helpers through server platform re-export shims backed by @devdigest/reviewer-core.",
+    "evidence_path": "server/src/platform/grounding.ts",
+    "evidence_line": 6,
+    "evidence_snippet": "export { groundFindings, groundingSummary, type GroundingResult } from '@devdigest/reviewer-core';",
+    "confidence": 0.99,
+    "status": "pending",
+    "accepted": false
+  },
+  {
+    "id": "a5fbe6ab-37a8-4359-8ab6-3c6a362934b0",
+    "category": "structure",
+    "rule": "Keep editable prompt instructions in src/prompts/*.md files.",
+    "evidence_path": "server/src/platform/prompts.ts",
+    "evidence_line": 4,
+    "evidence_snippet": "Prompt *instructions* live as editable files under `src/prompts/*.md`",
+    "confidence": 1,
+    "status": "pending",
+    "accepted": false
+  },
+  {
+    "id": "1fe6aa1f-23a6-4074-a968-23f01418cf8b",
+    "category": "errors",
+    "rule": "The default retry policy retries numeric HTTP statuses only when they are 429 or at least 500.",
+    "evidence_path": "server/src/platform/resilience.ts",
+    "evidence_line": 40,
+    "evidence_snippet": "if (typeof status === 'number') return status === 429 || status >= 500;",
+    "confidence": 1,
+    "status": "pending",
+    "accepted": false
+  },
+  {
+    "id": "21ba6616-db2e-4a18-b03d-af91fc930182",
+    "category": "testing",
+    "rule": "Run tests through a package test script using vitest run.",
+    "evidence_path": "server/package.json",
+    "evidence_line": 12,
+    "evidence_snippet": "\"test\": \"vitest run\",",
+    "confidence": 1,
+    "status": "pending",
+    "accepted": false
+  },
+  {
+    "id": "e05f4c8e-496e-401d-b762-81ee19dd5335",
+    "category": "types",
+    "rule": "Enable strict TypeScript checking in the client and server.",
+    "evidence_path": "server/tsconfig.json",
+    "evidence_line": 7,
+    "evidence_snippet": "\"strict\": true,",
+    "confidence": 1,
+    "status": "pending",
+    "accepted": false
+  },
+  {
+    "id": "de48b560-e14c-4aaa-8306-cc80042b8dc3",
+    "category": "api_contracts",
+    "rule": "Validate constructed run traces with RunTraceSchema.parse before returning them.",
+    "evidence_path": "server/src/platform/trace-builder.ts",
+    "evidence_line": 56,
+    "evidence_snippet": "return RunTraceSchema.parse(trace);",
+    "confidence": 1,
+    "status": "pending",
+    "accepted": false
+  },
+  {
+    "id": "7a4da304-aff0-4714-8fef-36f5d0f5aebc",
+    "category": "api_contracts",
+    "rule": "RunBus subscriptions replay buffered events before delivering live events.",
+    "evidence_path": "server/src/platform/sse.ts",
+    "evidence_line": 62,
+    "evidence_snippet": "Subscribe to live events. Replays any buffered events first.",
+    "confidence": 1,
+    "status": "pending",
+    "accepted": false
+  },
+  {
+    "id": "930df8e7-afd2-46f8-b38a-ea4b0594ae8c",
+    "category": "naming",
+    "rule": "Exported helper functions use camelCase, while named TypeScript types use PascalCase.",
+    "evidence_path": "server/src/platform/trace-builder.ts",
+    "evidence_line": 37,
+    "evidence_snippet": "export function buildRunTrace(input: BuildTraceInput): RunTrace {",
+    "confidence": 0.95,
+    "status": "rejected",
+    "accepted": false
+  }
+]

@@ -6,7 +6,7 @@
     "repoFallback": "repo",
     "subtitle": "Scan the cloned repo to surface house-rules — each backed by evidence you can turn into a Skill.",
     "scanning": "Scanning…",
-    "rescan": "Re-scan",
+    "rescan": "Re-Scan",
     "runExtraction": "Run extraction",
     "extractionFailed": "Extraction failed",
     "loadError": "Could not load conventions.",
@@ -15,12 +15,27 @@
       "body": "Scan the repo to surface house-rules — naming, error handling, structure — each backed by evidence you can turn into a Skill.",
       "cta": "Run extraction"
     },
-    "candidateCount": "{count, plural, one {# candidate} other {# candidates}} · grounded against sampled files"
+    "candidateCount": "{count, plural, one {# candidate} other {# candidates}} · grounded against sampled files",
+    "runScan": "Run Scan",
+    "createSkill": "Create Skill",
+    "create": "Create",
+    "skillName": "Skill name",
+    "skillDescription": "Skill description",
+    "skillBody": "Skill body",
+    "created": "Created {name}. Find it in Skills.",
+    "modalExplanation": "Create a Skill from {count} accepted conventions. Rejected and pending rules are excluded."
   },
   "card": {
     "confidence": "Confidence",
     "accepted": "Accepted",
     "accepting": "Accepting…",
-    "acceptAsSkill": "Accept as Skill"
+    "acceptAsSkill": "Accept as Skill",
+    "category": "Category",
+    "rule": "Rule",
+    "save": "Save",
+    "cancel": "Cancel",
+    "accept": "Accept",
+    "reject": "Reject",
+    "edit": "Edit"
   }
 }

@@ -29,3 +29,15 @@ warning when the focused finding changed. Use separate top/right/bottom colors
 and preserve the severity stripe on the left. Evidence:
 `src/app/repos/[repoId]/pulls/[number]/_components/FindingCard/styles.ts:9`.
 The warning disappeared in the passing interaction suite after this change.
+
+## 2026-10-12 — Saved knowledge needs visible state and error recovery
+
+Provider settings arrive asynchronously; synchronize the provider picker when
+the persisted choice changes (`src/app/settings/[section]/_components/SettingsView/_components/SettingsModels/SettingsModels.tsx:15`).
+Skill link mutations show errors and restore their previous local order on failure
+(`src/app/agents/[id]/_components/AgentEditor/_components/SkillsTab/SkillsTab.tsx:44`).
+Prompt block weights are character-based estimates, not provider usage
+(`src/app/repos/[repoId]/pulls/[number]/_components/RunTraceDrawer/_components/PromptBlock/PromptBlock.tsx:37`).
+`pnpm test` passed 46 tests and `pnpm typecheck` passed. Browser checks verified
+actual saved versions, restored v3, agent link counts and both real comparison
+traces. Reject/reload/Edit/Accept and the editable Skill draft worked through UI.

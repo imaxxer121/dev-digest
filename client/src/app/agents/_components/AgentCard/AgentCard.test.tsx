@@ -38,7 +38,7 @@ describe("AgentCard (smoke)", () => {
   it("renders the agent name, model chip and skill count", () => {
     renderWithIntl(<AgentCard ag={AGENT} skillCount={3} />);
     expect(screen.getByText("Security Reviewer")).toBeInTheDocument();
-    expect(screen.getByText("gpt-4.1")).toBeInTheDocument();
+    expect(screen.getByText("openai / gpt-4.1")).toBeInTheDocument();
     expect(screen.getByText("3 skills")).toBeInTheDocument();
   });
 

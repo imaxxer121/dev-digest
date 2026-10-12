@@ -2,6 +2,7 @@ import { simpleGit, type SimpleGit } from 'simple-git';
 import { join } from 'node:path';
 import { mkdir, readFile, access, rm } from 'node:fs/promises';
 import { constants } from 'node:fs';
+import { createHash } from 'node:crypto';
 import type {
   GitClient,
   RepoRef,
@@ -24,6 +25,7 @@ const RESYNC_FETCH_DEPTH = 50;
  * `<cloneDir>/<owner>/<repo>`. We NEVER execute repo code — only git ops.
  */
 export class SimpleGitClient implements GitClient {
+  private clients = new Map<string, SimpleGit>();
   constructor(private cloneDir: string) {
     // Force non-interactive auth so an unauthenticated/private clone fails in
     // ~1s with a clear error instead of hanging on a credential prompt until the
@@ -39,7 +41,13 @@ export class SimpleGitClient implements GitClient {
   }
 
   private git(repo: RepoRef): SimpleGit {
-    return simpleGit(this.clonePathFor(repo));
+    const path = this.clonePathFor(repo);
+    let client = this.clients.get(path);
+    if (!client) {
+      client = simpleGit({ baseDir: path, maxConcurrentProcesses: 1 });
+      this.clients.set(path, client);
+    }
+    return client;
   }
 
   private async exists(path: string): Promise<boolean> {
@@ -92,7 +100,18 @@ export class SimpleGitClient implements GitClient {
   }
 
   async diff(repo: RepoRef, base: string, head: string): Promise<UnifiedDiff> {
-    const raw = await this.git(repo).diff([`${base}...${head}`]);
+    const git = this.git(repo);
+    let raw: string;
+    try { raw = await git.diff([`${base}...${head}`]); }
+    catch {
+      // Shallow public clones contain only their default branch. Fetch the
+      // exact PR head and base into an isolated local ref before falling back
+      // to REST patches. No credentials or working-tree reset are needed.
+      if (!/^[a-f0-9]{40}$/i.test(head) || !base || /[\s~^:?*\[\\]/.test(base) || base.startsWith('-')) throw new Error('Invalid PR revisions');
+      const localBase = `refs/devdigest/review-base/${createHash('sha256').update(base).digest('hex').slice(0, 16)}`;
+      await git.fetch(['--force', '--depth=200', 'origin', `refs/heads/${base}:${localBase}`, head]);
+      raw = await git.diff([`${localBase}...${head}`]);
+    }
     return parseUnifiedDiff(raw);
   }
 

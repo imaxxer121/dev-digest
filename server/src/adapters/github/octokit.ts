@@ -13,6 +13,7 @@ import type {
   IssueMeta,
 } from '@devdigest/shared';
 import { withRetry, withTimeout } from '../../platform/resilience.js';
+import { ConfigError } from '../../platform/errors.js';
 
 const TIMEOUT = 30_000;
 
@@ -29,8 +30,12 @@ function mapStatus(state: string, merged: boolean | undefined): PrStatus {
 export class OctokitGitHubClient implements GitHubClient {
   private octokit: Octokit;
 
-  constructor(token: string) {
+  constructor(private token?: string) {
     this.octokit = new Octokit({ auth: token });
+  }
+
+  private requireAuth(): void {
+    if (!this.token) throw new ConfigError('GITHUB_TOKEN is required for GitHub writes and account access; public repository reads work without it');
   }
 
   async listPullRequests(repo: RepoRef): Promise<PrMeta[]> {
@@ -139,6 +144,7 @@ export class OctokitGitHubClient implements GitHubClient {
     n: number,
     review: GitHubReviewPayload,
   ): Promise<{ id: string }> {
+    this.requireAuth();
     return withRetry(() =>
       withTimeout(
         (async () => {
@@ -212,6 +218,7 @@ export class OctokitGitHubClient implements GitHubClient {
     n: number,
     input: CreateReviewCommentInput,
   ): Promise<PrReviewComment> {
+    this.requireAuth();
     return withRetry(() =>
       withTimeout(
         (async () => {
@@ -243,6 +250,7 @@ export class OctokitGitHubClient implements GitHubClient {
   }
 
   async openPullRequest(repo: RepoRef, payload: OpenPrPayload): Promise<{ url: string }> {
+    this.requireAuth();
     return withRetry(() =>
       withTimeout(
         (async () => {
@@ -265,6 +273,7 @@ export class OctokitGitHubClient implements GitHubClient {
     repo: RepoRef,
     payload: CommitFilesPayload,
   ): Promise<{ branch: string }> {
+    this.requireAuth();
     return withRetry(() =>
       withTimeout(
         (async () => {
@@ -364,6 +373,7 @@ export class OctokitGitHubClient implements GitHubClient {
   }
 
   async currentLogin(): Promise<string> {
+    this.requireAuth();
     const res = await withRetry(() =>
       withTimeout(this.octokit.rest.users.getAuthenticated(), TIMEOUT),
     );

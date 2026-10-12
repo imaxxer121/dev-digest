@@ -11,8 +11,8 @@
      share the open/close timers so moving the pointer across the 6px gap keeps
      it open.
    - Closes on Escape and on scroll of an ancestor.
-   - The popover is decoration over already-visible counts (the full, actionable
-     list is the detail Findings panel), so it is aria-hidden. */
+   - Keyboard users can open the panel from its anchor and follow its links.
+     Accept/reject actions remain in the detail Findings panel. */
 "use client";
 
 import React from "react";

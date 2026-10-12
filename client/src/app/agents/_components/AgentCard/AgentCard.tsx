@@ -9,6 +9,7 @@ import type { Agent } from "@devdigest/shared";
 import { useDeleteAgent } from "../../../../lib/hooks/agents";
 import { modelColor } from "./helpers";
 import { s } from "./styles";
+import { ConfirmDeleteDialog } from "@/components/ConfirmDeleteDialog";
 
 export function AgentCard({
   ag,
@@ -25,8 +26,11 @@ export function AgentCard({
 }) {
   const t = useTranslations("agents");
   const del = useDeleteAgent();
+  const [confirming, setConfirming] = React.useState(false);
   const color = modelColor(ag.model);
   return (
+    <>
+    {confirming && <ConfirmDeleteDialog name={ag.name} pending={del.isPending} error={del.error?.message} onClose={() => setConfirming(false)} onConfirm={() => del.mutate(ag.id, { onSuccess: () => setConfirming(false) })} />}
     <div onClick={onClick} style={s.card(!!active, ag.enabled)}>
       <div style={s.headerRow}>
         <div style={s.iconBox}>
@@ -41,7 +45,7 @@ export function AgentCard({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (window.confirm(`Delete agent "${ag.name}"? This cannot be undone.`)) del.mutate(ag.id);
+            setConfirming(true);
           }}
           disabled={del.isPending}
           title="Delete agent"
@@ -61,14 +65,15 @@ export function AgentCard({
       <div style={s.description}>{ag.description || t("card.noDescription")}</div>
       <div style={s.metaRow}>
         <span className="mono" style={s.modelChip(color)}>
-          {ag.model}
+          {ag.provider} / {ag.model}
         </span>
-        {skillCount != null && (
+        {(skillCount ?? ag.skill_count) != null && (
           <Badge color="var(--text-secondary)" icon="Sparkles">
-            {t("card.skillCount", { count: skillCount })}
+            {t("card.skillCount", { count: skillCount ?? ag.skill_count ?? 0 })}
           </Badge>
         )}
       </div>
     </div>
+    </>
   );
 }

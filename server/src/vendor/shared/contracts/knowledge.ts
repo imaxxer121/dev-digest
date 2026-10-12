@@ -128,6 +128,7 @@ export const Skill = z.object({
   enabled: z.boolean(),
   version: z.number().int(),
   evidence_files: z.array(z.string()).nullish(),
+  agent_count: z.number().int().nonnegative().optional(),
 });
 export type Skill = z.infer<typeof Skill>;
 
@@ -140,9 +141,40 @@ export const CommunitySkill = z.object({
 });
 export type CommunitySkill = z.infer<typeof CommunitySkill>;
 
+export const SkillVersion = z.object({
+  skill_id: z.string(),
+  version: z.number().int(),
+  body: z.string(),
+  message: z.string().nullable().optional(),
+  created_at: z.string(),
+});
+export type SkillVersion = z.infer<typeof SkillVersion>;
+
+export const SkillStats = z.object({
+  used_by_count: z.number().int(),
+  agents: z.array(z.object({ id: z.string(), name: z.string() })),
+  version_count: z.number().int(),
+  findings_by_category: z.record(z.string(), z.number()),
+  findings_last_30d: z.number().int(),
+});
+export type SkillStats = z.infer<typeof SkillStats>;
+
+export const SkillImportPreview = z.object({
+  name: z.string(),
+  description: z.string(),
+  type: SkillType,
+  source: SkillSource,
+  body: z.string(),
+  ignored_files: z.array(z.string()),
+});
+export type SkillImportPreview = z.infer<typeof SkillImportPreview>;
+
 // ---- Conventions ----
 export const ConventionCandidate = z.object({
   id: z.string(),
+  category: z.string(),
+  evidence_line: z.number().int().positive(),
+  status: z.enum(['pending', 'accepted', 'rejected']),
   rule: z.string(),
   evidence_path: z.string(),
   evidence_snippet: z.string(),
@@ -154,7 +186,7 @@ export type ConventionCandidate = z.infer<typeof ConventionCandidate>;
 // ---- Agents ----
 // 'openrouter' routes through the OpenAI-compatible API (OpenAIProvider with a
 // custom baseURL) — used by the CI runner for cheap models (DeepSeek/GLM/MiniMax).
-export const Provider = z.enum(['openai', 'anthropic', 'openrouter']);
+export const Provider = z.enum(['openai', 'anthropic', 'openrouter', 'codex']);
 export type Provider = z.infer<typeof Provider>;
 
 // Review execution strategy (matches @devdigest/reviewer-core's ReviewStrategy):
@@ -188,6 +220,7 @@ export const Agent = z.object({
   // Inject repo-intel context (repo skeleton + callers + rank note) into this
   // agent's review prompt. Default on; gated again by the global flag.
   repo_intel: z.boolean().default(true),
+  skill_count: z.number().int().nonnegative().optional(),
 });
 export type Agent = z.infer<typeof Agent>;
 
