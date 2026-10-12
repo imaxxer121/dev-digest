@@ -5,6 +5,7 @@ import * as t from '../../db/schema.js';
 import { getContext } from '../_shared/context.js';
 import { IdParams } from '../_shared/schemas.js';
 import { NotFoundError } from '../../platform/errors.js';
+import { PullsRepository } from '../pulls/repository.js';
 
 /**
  * F1 — polling module. MANUAL refresh that ONLY syncs the PR list
@@ -16,6 +17,7 @@ import { NotFoundError } from '../../platform/errors.js';
 export default async function pollingRoutes(appBase: FastifyInstance) {
   const app = appBase.withTypeProvider<ZodTypeProvider>();
   const { container } = app;
+  const persistence = new PullsRepository(container.db);
 
   app.post('/repos/:id/poll', { schema: { params: IdParams } }, async (req) => {
     const { workspaceId } = await getContext(container, req);
@@ -29,32 +31,7 @@ export default async function pollingRoutes(appBase: FastifyInstance) {
     const pulls = await gh.listPullRequests({ owner: repo.owner, name: repo.name });
     let synced = 0;
     for (const pr of pulls) {
-      await container.db
-        .insert(t.pullRequests)
-        .values({
-          workspaceId,
-          repoId: repo.id,
-          number: pr.number,
-          title: pr.title,
-          author: pr.author,
-          branch: pr.branch,
-          base: pr.base,
-          headSha: pr.head_sha,
-          additions: pr.additions,
-          deletions: pr.deletions,
-          filesCount: pr.files_count,
-          status: pr.status,
-          updatedAt: pr.updated_at ? new Date(pr.updated_at) : null,
-        })
-        .onConflictDoUpdate({
-          target: [t.pullRequests.repoId, t.pullRequests.number],
-          set: {
-            title: pr.title,
-            headSha: pr.head_sha,
-            status: pr.status,
-            updatedAt: pr.updated_at ? new Date(pr.updated_at) : null,
-          },
-        });
+      await persistence.syncMeta(workspaceId, repo.id, pr);
       synced++;
     }
     await container.db

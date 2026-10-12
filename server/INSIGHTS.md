@@ -1,5 +1,33 @@
 # Server engineering insights
 
+## 2026-10-12 — PR Brief captures coherent facts and generates explicitly
+
+`src/modules/brief/service.ts:36` captures PR head/files/specs before inference;
+one `completeStructured` at line54 uses `maxRetries: 0`, then exact-path
+grounding and a row-locked head comparison protect the JSON cache. GET reads
+the cache only. The same PR lock coordinates list/poll sync, live detail,
+offline reads and delayed stats (`src/modules/pulls/repository.ts:11`).
+Without the captured/fetched/current SHA guard at line23, late stats can belong
+to an older revision. PostgreSQL tests exercise real lock contention and races.
+
+Specs use scoped `code_chunks.source=spec` replacement with an advisory lock
+(`src/modules/context/repository.ts:19`); ordinary code/docs remain intact.
+Do not infer Intent freshness: its legacy table has no SHA. Standalone issue
+references are parsed locally (`src/modules/brief/input.ts:10`); qualified
+foreign-repository references and URL fragments are not same-repo issues.
+
+The measured budget at `src/modules/brief/input.ts:142` is UTF-8 bytes of the
+serialized application messages/schema plus 1024 framing allowance, not provider
+hidden prompt tokens. Two real Codex calls measured 12314+1024=13338 bytes;
+actual input usage was 13822 and13824 tokens, recorded separately. Both had one
+structured attempt and zero tool items. Reload and controlled head move/restore
+added no model process. Evidence is in `../docs/evidence/l05/`.
+
+Final server typecheck passed; `pnpm test` passed 230 tests across 39 files,
+including real PostgreSQL integration. Provider/GitHub fixture tests and the
+two actual CLI generations are distinguished in the report. Different-family
+planning review remains unavailable, an explicitly reported optional P2 gap.
+
 ## 2026-10-12 — CLI entry-point checks must convert Windows paths
 
 Comparing `import.meta.url` with a string built as `file://${process.argv[1]}`

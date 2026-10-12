@@ -6,6 +6,7 @@ import { DiffViewer } from "../components/diff-viewer";
 import type { PrFile } from "../lib/types";
 import shellMessages from "../../messages/en/shell.json";
 import prReviewMessages from "../../messages/en/prReview.json";
+import briefMessages from "../../messages/en/brief.json";
 
 afterEach(cleanup);
 
@@ -35,7 +36,7 @@ describe("web smoke (both themes)", () => {
       },
     ];
     render(
-      <NextIntlClientProvider locale="en" messages={{ shell: shellMessages, prReview: prReviewMessages }}>
+      <NextIntlClientProvider locale="en" messages={{ shell: shellMessages, prReview: prReviewMessages, brief: briefMessages }}>
         <div data-theme="dark">
           <DiffViewer files={files} />
         </div>

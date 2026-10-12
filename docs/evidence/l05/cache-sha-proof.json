@@ -1,0 +1,53 @@
+{
+  "scope": "Own local PR10 fixture, real published diff/index. Controlled SHA move is not a remote commit.",
+  "baseline_model_processes": 17,
+  "after_first": 18,
+  "after_reload": 18,
+  "after_explicit_regenerate": 19,
+  "after_sha_move_and_restore": 19,
+  "unchanged_reload": true,
+  "explicit_regeneration_new_call": true,
+  "stale_preserved_second_brief": true,
+  "controlled_head": "controlled-l05-next-head",
+  "real_head": "674794b9af6a7592251755c134441ee589a72134",
+  "restored_response_equal_second": true,
+  "budget_scope": "UTF-8 bytes of application-controlled messages + JSON schema, plus 1024 framing allowance; provider hidden prompt/token usage is separate.",
+  "calls": [
+    {
+      "label": "first",
+      "call_id": "815d4fd7-1dd0-402a-8833-b81d57c3ef87",
+      "one_process": true,
+      "one_structured_attempt": true,
+      "tool_items": 0,
+      "measured_payload_bytes": 12314,
+      "framing_allowance_bytes": 1024,
+      "budgeted_input_bytes": 13338,
+      "input_budget_bytes": 32000,
+      "usage": {
+        "input_tokens": 13822,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 300,
+        "reasoning_output_tokens": 0
+      }
+    },
+    {
+      "label": "regenerated",
+      "call_id": "a42a3859-08e4-45eb-834c-dc114c05dbc9",
+      "one_process": true,
+      "one_structured_attempt": true,
+      "tool_items": 0,
+      "measured_payload_bytes": 12314,
+      "framing_allowance_bytes": 1024,
+      "budgeted_input_bytes": 13338,
+      "input_budget_bytes": 32000,
+      "usage": {
+        "input_tokens": 13824,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 266,
+        "reasoning_output_tokens": 0
+      }
+    }
+  ]
+}

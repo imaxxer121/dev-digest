@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import type { FindingRecord, PrFile, PrReviewComment, SmartDiffResponse } from "@devdigest/shared";
 import prReview from "../../../../messages/en/prReview.json";
 import shell from "../../../../messages/en/shell.json";
+import brief from "../../../../messages/en/brief.json";
 import { DiffViewer } from "./DiffViewer";
 import type { DiffCommentApi } from "../comments";
 import type { DiffFindingsApi } from "../findings";
@@ -31,7 +32,7 @@ const comment: PrReviewComment = { id: 1, path: "src/a.ts", line: 20, original_l
 function view(show = true, grouped = true, onSubmit = vi.fn().mockResolvedValue({})) {
   const commenting: DiffCommentApi = { comments: [comment], canComment: true, showComments: show, posting: false, onSubmit };
   const reviewing: DiffFindingsApi = { findings, showComments: show, renderFinding: (f) => <div data-testid={f.id}>{f.id}</div> };
-  return <NextIntlClientProvider locale="en" messages={{ prReview, shell }}><DiffViewer files={files} groups={grouped ? groups : undefined} commenting={commenting} reviewing={reviewing} /></NextIntlClientProvider>;
+  return <NextIntlClientProvider locale="en" messages={{ prReview, shell, brief }}><DiffViewer files={files} groups={grouped ? groups : undefined} commenting={commenting} reviewing={reviewing} /></NextIntlClientProvider>;
 }
 
 describe("Smart Diff rendering", () => {
@@ -133,7 +134,7 @@ describe("Smart Diff rendering", () => {
   });
 
   it("renders five empty groups for an empty PR", () => {
-    const { container } = render(<NextIntlClientProvider locale="en" messages={{ prReview, shell }}><DiffViewer files={[]} groups={[]} /></NextIntlClientProvider>);
+    const { container } = render(<NextIntlClientProvider locale="en" messages={{ prReview, shell, brief }}><DiffViewer files={[]} groups={[]} /></NextIntlClientProvider>);
     expect(container.querySelectorAll("[data-diff-role]")).toHaveLength(5);
     expect(screen.getAllByText("0 files with findings")).toHaveLength(5);
   });

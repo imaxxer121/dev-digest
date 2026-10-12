@@ -1,0 +1,14 @@
+{
+  "first_focus_url": "?tab=diff&file=server%2Fsrc%2Fmodules%2F_shared%2Fcontext.ts&line=19",
+  "focused_right_row": 19,
+  "row_top": 376.296875,
+  "row_bottom": 396.296875,
+  "viewport_height": 720,
+  "focus_marker": true,
+  "caller_only_fallback": "File not in this PR’s diff: server/src/modules/pulls/routes.ts. Caller lines belong to an indexed snapshot and may differ from this PR head.",
+  "saved_spec_after_reload": {
+    "path": "specs/l04-blast-radius.md",
+    "bytes": 14387
+  },
+  "stale_text": "The PR head has moved. This saved brief is stale; regenerate to use the current facts."
+}

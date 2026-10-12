@@ -3,7 +3,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { SectionLabel, Button } from "@devdigest/ui";
-import { DiffViewer, type DiffCommentApi, type DiffFindingsApi } from "@/components/diff-viewer";
+import { DiffViewer, type DiffCommentApi, type DiffFindingsApi, type DiffFocusTarget } from "@/components/diff-viewer";
 import { usePrComments, useCreatePrComment, usePrReviews, usePrSmartDiff, useFindingAction } from "@/lib/hooks/reviews";
 import { notify } from "@/lib/toast";
 import type { PrFile, ReviewRecord } from "@devdigest/shared";
@@ -16,6 +16,7 @@ interface DiffTabProps {
   canComment?: boolean;
   repoFullName?: string | null;
   headSha?: string | null;
+  focusTarget?: DiffFocusTarget | null;
 }
 
 /** Match server latest-review ordering, including a deterministic tie break. */
@@ -24,7 +25,7 @@ export function latestReview(reviews: ReviewRecord[]) {
     b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id))[0];
 }
 
-export function DiffTab({ prId, filesCount, files, canComment, repoFullName, headSha }: DiffTabProps) {
+export function DiffTab({ prId, filesCount, files, canComment, repoFullName, headSha, focusTarget }: DiffTabProps) {
   const t = useTranslations("prReview.smartDiff");
   const { data: comments } = usePrComments(prId);
   const smart = usePrSmartDiff(prId);
@@ -81,6 +82,7 @@ export function DiffTab({ prId, filesCount, files, canComment, repoFullName, hea
       : <p style={{ color: "var(--text-muted)", fontSize: 13 }}>{latest ? (findings.length === 0 ? t("reviewedClean") : t("latestFindings", { count: findings.length })) : t("noReview")}</p>}
     {actionError && <p role="alert" style={{ color: "var(--crit)" }}>{actionError}</p>}
     <DiffViewer files={files} commenting={commenting} reviewing={reviewing}
+      focusTarget={focusTarget}
       groups={grouped && !smart.isError ? smart.data?.groups : undefined} />
   </section>;
 }

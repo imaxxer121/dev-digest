@@ -1,5 +1,12 @@
 {
   "title": "Project Context",
+  "subtitle": "Save text specifications for this repository. PR brief generation includes their saved content within its input budget.",
+  "savedFiles": "Saved text specs",
+  "loading": "Loading saved text specs…",
+  "retry": "Retry",
+  "bytes": "{count} bytes",
+  "editFile": "Edit {path}",
+  "newFile": "New text spec",
   "chunks": "{count} chunks",
   "reindex": "Re-index",
   "indexing": "Indexing…",
@@ -10,13 +17,22 @@
   "kb": "{kb}kb",
   "empty": {
     "title": "No spec files yet",
-    "body": "Drop your PRDs, tech specs, and acceptance criteria under .devdigest/specs/. Every agent and the PR brief read them as grounding context."
+    "body": "Use the editor to save a PRD, technical spec, or acceptance criteria as text. The next explicit PR brief generation uses these saved attachments."
   },
   "mode": {
     "preview": "preview",
     "edit": "edit"
   },
   "editor": {
+    "title": "Text spec editor",
+    "path": "Logical path",
+    "pathPlaceholder": "specs/payment-requirements.md",
+    "pathHint": "Use a repository-relative name. Saving the same path replaces its text; this does not read a file or watch a folder.",
+    "content": "Spec content",
+    "invalidPath": "Use a relative POSIX path of at most 256 characters, without empty, dot, parent, backslash, or control-character segments.",
+    "invalidContent": "Enter nonempty text of at most 65,536 UTF-8 bytes.",
+    "saveError": "Couldn’t save the text spec. Your draft is retained",
+    "saved": "Saved {path}.",
     "loadError": "Couldn’t load spec",
     "save": "Save",
     "saving": "Saving…"
