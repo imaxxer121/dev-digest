@@ -8,6 +8,8 @@ import { getContext } from '../_shared/context.js';
 import { IdParams } from '../_shared/schemas.js';
 import { AppError, NotFoundError } from '../../platform/errors.js';
 import { deriveReviewStatus } from './status.js';
+import { successfulRunCosts } from './cost.js';
+import { findingRowToDto } from '../reviews/helpers.js';
 
 /**
  * F1 — pulls module. PR import via Octokit (list + per-PR detail).
@@ -111,22 +113,72 @@ export default async function pullsRoutes(appBase: FastifyInstance) {
       }
     }
 
-    // Latest-review SCORE per PR for the list's score ring. Computed on read
-    // from reviews (no FK denorm); the list is small, so one IN-query + JS
-    // grouping is cheap. (The per-severity FINDINGS breakdown is intentionally
-    // not surfaced on the list — findings live on the PR detail page.)
+    // Preview findings from the latest persisted review run, computed on read.
     const prIds = rows.map((r) => r.id);
     const latestReviewByPr = new Map<string, { score: number | null }>();
+    const findingsByPr = new Map<string, ReturnType<typeof findingRowToDto>[]>();
     if (prIds.length > 0) {
       const reviewRows = await container.db
-        .select({ prId: t.reviews.prId, score: t.reviews.score })
+        .select({
+          id: t.reviews.id,
+          prId: t.reviews.prId,
+          score: t.reviews.score,
+          createdAt: t.reviews.createdAt,
+        })
         .from(t.reviews)
         .where(and(inArray(t.reviews.prId, prIds), eq(t.reviews.kind, 'review')))
         .orderBy(desc(t.reviews.createdAt));
-      // Rows are newest-first → first seen per PR is the latest review.
+      // Rows newest-first: keep only the latest run for each PR.
+      const reviewIdToPr = new Map<string, string>();
+      const batchReviewIds: string[] = [];
       for (const rv of reviewRows) {
-        if (!latestReviewByPr.has(rv.prId)) latestReviewByPr.set(rv.prId, { score: rv.score });
+        if (latestReviewByPr.has(rv.prId)) continue;
+        latestReviewByPr.set(rv.prId, { score: rv.score });
+        reviewIdToPr.set(rv.id, rv.prId);
+        batchReviewIds.push(rv.id);
       }
+
+      // One IN-query over the latest runs' findings, mapped to the wire DTO and
+      // grouped per PR. The list surfaces these directly: per-severity chips
+      // (counts derived client-side) + a hover popover of the findings.
+      if (batchReviewIds.length > 0) {
+        const findingRows = await container.db
+          .select()
+          .from(t.findings)
+          .where(inArray(t.findings.reviewId, batchReviewIds));
+        for (const row of findingRows) {
+          const prId = reviewIdToPr.get(row.reviewId);
+          if (!prId) continue;
+          let arr = findingsByPr.get(prId);
+          if (!arr) {
+            arr = [];
+            findingsByPr.set(prId, arr);
+          }
+          arr.push(findingRowToDto(row));
+        }
+      }
+    }
+
+    // Total cost of all successful runs, independent of the latest findings batch.
+    // Unknown prices remain null, so the UI never claims an incomplete total.
+    let costByPr = new Map<string, number | null>();
+    if (prIds.length > 0) {
+      const runRows = await container.db
+        .select({
+          prId: t.agentRuns.prId,
+          ranAt: t.agentRuns.ranAt,
+          costUsd: t.agentRuns.costUsd,
+        })
+        .from(t.agentRuns)
+        .where(
+          and(
+            eq(t.agentRuns.workspaceId, workspaceId),
+            inArray(t.agentRuns.prId, prIds),
+            eq(t.agentRuns.status, 'done'),
+          ),
+        )
+        .orderBy(desc(t.agentRuns.ranAt));
+      costByPr = successfulRunCosts(runRows);
     }
 
     const now = Date.now();
@@ -153,6 +205,8 @@ export default async function pullsRoutes(appBase: FastifyInstance) {
         opened_at: r.openedAt?.toISOString() ?? null,
         updated_at: r.updatedAt?.toISOString() ?? null,
         score: review ? review.score : null,
+        cost_usd: costByPr.has(r.id) ? costByPr.get(r.id)! : null,
+        findings: findingsByPr.get(r.id) ?? null,
       };
     });
   });

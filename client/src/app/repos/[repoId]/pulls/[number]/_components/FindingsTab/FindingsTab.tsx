@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Icon, Badge, Button, SectionLabel, EmptyState } from "@devdigest/ui";
 import { RunStatus } from "../RunStatus";
 import { RunHistory } from "../RunHistory/RunHistory";
@@ -41,6 +42,8 @@ export function FindingsTab({
   onDelete,
   onRunDone,
 }: FindingsTabProps) {
+  const t = useTranslations("prReview");
+
   const handleCancelAll = useCallback(() => {
     liveRunIds.forEach((id) => cancelMutation.mutate(id));
   }, [liveRunIds, cancelMutation]);
@@ -131,6 +134,9 @@ export function FindingsTab({
           <RunHistory
             runs={prRuns ?? []}
             commits={prCommits}
+            findingsByRunId={new Map(runs.filter(r => r.run_id).map(r => [r.run_id!, r.findings]))}
+            repoFullName={repoFullName}
+            headSha={headSha}
             onOpenTrace={handleOpenTrace}
             onGoToReview={handleGoToReview}
             onDelete={handleDelete}
@@ -154,12 +160,12 @@ export function FindingsTab({
         )
       ) : (
         prId &&
-        runs.map((review, i) => (
+        runs.map((review) => (
           <ReviewRunAccordion
             key={review.id}
             review={review}
             prId={prId}
-            defaultOpen={i === 0}
+            defaultOpen={review.id === runs[0]?.id}
             repoFullName={repoFullName}
             headSha={headSha}
             targetRunId={target?.runId ?? null}
