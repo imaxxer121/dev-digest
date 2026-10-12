@@ -57,4 +57,12 @@ describe("FindingCard (smoke, both themes)", () => {
     fireEvent.click(screen.getByText("Reject"));
     expect(onAction).toHaveBeenCalledWith("dismiss");
   });
+
+  it("can show an explicit severity label while preserving the compact default", () => {
+    renderWithIntl(<FindingCard f={FINDING} />);
+    expect(screen.queryByText("Critical")).not.toBeInTheDocument();
+    cleanup();
+    renderWithIntl(<FindingCard f={FINDING} showSeverityLabel />);
+    expect(screen.getByText("Critical")).toBeInTheDocument();
+  });
 });

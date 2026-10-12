@@ -7,6 +7,7 @@ import { type ReviewDto, type ReviewDtoFinding } from './helpers.js';
 import { ReviewRunExecutor, type Logger } from './run-executor.js';
 import { actOnFinding as actOnFindingImpl } from './findings.js';
 import { reviewToDto } from './helpers.js';
+import { buildSmartDiff } from './smart-diff/index.js';
 
 // Re-export DTO types + converters for backward-compatible imports from
 // './service.js' (these previously lived here; logic now in ./helpers.ts).
@@ -160,7 +161,7 @@ export class ReviewService {
   async reviewsForPull(workspaceId: string, prId: string): Promise<ReviewDto[]> {
     const pull = await this.repo.getPull(workspaceId, prId);
     if (!pull) throw new NotFoundError('Pull request not found');
-    const rows = await this.repo.reviewsForPull(prId);
+    const rows = await this.repo.reviewsForPull(workspaceId, prId);
     const names = new Map<string, string>();
     for (const { review } of rows) {
       if (review.agentId && !names.has(review.agentId)) {
@@ -171,6 +172,16 @@ export class ReviewService {
     return rows.map(({ review, findings }) =>
       reviewToDto(review, findings, review.agentId ? names.get(review.agentId) : null),
     );
+  }
+
+  async smartDiffForPull(workspaceId: string, prId: string) {
+    const pull = await this.repo.getPull(workspaceId, prId);
+    if (!pull) throw new NotFoundError('Pull request not found');
+    const [files, latest] = await Promise.all([
+      this.repo.getPrFiles(prId),
+      this.repo.latestReviewForPull(workspaceId, prId),
+    ]);
+    return buildSmartDiff(files, latest?.findings ?? []);
   }
 
   async getRunTrace(runId: string): Promise<RunTrace | undefined> {

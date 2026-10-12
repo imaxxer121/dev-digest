@@ -1,0 +1,256 @@
+{
+  "fixture_pr": "https://github.com/imaxxer121/dev-digest/pull/8",
+  "base_sha": "c3c804216fb4b954315c544280d68110ec1e5b05",
+  "head_sha": "52a6fca9477bda8a6660a9a8dd74226342078253",
+  "runs": [
+    {
+      "run_id": "b9e1ba63-f4fb-4cea-b5c8-71a88d920b39",
+      "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "agent_name": "Course Reviewer",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "status": "done",
+      "error": null,
+      "duration_ms": 103139,
+      "tokens_in": 18562,
+      "tokens_out": 3046,
+      "cost_usd": null,
+      "findings_count": 3,
+      "grounding": "3/3 passed",
+      "ran_at": "2026-10-12T18:05:05.808Z",
+      "score": 41,
+      "blockers": 1
+    }
+  ],
+  "trace": {
+    "config": {
+      "pr": 8,
+      "agent": "Course Reviewer",
+      "model": "gpt-6.1-sol",
+      "source": "local",
+      "version": "1",
+      "provider": "codex"
+    },
+    "stats": {
+      "cost_usd": null,
+      "findings": 3,
+      "grounding": "3/3 passed",
+      "tokens_in": 18562,
+      "tokens_out": 3046,
+      "duration_ms": 103139
+    },
+    "log": [
+      {
+        "t": "20:05:04",
+        "msg": "Loading PR diff…",
+        "kind": "tool"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Loading PR diff done (858ms)",
+        "kind": "tool"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Diff ready — 5 changed file(s); starting 1 agent run(s)",
+        "kind": "info"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Starting review with agent \"Course Reviewer\" (codex/gpt-6.1-sol)",
+        "kind": "info"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Resolving codex provider…",
+        "kind": "tool"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Resolving codex provider done (0ms)",
+        "kind": "tool"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Repo intel disabled for this agent — skipping context enrichment",
+        "kind": "info"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Reviewing 5 changed file(s) in one pass",
+        "kind": "info"
+      },
+      {
+        "t": "20:05:05",
+        "msg": "Reviewing all files in one pass",
+        "kind": "tool"
+      },
+      {
+        "t": "20:06:48",
+        "msg": "all files: 3 candidate finding(s)",
+        "kind": "result"
+      },
+      {
+        "t": "20:06:48",
+        "msg": "Reduced to 3 finding(s); verdict=request_changes, score=24",
+        "kind": "result"
+      },
+      {
+        "t": "20:06:48",
+        "msg": "Citation grounding: 3/3 passed",
+        "kind": "result"
+      },
+      {
+        "t": "20:06:48",
+        "msg": "Persisted review dacdbaec-64b9-46f1-938a-2c842321f5cb with 3 finding(s)",
+        "kind": "result"
+      }
+    ],
+    "raw_output": "{\n  \"verdict\": \"request_changes\",\n  \"summary\": \"The share endpoint allows SSRF, reports rejected deliveries as successful, and sends an incompatible payload to the advertised Slack/Discord webhooks.\",\n  \"score\": 24,\n  \"findings\": [\n    {\n      \"id\": \"F1\",\n      \"severity\": \"CRITICAL\",\n      \"category\": \"security\",\n      \"title\": \"Restrict webhook destinations to prevent SSRF\",\n      \"file\": \"server/src/modules/reviews/routes.ts\",\n      \"start_line\": 173,\n      \"end_line\": 175,\n      \"rationale\": \"The caller-controlled URL is passed directly to server-side fetch without destination restrictions. A caller who can access a review can make the server POST to loopback, private-network, or link-local services, crossing the server's network boundary. Automatic redirects also allow a public URL to lead to an internal destination.\",\n      \"suggestion\": \"Allow only approved HTTPS destinations, enforce restrictions on resolved addresses, and disable redirects or validate every redirect destination. Apply outbound network restrictions as additional protection.\",\n      \"confidence\": 0.99,\n      \"kind\": \"finding\",\n      \"trifecta_components\": null,\n      \"evidence\": null\n    },\n    {\n      \"id\": \"F2\",\n      \"severity\": \"WARNING\",\n      \"category\": \"bug\",\n      \"title\": \"Check the webhook response before reporting success\",\n      \"file\": \"server/src/modules/reviews/routes.ts\",\n      \"start_line\": 186,\n      \"end_line\": 188,\n      \"rationale\": \"Fetch resolves normally for HTTP errors, but the response is discarded and the route always returns ok: true. Rejected payloads, expired webhook URLs, rate limits, and downstream server failures are therefore reported as successful deliveries.\",\n      \"suggestion\": \"Capture the response and check response.ok before returning success. Return an appropriate delivery error for non-success statuses.\",\n      \"confidence\": 1,\n      \"kind\": \"finding\",\n      \"trifecta_components\": null,\n      \"evidence\": null\n    },\n    {\n      \"id\": \"F3\",\n      \"severity\": \"WARNING\",\n      \"category\": \"bug\",\n      \"title\": \"Use payloads supported by the advertised webhook providers\",\n      \"file\": \"server/src/modules/reviews/routes.ts\",\n      \"start_line\": 176,\n      \"end_line\": 179,\n      \"rationale\": \"The route advertises direct Slack/Discord sharing, but sends only summary, verdict, and findings. Slack incoming webhooks require message fields such as text or blocks, while Discord requires content such as content or embeds. This payload supplies neither, so valid webhook URLs for those providers reject the delivery.\",\n      \"suggestion\": \"Format the review using the selected provider's message schema, and define the current JSON format separately for generic webhook consumers.\",\n      \"confidence\": 0.98,\n      \"kind\": \"finding\",\n      \"trifecta_components\": null,\n      \"evidence\": null\n    }\n  ]\n}"
+  },
+  "trace_step_note": "The application records a single-pass review_file step. This is not a claim that the inference model called a repository tool.",
+  "reviews_before_actions": [
+    {
+      "id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+      "pr_id": "a5649b82-15d4-4ea9-bb6a-473a4e3fc60d",
+      "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "run_id": "b9e1ba63-f4fb-4cea-b5c8-71a88d920b39",
+      "agent_name": "Course Reviewer",
+      "kind": "review",
+      "verdict": "request_changes",
+      "summary": "The share endpoint allows SSRF, reports rejected deliveries as successful, and sends an incompatible payload to the advertised Slack/Discord webhooks.",
+      "score": 41,
+      "model": "gpt-6.1-sol",
+      "created_at": "2026-10-12T18:06:49.239Z",
+      "findings": [
+        {
+          "id": "b6e797a5-ea50-47b5-b843-ec7a952b73f8",
+          "severity": "CRITICAL",
+          "category": "security",
+          "title": "Restrict webhook destinations to prevent SSRF",
+          "file": "server/src/modules/reviews/routes.ts",
+          "start_line": 173,
+          "end_line": 175,
+          "rationale": "The caller-controlled URL is passed directly to server-side fetch without destination restrictions. A caller who can access a review can make the server POST to loopback, private-network, or link-local services, crossing the server's network boundary. Automatic redirects also allow a public URL to lead to an internal destination.",
+          "suggestion": "Allow only approved HTTPS destinations, enforce restrictions on resolved addresses, and disable redirects or validate every redirect destination. Apply outbound network restrictions as additional protection.",
+          "confidence": 0.99,
+          "kind": "finding",
+          "trifecta_components": null,
+          "evidence": null,
+          "review_id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+          "accepted_at": null,
+          "dismissed_at": null
+        },
+        {
+          "id": "dc473e8d-3862-464d-abce-521f1b908599",
+          "severity": "WARNING",
+          "category": "bug",
+          "title": "Check the webhook response before reporting success",
+          "file": "server/src/modules/reviews/routes.ts",
+          "start_line": 186,
+          "end_line": 188,
+          "rationale": "Fetch resolves normally for HTTP errors, but the response is discarded and the route always returns ok: true. Rejected payloads, expired webhook URLs, rate limits, and downstream server failures are therefore reported as successful deliveries.",
+          "suggestion": "Capture the response and check response.ok before returning success. Return an appropriate delivery error for non-success statuses.",
+          "confidence": 1,
+          "kind": "finding",
+          "trifecta_components": null,
+          "evidence": null,
+          "review_id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+          "accepted_at": null,
+          "dismissed_at": null
+        },
+        {
+          "id": "2e3f3670-7cba-4e4b-8f7e-39da9782fb22",
+          "severity": "WARNING",
+          "category": "bug",
+          "title": "Use payloads supported by the advertised webhook providers",
+          "file": "server/src/modules/reviews/routes.ts",
+          "start_line": 176,
+          "end_line": 179,
+          "rationale": "The route advertises direct Slack/Discord sharing, but sends only summary, verdict, and findings. Slack incoming webhooks require message fields such as text or blocks, while Discord requires content such as content or embeds. This payload supplies neither, so valid webhook URLs for those providers reject the delivery.",
+          "suggestion": "Format the review using the selected provider's message schema, and define the current JSON format separately for generic webhook consumers.",
+          "confidence": 0.98,
+          "kind": "finding",
+          "trifecta_components": null,
+          "evidence": null,
+          "review_id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+          "accepted_at": null,
+          "dismissed_at": null
+        }
+      ]
+    }
+  ],
+  "smart_diff_after_completion": {
+    "groups": [
+      {
+        "role": "core",
+        "files": [
+          {
+            "path": "server/src/modules/reviews/routes.ts",
+            "pseudocode_summary": null,
+            "additions": 40,
+            "deletions": 0,
+            "finding_lines": [
+              173,
+              176,
+              186
+            ]
+          }
+        ]
+      },
+      {
+        "role": "tests",
+        "files": [
+          {
+            "path": "server/test/l03-diff-fixture.test.ts",
+            "pseudocode_summary": null,
+            "additions": 19,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      },
+      {
+        "role": "wiring",
+        "files": [
+          {
+            "path": "server/src/modules/reviews/index.ts",
+            "pseudocode_summary": null,
+            "additions": 1,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      },
+      {
+        "role": "docs",
+        "files": [
+          {
+            "path": "docs/l03-review-fixture.md",
+            "pseudocode_summary": null,
+            "additions": 13,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      },
+      {
+        "role": "boilerplate",
+        "files": [
+          {
+            "path": "server/pnpm-lock.yaml",
+            "pseudocode_summary": null,
+            "additions": 1,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      }
+    ],
+    "split_suggestion": {
+      "too_big": false,
+      "total_lines": 74,
+      "proposed_splits": []
+    }
+  }
+}

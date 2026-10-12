@@ -5,7 +5,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Textarea, Button } from "@devdigest/ui";
-import { cs, type DiffCommentApi } from "../comments";
+import { cs, commentDraftKey, type DiffCommentApi } from "../comments";
 
 export function InlineComposer({
   commenting,
@@ -23,7 +23,13 @@ export function InlineComposer({
   onClose: () => void;
 }) {
   const t = useTranslations("shell");
-  const [text, setText] = React.useState("");
+  const [localText, setLocalText] = React.useState("");
+  const draftKey = commentDraftKey(path, line, side, inReplyTo);
+  const text = commenting.drafts?.values[draftKey]?.text ?? localText;
+  const setText = (value: string) => {
+    setLocalText(value);
+    commenting.drafts?.update(draftKey, { text: value });
+  };
   const submit = async () => {
     const body = text.trim();
     if (!body) return;

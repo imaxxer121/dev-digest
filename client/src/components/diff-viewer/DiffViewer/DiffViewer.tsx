@@ -7,25 +7,42 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import type { PrFile } from "@/lib/types";
-import { type DiffCommentApi } from "../comments";
+import { type DiffCommentApi, type DiffDraftApi } from "../comments";
 import { s } from "../styles";
 import { FileCard } from "../FileCard";
+import { RoleGroup } from "../RoleGroup";
+import { groupedFiles, type DiffFindingsApi } from "../findings";
+import type { SmartDiffResponse } from "@devdigest/shared";
 
 export function DiffViewer({
   files,
   commenting,
+  reviewing,
+  groups,
 }: {
   files: PrFile[];
   commenting?: DiffCommentApi;
+  reviewing?: DiffFindingsApi;
+  groups?: SmartDiffResponse["groups"];
 }) {
   const t = useTranslations("shell");
+  const [drafts, setDrafts] = React.useState<DiffDraftApi["values"]>({});
+  const updateDraft = React.useCallback<DiffDraftApi["update"]>((key, patch) => {
+    setDrafts((before) => ({ ...before, [key]: { open: false, text: "", ...before[key], ...patch } }));
+  }, []);
+  const commentsWithDrafts = commenting ? { ...commenting, drafts: { values: drafts, update: updateDraft } } : undefined;
+  if (groups) {
+    return <div style={s.list}>{groupedFiles(files, groups).map((group) => (
+      <RoleGroup key={group.role} {...group} commenting={commentsWithDrafts} reviewing={reviewing} />
+    ))}</div>;
+  }
   if (!files || files.length === 0) {
     return <div style={s.empty}>{t("diffViewer.noChangedFiles")}</div>;
   }
   return (
     <div style={s.list}>
-      {files.map((f, i) => (
-        <FileCard key={i} file={f} commenting={commenting} />
+      {files.map((f) => (
+        <FileCard key={f.path} file={f} commenting={commentsWithDrafts} reviewing={reviewing} />
       ))}
     </div>
   );

@@ -27,6 +27,7 @@ export function FindingCard({
   f,
   focused,
   defaultExpanded,
+  showSeverityLabel = false,
   onAction,
   pending,
   repoFullName,
@@ -35,6 +36,7 @@ export function FindingCard({
   f: FindingRecord;
   focused?: boolean;
   defaultExpanded?: boolean;
+  showSeverityLabel?: boolean;
   onAction?: (action: FindingActionKind, reply?: string) => void;
   pending?: boolean;
   repoFullName?: string | null;
@@ -55,7 +57,7 @@ export function FindingCard({
     <div data-finding-id={f.id} style={s.card(!!focused, sevColor, muted)}>
       <div onClick={() => setExpanded((e) => !e)} style={s.header}>
         <div style={s.badgeWrap}>
-          <SeverityBadge severity={f.severity as Severity} compact />
+          <SeverityBadge severity={f.severity as Severity} compact={!showSeverityLabel} />
         </div>
         <div style={s.headerMain}>
           <div style={s.titleRow}>
