@@ -30,6 +30,7 @@ export type BlastCaller = z.infer<typeof BlastCaller>;
 
 export const DownstreamImpact = z.object({
   symbol: z.string(),
+  symbol_file: z.string().optional(),
   callers: z.array(BlastCaller),
   endpoints_affected: z.array(z.string()),
   crons_affected: z.array(z.string()),
@@ -40,6 +41,15 @@ export const BlastRadius = z.object({
   changed_symbols: z.array(ChangedSymbol),
   downstream: z.array(DownstreamImpact),
   summary: z.string(),
+  degraded: z.boolean().default(false),
+  reason: z.enum(['flag_off', 'index_failed', 'index_partial', 'repo_too_large', 'no_data']).nullish(),
+  indexed_sha: z.string().nullish(),
+  counts: z.object({
+    symbols: z.number().int().nonnegative(),
+    callers: z.number().int().nonnegative(),
+    endpoints: z.number().int().nonnegative(),
+    crons: z.number().int().nonnegative(),
+  }).optional(),
 });
 export type BlastRadius = z.infer<typeof BlastRadius>;
 

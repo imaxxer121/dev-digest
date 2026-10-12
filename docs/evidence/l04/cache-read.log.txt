@@ -1,0 +1,13 @@
+[21:03:24.995] INFO (30020): blast radius read
+    prId: "6c5fdc55-3bf4-4e45-a678-f1c9a60de1bc"
+    repoId: "7b59db39-cd55-4c11-8690-faf47a579983"
+    counts: {
+      "symbols": 2,
+      "callers": 8,
+      "endpoints": 27,
+      "crons": 0
+    }
+    source: "persisted-repo-intel"
+    indexedSha: "674794b9af6a7592251755c134441ee589a72134"
+    degraded: false
+    reason: null

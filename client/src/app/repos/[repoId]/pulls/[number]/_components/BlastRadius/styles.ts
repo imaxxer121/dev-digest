@@ -1,0 +1,25 @@
+import type { CSSProperties } from "react";
+
+export const s = {
+  panel: { border: "1px solid var(--border)", borderRadius: 8, background: "var(--bg-elevated)", padding: 18, display: "flex", flexDirection: "column", gap: 16 } satisfies CSSProperties,
+  stats: { display: "flex", gap: 28, flexWrap: "wrap" } satisfies CSSProperties,
+  stat: { display: "flex", flexDirection: "column", gap: 4 } satisfies CSSProperties,
+  value: { fontSize: 24, fontWeight: 650, color: "var(--text-primary)" } satisfies CSSProperties,
+  caption: { fontSize: 12, color: "var(--text-muted)" } satisfies CSSProperties,
+  coverage: { fontSize: 12, lineHeight: 1.5, color: "var(--text-muted)", margin: 0 } satisfies CSSProperties,
+  warning: { color: "var(--warn)", background: "var(--warn-bg)", padding: "10px 12px", borderRadius: 6, fontSize: 13, lineHeight: 1.5 } satisfies CSSProperties,
+  empty: { margin: 0, fontSize: 13, lineHeight: 1.5, color: "var(--text-secondary)" } satisfies CSSProperties,
+  list: { display: "flex", flexDirection: "column", gap: 12 } satisfies CSSProperties,
+  symbol: { border: "1px solid var(--border)", borderRadius: 6, padding: 12 } satisfies CSSProperties,
+  symbolHeader: { display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10 } satisfies CSSProperties,
+  symbolToggle: { display: "inline-flex", alignItems: "center", flexWrap: "wrap", gap: 8, background: "transparent", border: 0, padding: 0, cursor: "pointer", color: "var(--text-primary)", fontSize: 13, textAlign: "left" } satisfies CSSProperties,
+  kind: { color: "var(--text-muted)", fontSize: 11, background: "var(--bg-surface)", borderRadius: 4, padding: "2px 6px" } satisfies CSSProperties,
+  body: { display: "flex", flexDirection: "column", gap: 12, marginTop: 12, paddingLeft: 22 } satisfies CSSProperties,
+  callers: { display: "flex", flexDirection: "column", gap: 7, listStyle: "none", padding: 0, margin: 0 } satisfies CSSProperties,
+  caller: { display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: 10, fontSize: 13, color: "var(--text-secondary)" } satisfies CSSProperties,
+  chips: { display: "flex", gap: 6, flexWrap: "wrap", marginTop: 5 } satisfies CSSProperties,
+  endpoint: { fontSize: 12, color: "var(--accent-text)", background: "var(--accent-bg)", borderRadius: 4, padding: "4px 7px" } satisfies CSSProperties,
+  cron: { fontSize: 12, color: "var(--text-secondary)", background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 4, padding: "4px 7px" } satisfies CSSProperties,
+  source: { fontSize: 13, color: "var(--text-muted)" } satisfies CSSProperties,
+  error: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10, color: "var(--crit)", fontSize: 13 } satisfies CSSProperties,
+} as const;

@@ -65,6 +65,8 @@ export interface BlastCallerRow {
   symbol: string;
   /** Which changed symbol this caller reaches. */
   viaSymbol: string;
+  /** Declaration path, to disambiguate identical symbol names. */
+  viaFile?: string;
   /** 1-based line of the reference (representative; for the BlastRadius view). */
   line: number;
   /** file_rank.rank of the caller file (0 in the degraded/ripgrep path). */
@@ -72,6 +74,8 @@ export interface BlastCallerRow {
 }
 
 export interface BlastResult {
+  /** Snapshot to which all cached line numbers belong. */
+  indexedSha?: string;
   changedSymbols: BlastChangedSymbol[];
   callers: BlastCallerRow[];
   /** "METHOD /path" (via extractEndpoints / file_facts) — flat union. */

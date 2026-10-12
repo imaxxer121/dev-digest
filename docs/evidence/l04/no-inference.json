@@ -1,0 +1,352 @@
+{
+  "before": [
+    {
+      "agent_runs": "21",
+      "symbols": "1032",
+      "references": "6416",
+      "edges": "514",
+      "index_updated_at": "2026-10-12 18:55:17.088+00",
+      "indexed_sha": "674794b9af6a7592251755c134441ee589a72134"
+    }
+  ],
+  "after": [
+    {
+      "agent_runs": "21",
+      "symbols": "1032",
+      "references": "6416",
+      "edges": "514",
+      "index_updated_at": "2026-10-12 18:55:17.088+00",
+      "indexed_sha": "674794b9af6a7592251755c134441ee589a72134"
+    }
+  ],
+  "unchanged": true,
+  "responses": [
+    {
+      "changed_symbols": [
+        {
+          "name": "getContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "function"
+        },
+        {
+          "name": "RequestContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "interface"
+        }
+      ],
+      "downstream": [
+        {
+          "symbol": "getContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [
+            {
+              "name": "repoIntelRoutes",
+              "file": "server/src/modules/repo-intel/routes.ts",
+              "line": 38
+            },
+            {
+              "name": "agentsRoutes",
+              "file": "server/src/modules/agents/routes.ts",
+              "line": 75
+            },
+            {
+              "name": "pollingRoutes",
+              "file": "server/src/modules/polling/routes.ts",
+              "line": 21
+            },
+            {
+              "name": "pullsRoutes",
+              "file": "server/src/modules/pulls/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reposRoutes",
+              "file": "server/src/modules/repos/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reviewsRoutes",
+              "file": "server/src/modules/reviews/routes.ts",
+              "line": 31
+            },
+            {
+              "name": "settingsRoutes",
+              "file": "server/src/modules/settings/routes.ts",
+              "line": 29
+            },
+            {
+              "name": "workspaceRoutes",
+              "file": "server/src/modules/workspace/routes.ts",
+              "line": 17
+            }
+          ],
+          "endpoints_affected": [
+            "DELETE /agents/:id",
+            "DELETE /repos/:id",
+            "DELETE /reviews/:id",
+            "DELETE /runs/:id",
+            "GET /agents",
+            "GET /agents/:id",
+            "GET /agents/:id/models",
+            "GET /agents/:id/skills",
+            "GET /agents/:id/versions",
+            "GET /providers/:id/models",
+            "GET /pulls/:id",
+            "GET /pulls/:id/reviews",
+            "GET /pulls/:id/runs",
+            "GET /pulls/:id/runs/active",
+            "GET /repos",
+            "GET /repos/:id/pulls",
+            "GET /runs/:id/trace",
+            "GET /settings",
+            "GET /settings/secrets-status",
+            "GET /workspace",
+            "POST /agents",
+            "POST /findings/:id/${action}",
+            "POST /repos",
+            "POST /repos/:id/poll",
+            "POST /repos/:id/refresh",
+            "POST /runs/:id/cancel",
+            "PUT /settings"
+          ],
+          "crons_affected": []
+        },
+        {
+          "symbol": "RequestContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [],
+          "endpoints_affected": [],
+          "crons_affected": []
+        }
+      ],
+      "summary": "2 symbols · 8 callers · 27 endpoints · 0 cron/jobs",
+      "degraded": false,
+      "reason": null,
+      "indexed_sha": "674794b9af6a7592251755c134441ee589a72134",
+      "counts": {
+        "symbols": 2,
+        "callers": 8,
+        "endpoints": 27,
+        "crons": 0
+      }
+    },
+    {
+      "changed_symbols": [
+        {
+          "name": "getContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "function"
+        },
+        {
+          "name": "RequestContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "interface"
+        }
+      ],
+      "downstream": [
+        {
+          "symbol": "getContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [
+            {
+              "name": "repoIntelRoutes",
+              "file": "server/src/modules/repo-intel/routes.ts",
+              "line": 38
+            },
+            {
+              "name": "agentsRoutes",
+              "file": "server/src/modules/agents/routes.ts",
+              "line": 75
+            },
+            {
+              "name": "pollingRoutes",
+              "file": "server/src/modules/polling/routes.ts",
+              "line": 21
+            },
+            {
+              "name": "pullsRoutes",
+              "file": "server/src/modules/pulls/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reposRoutes",
+              "file": "server/src/modules/repos/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reviewsRoutes",
+              "file": "server/src/modules/reviews/routes.ts",
+              "line": 31
+            },
+            {
+              "name": "settingsRoutes",
+              "file": "server/src/modules/settings/routes.ts",
+              "line": 29
+            },
+            {
+              "name": "workspaceRoutes",
+              "file": "server/src/modules/workspace/routes.ts",
+              "line": 17
+            }
+          ],
+          "endpoints_affected": [
+            "DELETE /agents/:id",
+            "DELETE /repos/:id",
+            "DELETE /reviews/:id",
+            "DELETE /runs/:id",
+            "GET /agents",
+            "GET /agents/:id",
+            "GET /agents/:id/models",
+            "GET /agents/:id/skills",
+            "GET /agents/:id/versions",
+            "GET /providers/:id/models",
+            "GET /pulls/:id",
+            "GET /pulls/:id/reviews",
+            "GET /pulls/:id/runs",
+            "GET /pulls/:id/runs/active",
+            "GET /repos",
+            "GET /repos/:id/pulls",
+            "GET /runs/:id/trace",
+            "GET /settings",
+            "GET /settings/secrets-status",
+            "GET /workspace",
+            "POST /agents",
+            "POST /findings/:id/${action}",
+            "POST /repos",
+            "POST /repos/:id/poll",
+            "POST /repos/:id/refresh",
+            "POST /runs/:id/cancel",
+            "PUT /settings"
+          ],
+          "crons_affected": []
+        },
+        {
+          "symbol": "RequestContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [],
+          "endpoints_affected": [],
+          "crons_affected": []
+        }
+      ],
+      "summary": "2 symbols · 8 callers · 27 endpoints · 0 cron/jobs",
+      "degraded": false,
+      "reason": null,
+      "indexed_sha": "674794b9af6a7592251755c134441ee589a72134",
+      "counts": {
+        "symbols": 2,
+        "callers": 8,
+        "endpoints": 27,
+        "crons": 0
+      }
+    },
+    {
+      "changed_symbols": [
+        {
+          "name": "getContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "function"
+        },
+        {
+          "name": "RequestContext",
+          "file": "server/src/modules/_shared/context.ts",
+          "kind": "interface"
+        }
+      ],
+      "downstream": [
+        {
+          "symbol": "getContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [
+            {
+              "name": "repoIntelRoutes",
+              "file": "server/src/modules/repo-intel/routes.ts",
+              "line": 38
+            },
+            {
+              "name": "agentsRoutes",
+              "file": "server/src/modules/agents/routes.ts",
+              "line": 75
+            },
+            {
+              "name": "pollingRoutes",
+              "file": "server/src/modules/polling/routes.ts",
+              "line": 21
+            },
+            {
+              "name": "pullsRoutes",
+              "file": "server/src/modules/pulls/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reposRoutes",
+              "file": "server/src/modules/repos/routes.ts",
+              "line": 27
+            },
+            {
+              "name": "reviewsRoutes",
+              "file": "server/src/modules/reviews/routes.ts",
+              "line": 31
+            },
+            {
+              "name": "settingsRoutes",
+              "file": "server/src/modules/settings/routes.ts",
+              "line": 29
+            },
+            {
+              "name": "workspaceRoutes",
+              "file": "server/src/modules/workspace/routes.ts",
+              "line": 17
+            }
+          ],
+          "endpoints_affected": [
+            "DELETE /agents/:id",
+            "DELETE /repos/:id",
+            "DELETE /reviews/:id",
+            "DELETE /runs/:id",
+            "GET /agents",
+            "GET /agents/:id",
+            "GET /agents/:id/models",
+            "GET /agents/:id/skills",
+            "GET /agents/:id/versions",
+            "GET /providers/:id/models",
+            "GET /pulls/:id",
+            "GET /pulls/:id/reviews",
+            "GET /pulls/:id/runs",
+            "GET /pulls/:id/runs/active",
+            "GET /repos",
+            "GET /repos/:id/pulls",
+            "GET /runs/:id/trace",
+            "GET /settings",
+            "GET /settings/secrets-status",
+            "GET /workspace",
+            "POST /agents",
+            "POST /findings/:id/${action}",
+            "POST /repos",
+            "POST /repos/:id/poll",
+            "POST /repos/:id/refresh",
+            "POST /runs/:id/cancel",
+            "PUT /settings"
+          ],
+          "crons_affected": []
+        },
+        {
+          "symbol": "RequestContext",
+          "symbol_file": "server/src/modules/_shared/context.ts",
+          "callers": [],
+          "endpoints_affected": [],
+          "crons_affected": []
+        }
+      ],
+      "summary": "2 symbols · 8 callers · 27 endpoints · 0 cron/jobs",
+      "degraded": false,
+      "reason": null,
+      "indexed_sha": "674794b9af6a7592251755c134441ee589a72134",
+      "counts": {
+        "symbols": 2,
+        "callers": 8,
+        "endpoints": 27,
+        "crons": 0
+      }
+    }
+  ]
+}

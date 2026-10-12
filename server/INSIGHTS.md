@@ -55,3 +55,27 @@ exclude the foreign review. `pnpm typecheck` and final `pnpm test` passed
 185 tests in 28 files, including all PostgreSQL cases. These tests use provider
 spies; the separate actual run is documented in
 `../docs/evidence/l03/real-review.json`.
+
+## 2026-10-12 — Cached impact reads need declaration identity and POSIX paths
+
+Blast Radius reads only persisted index rows (`src/modules/repo-intel/service.ts:211`)
+and groups callers by declaration file plus symbol name, so duplicate names do
+not cross-contaminate groups. Enclosing names require both range endpoints
+(`src/modules/repo-intel/service.ts:635`); otherwise top-level references can be
+misnamed as a previous function. The PR and its parent repository are both
+workspace-checked before reading the facade (`src/modules/blast/service.ts:9`).
+
+Dependency-cruiser paths must normalize Windows separators before matching the
+POSIX index (`src/adapters/depgraph/index.ts:111`). A real full index initially
+had zero callers until this was fixed; reindexing the same fixture found eight.
+`test/depgraph-paths.test.ts:8` exercises the real adapter, including TS ESM
+`.js` imports. Final `pnpm typecheck` passed and `pnpm test` passed **197/197**
+in 32 files, including PostgreSQL integration. Cache tests forbid parser, Git
+and provider I/O. Three actual HTTP reads left run/index records unchanged;
+the actual stdio MCP and Codex call records are in `../docs/evidence/l04/`.
+
+Cached reverse file imports extend potential endpoint/cron impact by one hop
+after a direct symbol caller (`src/modules/repo-intel/service.ts:666`). This is
+not a second-hop symbol call graph or proof of runtime invocation. Existing
+index writes are not atomic; snapshot guarantees during concurrent reindexing
+require a future versioned/transactional index change.

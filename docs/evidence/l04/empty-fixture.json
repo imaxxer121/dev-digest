@@ -1,0 +1,14 @@
+{
+  "pr_id": "7c44fd3b-8c6d-4f17-9136-7bdd4a2ce203",
+  "github_url": "https://github.com/imaxxer121/dev-digest/pull/11",
+  "base": "c3c804216fb4b954315c544280d68110ec1e5b05",
+  "head": "e93e59fb11eb92089eee129a44b7fcdf6682ea9e",
+  "files": [
+    {
+      "path": "docs/l04-no-callers.md",
+      "additions": 5,
+      "deletions": 0,
+      "patch": "@@ -0,0 +1,5 @@\n+# Blast Radius empty-state example\n+\n+This documentation-only PR changes no indexed JavaScript or TypeScript symbol.\n+The existing full repository index should therefore produce zero callers and\n+an explicit empty-state message. It must not trigger a model or reindex the repo.\n"
+    }
+  ]
+}

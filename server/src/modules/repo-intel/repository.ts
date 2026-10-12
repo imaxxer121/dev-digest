@@ -124,6 +124,7 @@ export interface FullSymbolRow {
 
 /** A resolved cross-file caller (reference whose decl_file is a changed file). */
 export interface ResolvedCallerRow {
+  declFile: string | null;
   fromPath: string;
   toSymbol: string;
   line: number;
@@ -512,6 +513,7 @@ export class RepoIntelRepository {
         toSymbol: t.references.toSymbol,
         line: t.references.line,
         rank: t.fileRank.rank,
+        declFile: t.references.declFile,
       })
       .from(t.references)
       .innerJoin(
