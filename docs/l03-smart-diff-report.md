@@ -61,7 +61,7 @@ Evidence: [no-inference](evidence/l03/no-inference.json), [real run](evidence/l0
 
 ## Demo
 
-The demo is **110 seconds (1:50), H.264/MP4**, assembled from actual browser captures with captions. It is an **edited step-by-step walkthrough, not a continuous screencast**. Model waiting time is condensed; final traces show the actual duration and usage. The MP4 was decoded and played in the browser through a local byte-range preview. The native GitHub attachment is linked in the implementation PR description; a [repository copy](assets/l03/l03-smart-diff-demo.mp4) is also retained. The in-app browser could not play the GitHub CDN embed, so successful remote embedded playback is not claimed; the MP4 can be downloaded.
+The demo is **about 108 seconds (1:48), H.264/MP4**, assembled from actual browser captures with captions. It is an **edited step-by-step walkthrough, not a continuous screencast**. Model waiting time is condensed; final traces show the actual duration and usage. The MP4 was decoded and played in the browser through a local byte-range preview. The [native GitHub attachment](https://github.com/user-attachments/assets/a3c8ceb4-4aa8-4e87-a5d8-ce23e5549d34) is also in the implementation PR description; a [repository copy](assets/l03/l03-smart-diff-demo.mp4) is retained. The in-app browser could not play the GitHub CDN embed, so successful remote embedded playback is not claimed; the MP4 can be downloaded. The same final MP4 is attached directly to the GoIT homework.
 
 ![Five groups before inference](assets/l03/l03-before-review.png)
 ![One finding-bearing file after the real review](assets/l03/l03-after-review.png)
