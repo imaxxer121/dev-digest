@@ -17,6 +17,8 @@ Accept and Reject remain on detail cards.
 ## Model comparison
 
 The UI demo uses the starter's seeded PR, not a new model review. Claude Code has
-not been used. A separately logged Codex run can provide actual inference evidence
-without an API key; its subscription does not expose a per-request dollar cost.
+not been used. Actual Codex-backed reviews and a same-diff prompt comparison are
+recorded in [l01-review-report.md](l01-review-report.md), with persisted traces.
+The CLI used an existing subscription without an API key; it does not expose a
+per-request dollar cost.
 Never present an unavailable comparison or seeded output as a real experiment.
