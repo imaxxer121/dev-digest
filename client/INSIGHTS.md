@@ -78,7 +78,15 @@ compact default. Evidence:
 `src/app/repos/[repoId]/pulls/[number]/_components/FindingCard/FindingCard.tsx:60`.
 After this focused change, `pnpm exec vitest run FindingCard.test.tsx
 DiffTab.test.tsx` passed 10 tests and `pnpm typecheck` passed.
-The final full `pnpm test` passed 68 tests across 20 files. Actual browser QA
+
+The course rubric also requires severity on the code row itself, rather than
+only on the card. `src/components/diff-viewer/CodeLine/CodeLine.tsx:44` selects
+the highest attached severity and renders a themed left stripe with the
+localized blocker/warning/suggestion label on the right. Hiding comments
+removes row markers along with cards; deleted-only and unmatched lines remain
+unmarked. After this fix, `pnpm test` passed 69 tests across 20 files and
+`pnpm typecheck` passed.
+The final full `pnpm test` passed 69 tests across 20 files. Actual browser QA
 confirmed three grounded findings below RIGHT:173/176/186, one finding-bearing
 file, persisted Accept/Reject and new-comment draft survival during mode changes
 (`../docs/evidence/l03/browser-checks.json`). Off-patch and external comment

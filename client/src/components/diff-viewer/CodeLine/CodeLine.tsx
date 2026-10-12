@@ -3,6 +3,8 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
+import { SEV, type Severity } from "@devdigest/ui";
 import { commentTargetFor, commentDraftKey, type CommentThread, type DiffCommentApi, cs } from "../comments";
 import { type Line } from "../helpers";
 import { s, lineRowFor, lineSignFor } from "../styles";
@@ -28,6 +30,7 @@ export function CodeLine({
 }) {
   const [hover, setHover] = React.useState(false);
   const [composing, setComposing] = React.useState(false);
+  const t = useTranslations("prReview.smartDiff");
 
   if (ln.kind === "hunk") {
     return (
@@ -38,6 +41,10 @@ export function CodeLine({
   }
 
   const sign = ln.kind === "add" ? "+" : ln.kind === "del" ? "−" : "";
+  const markedSeverity = reviewing?.showComments
+    ? (["CRITICAL", "WARNING", "SUGGESTION", "INFO"] as Severity[]).find((severity) => findings.some((finding) => finding.severity === severity))
+    : undefined;
+  const severityLabel = markedSeverity ? t(`rowSeverity.${markedSeverity}`) : null;
   const target = commenting?.canComment ? commentTargetFor(ln) : null;
   const draftKey = target ? commentDraftKey(path, target.line, target.side) : null;
   const isComposing = draftKey ? (commenting?.drafts?.values[draftKey]?.open ?? composing) : false;
@@ -54,7 +61,12 @@ export function CodeLine({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <div style={lineRowFor(ln.kind)}>
+      <div data-row-severity={markedSeverity} style={{
+        ...lineRowFor(ln.kind),
+        borderLeftWidth: markedSeverity ? 3 : 0,
+        borderLeftStyle: "solid",
+        borderLeftColor: markedSeverity ? SEV[markedSeverity].c : "transparent",
+      }}>
         <span className="mono tnum" style={{ ...s.lineNo, position: "relative" }}>
           {showAdd && target && (
             <button
@@ -75,6 +87,11 @@ export function CodeLine({
         <span className="mono" style={s.lineText}>
           {ln.text || " "}
         </span>
+        {markedSeverity && <span aria-label={t("rowFinding", { severity: severityLabel })} style={{
+          alignSelf: "center", flexShrink: 0, margin: "0 12px 0 8px", padding: "1px 6px",
+          borderRadius: 4, fontSize: 11, fontWeight: 600,
+          color: SEV[markedSeverity].c, background: SEV[markedSeverity].bg,
+        }}>{severityLabel}</span>}
       </div>
 
       {commenting &&

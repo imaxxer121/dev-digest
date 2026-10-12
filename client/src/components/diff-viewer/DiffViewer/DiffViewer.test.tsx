@@ -60,6 +60,22 @@ describe("Smart Diff rendering", () => {
     expect(screen.getByLabelText("1 GitHub comments")).toHaveTextContent("1");
   });
 
+  it("marks the actual RIGHT row with the highest severity stripe/right label and hides those markers", () => {
+    const { container, rerender } = render(view());
+    const right20 = container.querySelector('[data-diff-file="src/a.ts"] [data-diff-row="RIGHT:20"]') as HTMLElement;
+    const codeRow = right20.querySelector('[data-row-severity="CRITICAL"]') as HTMLElement;
+    expect(codeRow).toHaveStyle({ borderLeftWidth: "3px", borderLeftStyle: "solid", borderLeftColor: "var(--crit)" });
+    expect(codeRow.lastElementChild).toHaveTextContent("blocker");
+    expect(within(codeRow).getByLabelText("Review finding: blocker")).toBeInTheDocument();
+    const right50 = container.querySelector('[data-diff-row="RIGHT:50"]') as HTMLElement;
+    expect(within(right50).getByLabelText("Review finding: warning")).toBeInTheDocument();
+    const left10 = container.querySelector('[data-diff-row="LEFT:10"]') as HTMLElement;
+    expect(left10.querySelector("[data-row-severity]")).toBeNull();
+    rerender(view(false));
+    expect(container.querySelector("[data-row-severity]")).toBeNull();
+    expect(screen.queryByLabelText("Review finding: blocker")).not.toBeInTheDocument();
+  });
+
   it("hides both sources without changing dots/counts and posts a correctly anchored human comment", async () => {
     const submit = vi.fn().mockResolvedValue({});
     const { container, rerender } = render(view(true, true, submit));

@@ -67,6 +67,13 @@
     "findingFiles": "{count} files with findings",
     "fileFindings": "{count} review findings",
     "humanComments": "{count} GitHub comments",
+    "rowSeverity": {
+      "CRITICAL": "blocker",
+      "WARNING": "warning",
+      "SUGGESTION": "suggestion",
+      "INFO": "info"
+    },
+    "rowFinding": "Review finding: {severity}",
     "emptyGroup": "No files in this group.",
     "outsidePatch": "Findings outside the shown diff",
     "changedFiles": "Files changed · {count} files",

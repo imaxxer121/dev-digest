@@ -7,7 +7,7 @@ Files changed now groups real PR files as **core → tests → wiring → docs �
 - Pure ordered rules in `server/src/modules/reviews/smart-diff/` classify paths. Boilerplate precedes tests, wiring, docs and the core fallback. The matrix includes snapshots under tests, `.claude` Markdown and an e2e README.
 - `GET /pulls/:id/smart-diff` validates the ID and workspace, reads persisted files and the latest `kind=review`, and returns the shared five-role contract. A newer summary is excluded; a latest empty review clears old markers. Equal timestamps use an ID tie break. Both vendored contracts match.
 - The existing reviews feed is also scoped by workspace, so inline cards and server markers agree even for a malformed cross-workspace database row.
-- Shared diff components receive a finding renderer from the page. They do not import the page-local FindingCard. Actual parsed RIGHT line keys determine anchors; deleted rows cannot anchor new-side findings. Unmatched/binary findings appear once at the file end.
+- Shared diff components receive a finding renderer from the page. They do not import the page-local FindingCard. Actual parsed RIGHT line keys determine anchors; deleted rows cannot anchor new-side findings. Matching code rows have a severity-colored left stripe and a localized right label (Critical → blocker, Warning → warning, Suggestion → suggestion); multiple findings use the highest severity. Unmatched/binary findings appear once at the file end.
 - Counts include accepted/dismissed findings and are independent of visibility. Human comment counts and finding dots are distinct. One Show/Hide comments switch controls both sources. Accept/Reject uses the existing persisted actions and refreshes both caches.
 - The PR page observes completed runs while any tab is open. Continuous persisted-history polling also catches a run whose running state was missed between active polls. Path/side/line/reply-keyed draft state survives grouped/original remounts.
 
@@ -21,7 +21,7 @@ The user explicitly authorized these subagents in the current chat. These roles 
 | implementer | Implemented the client, contracts, interaction/cache regressions and client INSIGHTS. The primary implemented server code and integration tests. |
 | architecture-reviewer | Independently inspected route/service/repository boundaries, contracts, renderer isolation, anchors and cache behavior. Found composer draft loss and missed fast background completion. Both were corrected with regressions. Final read-only review found no unresolved material issue. |
 | plan-verifier | Independently compared the plan with code/tests. Found the reviews-feed workspace mismatch; it was corrected and the integration test now checks both endpoints. Independently ran 45 client interaction/hook tests and 41 server pure tests. |
-| primary browser QA | Ran the real fixture through the app, checked persisted decisions and draft survival, and found missing severity text in compact badges. Inline cards now explicitly show Critical/Warning/Suggestion/Info labels; other card callers retain their compact default. |
+| primary browser QA | Ran the real fixture through the app, checked persisted decisions and draft survival, and found missing severity text in compact badges. Inline cards now explicitly show Critical/Warning/Suggestion/Info labels; other card callers retain their compact default. Final rubric comparison also added the code-row stripe and localized right-side label, with a regression and narrow architecture re-review. |
 
 An optional sticky role-header attempt conflicted with the existing sticky PR header and was removed. Role headers are accessible normal-flow accordions; **sticky role headers are not implemented**.
 
@@ -35,7 +35,7 @@ Final checks on 2026-10-12:
 | Server `pnpm test` | **185/185**, 28 files, including PostgreSQL integration |
 | New server Smart Diff coverage | 38 path cases + 3 pure grouping cases + 4 persisted integration cases |
 | Client `pnpm typecheck` | Passed after the final severity-label change |
-| Client `pnpm test` | **68/68**, 20 files; 22 additional tests relative to L02 |
+| Client `pnpm test` | **69/69**, 20 files; 23 additional tests relative to L02 |
 | `git diff --check` | Passed |
 | Smart Diff reads before inference | Three HTTP reads; run IDs remained `[]` before and after |
 
@@ -51,7 +51,7 @@ The public [fixture PR #8](https://github.com/imaxxer121/dev-digest/pull/8) chan
 - Completed in **103,139 ms**, **18,562 input / 3,046 output tokens**, grounding **3/3 passed**, score 41. Dollar cost is **unknown/null**.
 - Findings: Critical SSRF at RIGHT:173; Warning webhook payload compatibility at RIGHT:176; Warning ignored response at RIGHT:186.
 
-The browser stayed on Files changed during completion and showed three findings with **one core file with findings** without reloading. Full cards were visibly anchored below the correct lines. Accept and Reject persisted, Hide/Show removed/restored cards without changing counts, and a typed new-comment draft survived grouped → original → grouped before being cancelled.
+The browser stayed on Files changed during completion and showed three findings with **one core file with findings** without reloading. Full cards were visibly anchored below the correct lines, with code-row stripes and blocker/warning labels. Accept and Reject persisted and survived a later reload. Hide/Show removed/restored cards and row markers without changing counts, and a typed new-comment draft survived grouped → original → grouped before being cancelled.
 
 The runtime used the existing Codex CLI login without a Claude Code account or API key. The application trace's `review_file` label records its own single-pass step; it does not prove an inference-side tool call. No Claude comparison or model tool execution is claimed.
 
@@ -61,7 +61,7 @@ Evidence: [no-inference](evidence/l03/no-inference.json), [real run](evidence/l0
 
 ## Demo
 
-The demo is **96 seconds (1:36), H.264/MP4**, assembled from actual browser captures with captions. It is an **edited step-by-step walkthrough, not a continuous screencast**. Model waiting time is condensed; final traces show the actual duration and usage. The MP4 was decoded and played in the browser through a local byte-range preview. The native GitHub attachment is linked in the implementation PR description; a [repository copy](assets/l03/l03-smart-diff-demo.mp4) is also retained.
+The demo is **110 seconds (1:50), H.264/MP4**, assembled from actual browser captures with captions. It is an **edited step-by-step walkthrough, not a continuous screencast**. Model waiting time is condensed; final traces show the actual duration and usage. The MP4 was decoded and played in the browser through a local byte-range preview. The native GitHub attachment is linked in the implementation PR description; a [repository copy](assets/l03/l03-smart-diff-demo.mp4) is also retained. The in-app browser could not play the GitHub CDN embed, so successful remote embedded playback is not claimed; the MP4 can be downloaded.
 
 ![Five groups before inference](assets/l03/l03-before-review.png)
 ![One finding-bearing file after the real review](assets/l03/l03-after-review.png)

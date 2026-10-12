@@ -24,8 +24,14 @@
     186
   ],
   "hide_restore_findings_preserves_counts": true,
+  "code_row_stripe_and_labels_observed": [
+    "blocker",
+    "warning"
+  ],
+  "hide_restore_row_markers_preserves_counts": true,
   "new_comment_draft_survived_original_and_grouped_modes": true,
   "draft_posted_to_github": false,
   "accept_and_reject_seen_persisted": true,
+  "accept_and_reject_survived_browser_reload": true,
   "scope_note": "Human-thread hide/reply/posting and off-patch/binary cases are deterministic interaction tests. GitHub API was offline for this real model demo; no successful external comment posting is claimed. All three real findings were inside the shown patch."
 }
