@@ -1,4 +1,4 @@
-# L01 — review costs and severity findings
+# L01 â€” review costs and severity findings
 
 The implementation plan was approved on 2026-10-12. The separate 24-point rubric
 was subsequently checked and the scope corrected to include all required surfaces.
@@ -13,7 +13,7 @@ filtering updates the visible counts. Navigation starts fresh local state.
 The PR list shows persisted severity counts and a read-only preview headed
 N FINDINGS IN THIS RUN. Detail cards retain Accept/Reject actions. Successful-run
 cost is stored and displayed in the PR list total, Timeline and Trace Stats.
-Unknown cost is —, never a fabricated zero. Trace also retains its findings section.
+Unknown cost is â€”, never a fabricated zero. Trace also retains its findings section.
 
 ## Implementation and validation
 

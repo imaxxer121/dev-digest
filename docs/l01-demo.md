@@ -1,22 +1,22 @@
-# L01 severity-filter demo
+# L01 actual UI walkthrough
 
 [Watch the demo](assets/l01-severity-demo.mp4).
 
-The recording shows the actual local interface on seeded PR #482: all findings,
-CRITICAL, WARNING, an empty SUGGESTION category, reset to All and the restored
-list. It was captured from browser frames at 5 fps and encoded as MP4.
-The fixture has 1 CRITICAL, 1 WARNING and 0 SUGGESTION findings.
+The video uses screenshots captured from the actual local interface at each
+interaction on the starter seeded PR #482: all findings, Warning, repeat-click
+reset, absent Suggestion, Critical, and the PR-list findings preview. Each captured
+state is held briefly for readability and the frames are encoded as MP4. The
+fixture has one critical and one warning; it is not a new model review. Cost is
+unknown because the fixture has no priced runs.
 
-Validation completed on 2026-10-12:
+Validated on 2026-10-12: client typechecking and 42 tests; server typechecking and
+103 unit tests; migration 0010 applied; browser filter/reset/empty/preview checks.
+The four hover-component tests passed again after keyboard/click support. DB
+integration and the standalone e2e runner were not run. Every package has docs,
+specs and Read When links. Cost capture, Timeline and Trace Stats are additionally
+covered by code/contracts and component tests.
 
-- Client TypeScript check and 26 component tests passed.
-- Server TypeScript check and 101 unit tests passed.
-- Browser selection, repeat-click reset, empty category, keyboard Enter and
-  a 768 px viewport checked; temporary viewport override reset afterward.
-- Local `agent_runs` count stayed 0 before and after filtering.
-- Engineering-insights skill metadata validated and module notes recorded.
-
-The starter shell has a fixed sidebar and is not suitable for a 375 px phone
-viewport. DB integration tests and real reviewer/Claude Code comparison were
-not run. The comparison needs model access; this demo is not model-quality
-evidence.
+A separate real Codex CLI inference completed using the existing ChatGPT login,
+without an API key. It identified a response-field rename at src/api/profile.ts:2
+in a supplied coursework diff. This is separate from the seeded UI video and is
+not a Claude Code comparison or a DevDigest persisted run.
