@@ -108,7 +108,6 @@ export function FindingsHoverCard({
       <div
         ref={panelRef}
         role="presentation"
-        aria-hidden
         onMouseEnter={cancelClose}
         onMouseLeave={scheduleClose}
         onClick={(e) => e.stopPropagation()}
@@ -174,6 +173,7 @@ export function FindingsHoverCard({
       onBlur={scheduleClose}
       onClick={(e) => { e.stopPropagation(); handleOpen(); }}
       onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleOpen(); }
       }}
     >

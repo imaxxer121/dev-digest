@@ -13,6 +13,11 @@ function setup() {
 }
 
 describe("FindingsHoverCard", () => {
+  it("does not cancel Enter on a link rendered through its portal", () => {
+    render(<FindingsHoverCard anchor={<span>chips</span>} header="Findings"><a href="/file">Open file</a></FindingsHoverCard>);
+    fireEvent.focus(screen.getByRole("button", {name:"Preview findings"}));
+    expect(fireEvent.keyDown(screen.getByRole("link", {name:"Open file"}), {key:"Enter"})).toBe(true);
+  });
   it("is closed until the anchor is hovered", () => {
     setup();
     expect(screen.queryByText("finding body")).not.toBeInTheDocument();
