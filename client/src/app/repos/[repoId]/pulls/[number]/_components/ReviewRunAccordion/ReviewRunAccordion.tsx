@@ -7,7 +7,7 @@
 
 import React from "react";
 import { Icon, Badge } from "@devdigest/ui";
-import type { ReviewRecord, Verdict } from "@devdigest/shared";
+import type { ReviewRecord, Verdict, Severity } from "@devdigest/shared";
 import { FindingsPanel } from "../FindingsPanel";
 import { VerdictBanner } from "../VerdictBanner";
 import { useDeleteReview } from "../../../../../../../lib/hooks/reviews";
@@ -27,6 +27,7 @@ export function ReviewRunAccordion({
   review,
   prId,
   defaultOpen = false,
+  severity = null,
   repoFullName,
   headSha,
   targetRunId = null,
@@ -35,6 +36,7 @@ export function ReviewRunAccordion({
   review: ReviewRecord;
   prId: string;
   defaultOpen?: boolean;
+  severity?: Severity | null;
   repoFullName?: string | null;
   headSha?: string | null;
   /** When this matches review.run_id, the accordion opens and scrolls into view
@@ -43,6 +45,9 @@ export function ReviewRunAccordion({
   targetNonce?: number;
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
+  React.useEffect(() => {
+    if (severity) setOpen(true);
+  }, [severity]);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
     if (review.run_id && review.run_id === targetRunId) {
@@ -149,6 +154,7 @@ export function ReviewRunAccordion({
           )}
           <FindingsPanel
             findings={findings}
+            severity={severity}
             prId={prId}
             repoFullName={repoFullName}
             headSha={headSha}

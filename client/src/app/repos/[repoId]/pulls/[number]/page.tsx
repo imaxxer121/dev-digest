@@ -138,6 +138,7 @@ export default function PRDetailPage() {
 
         {tab === "findings" && (
           <FindingsTab
+            key={prId}
             prId={prId}
             liveRunIds={liveRunIds}
             reviewRunning={reviewRunning}
