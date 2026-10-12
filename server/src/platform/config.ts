@@ -29,6 +29,8 @@ const EnvSchema = z.object({
   API_PORT: z.coerce.number().int().default(3001),
   WEB_PORT: z.coerce.number().int().default(3000),
   DEVDIGEST_CLONE_DIR: z.string().optional(),
+  CODEX_CLI_PATH: z.string().optional(),
+  GITHUB_API_OFFLINE: z.string().optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   // `.env` (and .env.example) ship `LOG_LEVEL=` empty; an empty string is not a
   // valid enum member, so coerce '' → undefined to fall through to the default.
@@ -44,6 +46,9 @@ export type AppConfig = {
   webPort: number;
   /** Absolute path where repos are cloned (~/.devdigest/workspace by default). */
   cloneDir: string;
+  codexCliPath?: string;
+  /** Skip GitHub REST calls and serve imported records. Git fetches remain available. */
+  githubApiOffline?: boolean;
   /** Absolute path to the writable secrets store (BYO keys from the UI). */
   secretsPath: string;
   nodeEnv: 'development' | 'test' | 'production';
@@ -68,6 +73,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const cloneDir = isAbsolute(cloneDirRaw) ? cloneDirRaw : resolve(process.cwd(), cloneDirRaw);
   return {
     databaseUrl: parsed.DATABASE_URL,
+    codexCliPath: parsed.CODEX_CLI_PATH,
+    githubApiOffline: parsed.GITHUB_API_OFFLINE === 'true',
     apiPort: parsed.API_PORT,
     webPort: parsed.WEB_PORT,
     cloneDir,

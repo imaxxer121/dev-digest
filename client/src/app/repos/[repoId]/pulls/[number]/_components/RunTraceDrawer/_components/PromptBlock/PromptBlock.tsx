@@ -34,7 +34,7 @@ export function PromptBlock({ label, text, color }: { label: string; text: strin
     <div style={s.promptRow}>
       <div onClick={() => setOpen((o) => !o)} style={s.promptHead}>
         <span style={s.promptDot(color)} />
-        <span style={s.promptLabel}>{label}</span>
+        <span style={s.promptLabel}>{label} · ~{Math.ceil((text || "").length / 4)} tokens</span>
         <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
           <button
             type="button"

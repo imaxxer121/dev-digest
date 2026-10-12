@@ -22,3 +22,18 @@ unknown instead of a partial sum. Evidence: `src/modules/pulls/cost.ts:3` and
 zero, null propagation and no runs. Server typechecking and 103 unit tests passed;
 migration 0010 was applied to the separate local fixture database. Preview reads
 use only the latest review's persisted findings, independent of cost history.
+
+## 2026-10-12 — Persist versions and knowledge decisions atomically
+
+Skill creation and its initial snapshot share a transaction; body edits lock the
+Skill row before assigning the next version (`src/modules/skills/repository.ts:76`
+and `src/modules/skills/repository.ts:112`). Concurrent edits now preserve both
+bodies and a matching current snapshot. Approved and rejected conventions survive
+re-scan (`src/modules/conventions/repository.ts:21`); exact source snippets are
+validated and their line is computed from loaded text
+(`src/modules/conventions/helpers.ts:4`). Agent Skill links reject foreign workspace
+IDs before replacement (`src/modules/agents/service.ts:158`).
+`pnpm typecheck` passed and `pnpm test` passed 140 tests, including 6 L02
+PostgreSQL integration cases. Model evidence is independent of these test results.
+The actual traces show saved Skill order and exclusion of a disabled body
+(`src/modules/reviews/run-executor.ts:188`, `../docs/evidence/l02/skills-composition.json:1`).

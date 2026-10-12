@@ -1,4 +1,5 @@
 import type { Container } from '../../platform/container.js';
+import { ValidationError } from '../../platform/errors.js';
 import type {
   Agent,
   AgentSkillLink,
@@ -57,7 +58,7 @@ export class AgentsService {
 
   async list(workspaceId: string): Promise<Agent[]> {
     const rows = await this.repo.list(workspaceId);
-    return rows.map(toAgentDto);
+    return Promise.all(rows.map(async row => ({ ...toAgentDto(row), skill_count: (await this.repo.linkedSkills(row.id)).length })));
   }
 
   async get(workspaceId: string, id: string): Promise<Agent | undefined> {
@@ -152,6 +153,10 @@ export class AgentsService {
   ): Promise<AgentSkillLink[] | undefined> {
     const agent = await this.repo.getById(workspaceId, agentId);
     if (!agent) return undefined;
+    if (new Set(skillIds).size !== skillIds.length) throw new ValidationError('Skill IDs must be unique');
+    for (const id of skillIds) {
+      if (!await this.container.skillsRepo.getById(workspaceId, id)) throw new ValidationError('Skill is not in this workspace');
+    }
     await this.repo.setSkills(agentId, skillIds);
     return this.skillLinks(agentId);
   }
@@ -165,6 +170,7 @@ export class AgentsService {
   ): Promise<AgentSkillLink[] | undefined> {
     const agent = await this.repo.getById(workspaceId, agentId);
     if (!agent) return undefined;
+    if (!await this.container.skillsRepo.getById(workspaceId, skillId)) throw new ValidationError('Skill is not in this workspace');
     const existing = await this.repo.linkedSkills(agentId);
     const resolvedOrder = order ?? existing.length;
     await this.repo.linkSkill(agentId, skillId, resolvedOrder);

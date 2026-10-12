@@ -1,0 +1,27 @@
+[
+  {
+    "agent_id": "3b20e718-0c29-4e3c-834c-6beaf61d5444",
+    "skill_id": "95dcf640-5202-4ef9-8ee9-17a9bf7c502f",
+    "order": 0
+  },
+  {
+    "agent_id": "3b20e718-0c29-4e3c-834c-6beaf61d5444",
+    "skill_id": "09d9d671-b3fc-44a4-a54a-d0d471c4494d",
+    "order": 1
+  },
+  {
+    "agent_id": "3b20e718-0c29-4e3c-834c-6beaf61d5444",
+    "skill_id": "845d5ae4-42e2-42f2-b61f-7d079de8de0b",
+    "order": 2
+  },
+  {
+    "agent_id": "3b20e718-0c29-4e3c-834c-6beaf61d5444",
+    "skill_id": "d917c8da-6177-4162-9d0f-f0b0e89134e7",
+    "order": 3
+  },
+  {
+    "agent_id": "3b20e718-0c29-4e3c-834c-6beaf61d5444",
+    "skill_id": "9adb1dcb-8e1d-418d-9203-22b121fa3c74",
+    "order": 4
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "id": "5db0f1da-8859-4cb9-b069-a7c31833ed53",
+    "category": "naming",
+    "rule": "Use camelCase for exported helper functions and PascalCase for TypeScript type names.",
+    "evidence_path": "server/src/platform/trace-builder.ts",
+    "evidence_line": 37,
+    "evidence_snippet": "export function buildRunTrace(input: BuildTraceInput): RunTrace {",
+    "confidence": 0.93,
+    "status": "pending",
+    "accepted": false
+  }
+]
