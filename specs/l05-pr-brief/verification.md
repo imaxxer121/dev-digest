@@ -1,8 +1,8 @@
 # L05 PR Brief — plan verification
 
-Verifier: the authorized `plan-verifier` subagent, inherited GPT-family Codex session. Date: 2026-10-12. Reviewed working implementation on `feat/l05-pr-brief` after artifact commit `612b9ee`. This report records implementation checks and their limits; it does not certify an unpublished submission.
+Verifier: the authorized `plan-verifier` subagent, inherited GPT-family Codex session. Date: 2026-10-12. Reviewed `feat/l05-pr-brief`, artifact commit `612b9ee` followed by implementation `1e5428b`. This report records implementation checks, runtime evidence and publication proof; root handles the separate GoIT submission.
 
-**Outcome:** no unresolved implementation P1 was found. The saved evidence now supports two actual Codex generations, cached reload, focus navigation and the controlled SHA exercise. AC-09 remains a publication/demo P1 gate. A different-family review remains unavailable (AC-18, P2).
+**Outcome:** all P1 requirements pass, including the published implementation PR and playable 2:09 demo (AC-09). The saved evidence supports two actual Codex generations, cached reload, focus navigation and the controlled SHA exercise. A different-family review remains unavailable (AC-18, P2); no cross-model review is claimed.
 
 ## Evidence independently checked
 
@@ -24,7 +24,14 @@ Read all eight JSON artifacts in `docs/evidence/l05/` and visually inspected roo
 - `browser-proof.json` and inspected focus screenshots show `server/src/modules/_shared/context.ts:19` open in Files changed/Core, with a genuine focused RIGHT row at viewport coordinates **376.30–396.30** inside a 720px viewport, marker true. The caller-only `server/src/modules/pulls/routes.ts` target displays the indexed-snapshot/file-not-in-diff fallback.
 - Freshness evidence uses root's **local controlled fixture**, not a remote commit: `PullsRepository.syncMeta` moves head to `controlled-l05-next-head`, old detail facts are cleared and the prior brief remains stale. Root restores real head `674794b9af6a7592251755c134441ee589a72134` and its detail through `saveDetail`; no additional generation is recorded.
 
-PASS below is supported by inspected implementation and deterministic checks, supplemented by R where applicable. Provider output describes potential exposure rather than proving code correctness; publication remains pending.
+### P — publication and demo evidence inspected
+
+- [Open implementation PR #13](https://github.com/imaxxer121/dev-digest/pull/13) targets `feat/l04-blast-radius` from `feat/l05-pr-brief`. The inspected GitHub screenshots show the concrete implementation description, rendered spec/plan/verifier links, validation results and disclosed P2 limitation. Local Git history confirms artifact commit `612b9ee` before implementation `1e5428b`.
+- The PR description contains the native [MP4 demo asset](https://github.com/user-attachments/assets/6775b341-9ef7-48ec-8ba5-473b3fb97711), rendered as a GitHub video player showing **2:09**. Permanent URLs are recorded in root's `work/l05-publication.json`; inspected screenshots are `l05-pr.png`, `l05-spec.png`, `l05-plan.png`, `l05-verifier.png` and `l05-pr-video.png`.
+- Inspected `work/l05-video-metadata.json` and the 16-scene contact sheet. The actual local MP4 size matches **1,744,109 bytes**, duration **129 seconds**, H.264/AAC MP4; root's full-decode check passed. It is an edited sequence of real browser captures with captions, explicitly disclosed in the PR. The timeline covers Overview/Generate/pending, summary/risks/focus, missing Intent and available Blast, RIGHT-row navigation, cached reload, spec/plan/verifier and the explanation for facts rather than diff code, plus regeneration/context/fallback/stale scenarios.
+- Recorded browser proof shows local playback advanced to **15.84 seconds**, readyState 4, no error. The remote GitHub asset element loaded **129 seconds**, readyState 4, no error; its captured state is paused at zero, so remote playback advancement is not claimed. These proofs contain no signed URLs or credentials.
+
+PASS below is supported by inspected implementation and deterministic checks, supplemented by R/P where applicable. Provider output describes potential exposure rather than proving code correctness.
 
 ## EARS results
 
@@ -38,7 +45,7 @@ PASS below is supported by inspected implementation and deterministic checks, su
 | AC-06 | P1 | PASS | PR page's `focusFile` changes tab/file/line together; generic target expands role and file. C grouped/original/collapsed cases; R actual Core/file navigation. |
 | AC-07 | P1 | PASS | Scoped GET only reads cache/head, with zero external calls/writes; D/C. R cached UI reload and recorded exact response equality, process count unchanged at 18. |
 | AC-08 | P1 | PASS | Explicit POST replaces successful cache once; retry false and mutation identity captured. D/C. R new call ID/summary only after explicit Regenerate, count 18 -> 19. |
-| AC-09 | P1 | UNRESOLVED | Spec/plan exist and are committed. Published implementation PR description and playable 1–3 minute journey have not yet been provided to this verifier. |
+| AC-09 | P1 | PASS | P: open PR #13 contains implementation description and rendered spec/plan/verifier links; native 129-second MP4 covers the required journey. Metadata/contact sheet and local playback/remote load proof inspected. |
 | AC-10 | P2 required | PASS | `brief/service.ts:54` makes one structured call, maxRetries zero, rejects extra attempts. D and R two distinct calls, each one process/attempt with actual provider/model metadata and zero tools. |
 | AC-11 | P2 required | PASS | Exact serialized messages/schema plus labeled 1,024-byte allowance <=32,000; U adversarial/overflow cases. R independently recomputed 12,314 + 1,024 = 13,338 for both real calls. |
 | AC-12 | P2 required | PASS | Input is a field whitelist; patch is used only to extract numeric hunk anchors. U/D sentinel and oversized input tests exclude raw patch/diff/source bodies. Saved specification prose is an explicitly allowed input. |
@@ -62,8 +69,8 @@ PASS below is supported by inspected implementation and deterministic checks, su
 
 Client navigation preserves unrelated query parameters; line parsing rejects nonpositive, noninteger and unsafe values. Brief/context mutations store results under the identity captured in `onMutate`, rather than the route reached while a request is pending. Head advances invalidate detail, brief, Smart Diff and Blast cache without POST. Existing success remains visible on load/generation errors, and stale state also compares the displayed PR head.
 
-## Remaining handoff
+## Remaining handoff and limits
 
-The supplied runtime handoff is inspected and recorded above. Root still owns the playable 1–3 minute video, published implementation PR/description and GoIT submission. AC-09 stays unresolved until concrete publication/demo proof arrives, and must be resolved before claiming submission complete. AC-18 remains an honest P2 process limitation.
+Runtime and publication handoffs are inspected and recorded above. All P1 gates are complete; **24 criteria PASS, AC-18 UNRESOLVED (P2)**. Root owns pushing this final report update and the separate GoIT submission. AC-18 remains an honest unavailable different-family review, not a fabricated approval.
 
 Existing index replacement is not an atomic versioned symbol snapshot; Blast's indexed SHA/degradation stay disclosed. The same-PR guard covers the current single server, not multiple server instances. These inherited/documented limits do not introduce a new P1 mismatch in the specified scope.

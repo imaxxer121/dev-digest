@@ -64,12 +64,12 @@ acceptance plan, not validation evidence. Its digest is
 
 | Actual action | Observation |
 | --- | --- |
-| Generate | call 815d4fd7-1dd0-402a-8833-b81d57c3ef87;14041 ms;13822 input/300 output tokens |
-| Reload | Same JSON and call ID; process count stays18 after baseline 17 |
-| Regenerate | calla42a3859-08e4-45eb-834c-dc114c05dbc9;9957 ms;13824 input/266 output tokens; count 19 |
-| Focus click | Files changed opened context.ts RIGHT19, visible at y376–396 in720 px viewport |
+| Generate | call 815d4fd7-1dd0-402a-8833-b81d57c3ef87; 14041 ms; 13822 input/300 output tokens |
+| Reload | Same JSON and call ID; process count stays 18 after baseline 17 |
+| Regenerate | call a42a3859-08e4-45eb-834c-dc114c05dbc9; 9957 ms; 13824 input/266 output tokens; count 19 |
+| Focus click | Files changed opened context.ts RIGHT:19, visible at y376–396 in 720 px viewport |
 | Caller-only click | pulls/routes.ts:27 produced the explicit “File not in this PR’s diff” notice |
-| Saved Context reload | Real saved path/content remained14387 bytes |
+| Saved Context reload | Real saved path/content remained 14387 bytes |
 | Controlled local SHA move | `PullsRepository.syncMeta` moved only the own demo PR to `controlled-l05-next-head`; saved brief remained readable/stale; no model call |
 | Restore | `saveDetail` restored real published head, original diff/body/stats; response equals regenerated JSON; count 19 |
 
@@ -102,3 +102,14 @@ Legacy Intent has no SHA freshness metadata. A different-family planning
 review remains the disclosed optional P2 gap. P3 graph/prior-history additions
 are outside this homework scope. Publication/demo status is recorded by the
 final verifier report and PR attachment.
+
+## Publication and demo
+
+Open [PR13](https://github.com/imaxxer121/dev-digest/pull/13) contains the
+implementation, artifact links and native [MP4 attachment](https://github.com/user-attachments/assets/6775b341-9ef7-48ec-8ba5-473b3fb97711).
+The video is **2:09**, edited real browser captures with Ukrainian captions,
+not a continuous recording. Its 16-scene timeline covers the required actions
+and shows the pre-publication verifier report; the final report closes that
+publication gate after upload. Full decoding passed with zero errors. Local
+playback advanced; the GitHub player loaded duration 129 / readyState 4 / error null.
+Permanent links and sanitized metadata are in `docs/evidence/l05/`.

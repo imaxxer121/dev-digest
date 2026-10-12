@@ -1,0 +1,106 @@
+{
+  "format": "H.264 Constrained Baseline / MP4, AAC silence, 1280x720, 12fps, faststart",
+  "duration_seconds": 129.0,
+  "bytes": 1744109,
+  "full_decode_passed": true,
+  "edited_real_browser_captures": true,
+  "continuous_screencast": false,
+  "timeline": [
+    {
+      "start_s": 0,
+      "end_s": 8,
+      "capture": "l05-before.png",
+      "caption": "Тестовий PR → Overview → Generate brief: генерація лише за явною дією"
+    },
+    {
+      "start_s": 8,
+      "end_s": 14,
+      "capture": "l05-pending.png",
+      "caption": "Натиснуто Generate brief; реальний виклик Codex CLI, без інструментів"
+    },
+    {
+      "start_s": 14,
+      "end_s": 24,
+      "capture": "l05-generated.png",
+      "caption": "Готовий бриф: Summary та Risk areas з перевіреними посиланнями на файли"
+    },
+    {
+      "start_s": 24,
+      "end_s": 34,
+      "capture": "l05-focus-sources.png",
+      "caption": "Review focus, прикріплена спека, явний missing Intent та наявний Blast Radius"
+    },
+    {
+      "start_s": 34,
+      "end_s": 44,
+      "capture": "l05-focus-diff.png",
+      "caption": "Клік Review focus відкрив Files changed, потрібний файл і справжній RIGHT-рядок 19"
+    },
+    {
+      "start_s": 44,
+      "end_s": 51,
+      "capture": "l05-caller-fallback.png",
+      "caption": "Файл викликача відсутній у diff: явне повідомлення про індексований snapshot"
+    },
+    {
+      "start_s": 51,
+      "end_s": 60,
+      "capture": "l05-cached.png",
+      "caption": "Перезавантаження читає той самий збережений JSON; нових викликів моделі: 0"
+    },
+    {
+      "start_s": 60,
+      "end_s": 67,
+      "capture": "l05-regenerating.png",
+      "caption": "Regenerate: один новий виклик; попередній бриф залишається доступним"
+    },
+    {
+      "start_s": 67,
+      "end_s": 75,
+      "capture": "l05-regenerated.png",
+      "caption": "Повторний реальний результат з новим call_id; рівно одна структурована спроба"
+    },
+    {
+      "start_s": 75,
+      "end_s": 83,
+      "capture": "l05-context.png",
+      "caption": "Project Context: справжня текстова спека 14 387 bytes збереглася після reload"
+    },
+    {
+      "start_s": 83,
+      "end_s": 91,
+      "capture": "l05-stale.png",
+      "caption": "Контрольна локальна зміна SHA → stale; це симуляція, дані потім відновлено"
+    },
+    {
+      "start_s": 91,
+      "end_s": 97,
+      "capture": "l05-pr.png",
+      "caption": "Відкритий PR №13 містить реалізацію, посилання на артефакти та результати перевірок"
+    },
+    {
+      "start_s": 97,
+      "end_s": 104,
+      "capture": "l05-spec.png",
+      "caption": "spec-creator написав spec.md; артефакти закомічено до коду в 612b9ee"
+    },
+    {
+      "start_s": 104,
+      "end_s": 111,
+      "capture": "l05-plan.png",
+      "caption": "implementation-planner написав plan.md; run-plan виконав реалізацію"
+    },
+    {
+      "start_s": 111,
+      "end_s": 120,
+      "capture": "l05-verifier.png",
+      "caption": "plan-verifier перевірив критерії; іншої родини моделі для P2 не було"
+    },
+    {
+      "start_s": 120,
+      "end_s": 129,
+      "capture": "l05-focus-sources.png",
+      "caption": "Готові факти замість коду diff обмежують контекст і прив’язують висновки до відомих даних"
+    }
+  ]
+}
