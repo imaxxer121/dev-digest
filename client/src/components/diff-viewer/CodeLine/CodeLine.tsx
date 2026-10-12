@@ -3,22 +3,28 @@
 "use client";
 
 import React from "react";
-import { commentTargetFor, type CommentThread, type DiffCommentApi, cs } from "../comments";
+import { commentTargetFor, commentDraftKey, type CommentThread, type DiffCommentApi, cs } from "../comments";
 import { type Line } from "../helpers";
 import { s, lineRowFor, lineSignFor } from "../styles";
 import { CommentThreadView } from "../CommentThreadView";
 import { InlineComposer } from "../InlineComposer";
+import type { FindingRecord } from "@devdigest/shared";
+import type { DiffFindingsApi } from "../findings";
 
 export function CodeLine({
   ln,
   path,
   threads,
   commenting,
+  findings = [],
+  reviewing,
 }: {
   ln: Line;
   path: string;
   threads: CommentThread[];
   commenting?: DiffCommentApi;
+  findings?: FindingRecord[];
+  reviewing?: DiffFindingsApi;
 }) {
   const [hover, setHover] = React.useState(false);
   const [composing, setComposing] = React.useState(false);
@@ -33,10 +39,17 @@ export function CodeLine({
 
   const sign = ln.kind === "add" ? "+" : ln.kind === "del" ? "−" : "";
   const target = commenting?.canComment ? commentTargetFor(ln) : null;
-  const showAdd = hover && !!target && !composing;
+  const draftKey = target ? commentDraftKey(path, target.line, target.side) : null;
+  const isComposing = draftKey ? (commenting?.drafts?.values[draftKey]?.open ?? composing) : false;
+  const setComposer = (open: boolean) => {
+    setComposing(open);
+    if (draftKey) commenting?.drafts?.update(draftKey, { open });
+  };
+  const showAdd = hover && !!target && !isComposing;
 
   return (
     <div
+      data-diff-row={ln.newNo != null ? `RIGHT:${ln.newNo}` : `LEFT:${ln.oldNo}`}
       style={cs.rowWrap}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -48,7 +61,7 @@ export function CodeLine({
               type="button"
               title="Add a comment on this line"
               aria-label="Add a comment on this line"
-              onClick={() => setComposing(true)}
+              onClick={() => setComposer(true)}
               style={cs.addBtn}
             >
               +
@@ -70,13 +83,17 @@ export function CodeLine({
           <CommentThreadView key={th.rootId} thread={th} commenting={commenting} path={path} />
         ))}
 
-      {commenting && composing && target && (
+      {reviewing?.showComments && findings.length > 0 && <div style={s.findingRail}>
+        {findings.map((finding) => <React.Fragment key={finding.id}>{reviewing.renderFinding(finding)}</React.Fragment>)}
+      </div>}
+
+      {commenting && isComposing && target && (
         <InlineComposer
           commenting={commenting}
           path={path}
           line={target.line}
           side={target.side}
-          onClose={() => setComposing(false)}
+          onClose={() => setComposer(false)}
         />
       )}
     </div>

@@ -41,3 +41,45 @@ Prompt block weights are character-based estimates, not provider usage
 `pnpm test` passed 46 tests and `pnpm typecheck` passed. Browser checks verified
 actual saved versions, restored v3, agent link counts and both real comparison
 traces. Reject/reload/Edit/Accept and the editable Skill draft worked through UI.
+
+## 2026-10-12 — Smart Diff requires page-level completion refresh and real RIGHT anchors
+
+RunStatus belongs to the Findings tab, so its completion callback cannot refresh
+inline cards while Files changed is open. The PR page now mounts the persisted
+run observer independently of tab selection; persisted terminal history polls
+even if a short background run finishes between active-run checks. Evidence:
+`src/lib/hooks/reviews.ts:47` and `src/lib/hooks/reviews.ts:72`. Background run
+acknowledgements, action and deletion mutations invalidate both
+representations, while server grouping is read without client reclassification.
+
+Unified-diff metadata and a trailing newline are not numbered context rows.
+`src/components/diff-viewer/helpers.ts:13` skips them; findings partition by
+actual RIGHT keys and retain unmatched cards at file end
+(`src/components/diff-viewer/findings.ts:29`). Group counts measure files with
+findings, independent of the visibility switch. Shared components receive a
+renderer callback instead of importing the page-local FindingCard.
+
+Composer open/text state belongs above grouped/original layout remounts, keyed
+by file, side, line and optional reply id. Evidence:
+`src/components/diff-viewer/DiffViewer/DiffViewer.tsx:29`. Active drafts keep
+their file/group open when remounted; the PR page keys DiffTab by PR identity
+so a draft cannot leak to another PR.
+
+After architecture-review fixes, `pnpm test` passed 67 tests across 20 files,
+and `pnpm typecheck` passed. A real-hook fake-clock test covers background
+completion whose running state was never observed; interaction tests preserve
+and correctly post both new-comment and reply drafts after mode switches.
+These are fixture/API-mock interaction and cache-lifecycle checks, not evidence
+of a real model review.
+
+Browser QA found that the compact severity badge hides its text label. Inline
+FindingCards now opt into `showSeverityLabel`; existing callers retain their
+compact default. Evidence:
+`src/app/repos/[repoId]/pulls/[number]/_components/FindingCard/FindingCard.tsx:60`.
+After this focused change, `pnpm exec vitest run FindingCard.test.tsx
+DiffTab.test.tsx` passed 10 tests and `pnpm typecheck` passed.
+The final full `pnpm test` passed 68 tests across 20 files. Actual browser QA
+confirmed three grounded findings below RIGHT:173/176/186, one finding-bearing
+file, persisted Accept/Reject and new-comment draft survival during mode changes
+(`../docs/evidence/l03/browser-checks.json`). Off-patch and external comment
+posting remain deterministic-test evidence, distinct from this real run.

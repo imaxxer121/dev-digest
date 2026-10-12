@@ -1,0 +1,31 @@
+{
+  "fixture_pr": 8,
+  "five_role_groups": [
+    "core",
+    "tests",
+    "wiring",
+    "docs",
+    "boilerplate"
+  ],
+  "docs_boilerplate_initially_collapsed": true,
+  "original_order_observed": [
+    "docs/l03-review-fixture.md",
+    "server/pnpm-lock.yaml",
+    "server/src/modules/reviews/index.ts",
+    "server/src/modules/reviews/routes.ts",
+    "server/test/l03-diff-fixture.test.ts"
+  ],
+  "real_review_completed_while_files_changed_open_without_reload": true,
+  "latest_findings": 3,
+  "finding_bearing_core_files": 1,
+  "inline_new_side_start_lines": [
+    173,
+    176,
+    186
+  ],
+  "hide_restore_findings_preserves_counts": true,
+  "new_comment_draft_survived_original_and_grouped_modes": true,
+  "draft_posted_to_github": false,
+  "accept_and_reject_seen_persisted": true,
+  "scope_note": "Human-thread hide/reply/posting and off-patch/binary cases are deterministic interaction tests. GitHub API was offline for this real model demo; no successful external comment posting is claimed. All three real findings were inside the shown patch."
+}

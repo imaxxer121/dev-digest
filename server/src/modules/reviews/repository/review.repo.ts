@@ -57,13 +57,14 @@ export async function insertFindings(
 /** Reviews for a PR (newest first), each with its findings. */
 export async function reviewsForPull(
   db: Db,
+  workspaceId: string,
   prId: string,
 ): Promise<{ review: ReviewRow; findings: FindingRow[] }[]> {
   const reviews = await db
     .select()
     .from(t.reviews)
-    .where(eq(t.reviews.prId, prId))
-    .orderBy(desc(t.reviews.createdAt));
+    .where(and(eq(t.reviews.workspaceId, workspaceId), eq(t.reviews.prId, prId)))
+    .orderBy(desc(t.reviews.createdAt), desc(t.reviews.id));
   if (reviews.length === 0) return [];
   const ids = reviews.map((r) => r.id);
   const findings = await db.select().from(t.findings).where(inArray(t.findings.reviewId, ids));
@@ -71,6 +72,21 @@ export async function reviewsForPull(
     review,
     findings: findings.filter((f) => f.reviewId === review.id),
   }));
+}
+
+/** Only the most recent completed review contributes Smart Diff markers. */
+export async function latestReviewForPull(db: Db, workspaceId: string, prId: string) {
+  const [review] = await db.select().from(t.reviews)
+    .where(and(
+      eq(t.reviews.workspaceId, workspaceId),
+      eq(t.reviews.prId, prId),
+      eq(t.reviews.kind, 'review'),
+    ))
+    .orderBy(desc(t.reviews.createdAt), desc(t.reviews.id))
+    .limit(1);
+  if (!review) return undefined;
+  const findings = await db.select().from(t.findings).where(eq(t.findings.reviewId, review.id));
+  return { review, findings };
 }
 
 export async function getReview(db: Db, reviewId: string): Promise<ReviewRow | undefined> {

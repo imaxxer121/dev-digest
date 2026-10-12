@@ -1,0 +1,71 @@
+[
+  {
+    "id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+    "pr_id": "a5649b82-15d4-4ea9-bb6a-473a4e3fc60d",
+    "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+    "run_id": "b9e1ba63-f4fb-4cea-b5c8-71a88d920b39",
+    "agent_name": "Course Reviewer",
+    "kind": "review",
+    "verdict": "request_changes",
+    "summary": "The share endpoint allows SSRF, reports rejected deliveries as successful, and sends an incompatible payload to the advertised Slack/Discord webhooks.",
+    "score": 41,
+    "model": "gpt-6.1-sol",
+    "created_at": "2026-10-12T18:06:49.239Z",
+    "findings": [
+      {
+        "id": "2e3f3670-7cba-4e4b-8f7e-39da9782fb22",
+        "severity": "WARNING",
+        "category": "bug",
+        "title": "Use payloads supported by the advertised webhook providers",
+        "file": "server/src/modules/reviews/routes.ts",
+        "start_line": 176,
+        "end_line": 179,
+        "rationale": "The route advertises direct Slack/Discord sharing, but sends only summary, verdict, and findings. Slack incoming webhooks require message fields such as text or blocks, while Discord requires content such as content or embeds. This payload supplies neither, so valid webhook URLs for those providers reject the delivery.",
+        "suggestion": "Format the review using the selected provider's message schema, and define the current JSON format separately for generic webhook consumers.",
+        "confidence": 0.98,
+        "kind": "finding",
+        "trifecta_components": null,
+        "evidence": null,
+        "review_id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+        "accepted_at": null,
+        "dismissed_at": null
+      },
+      {
+        "id": "b6e797a5-ea50-47b5-b843-ec7a952b73f8",
+        "severity": "CRITICAL",
+        "category": "security",
+        "title": "Restrict webhook destinations to prevent SSRF",
+        "file": "server/src/modules/reviews/routes.ts",
+        "start_line": 173,
+        "end_line": 175,
+        "rationale": "The caller-controlled URL is passed directly to server-side fetch without destination restrictions. A caller who can access a review can make the server POST to loopback, private-network, or link-local services, crossing the server's network boundary. Automatic redirects also allow a public URL to lead to an internal destination.",
+        "suggestion": "Allow only approved HTTPS destinations, enforce restrictions on resolved addresses, and disable redirects or validate every redirect destination. Apply outbound network restrictions as additional protection.",
+        "confidence": 0.99,
+        "kind": "finding",
+        "trifecta_components": null,
+        "evidence": null,
+        "review_id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+        "accepted_at": "2026-10-12T18:08:30.594Z",
+        "dismissed_at": null
+      },
+      {
+        "id": "dc473e8d-3862-464d-abce-521f1b908599",
+        "severity": "WARNING",
+        "category": "bug",
+        "title": "Check the webhook response before reporting success",
+        "file": "server/src/modules/reviews/routes.ts",
+        "start_line": 186,
+        "end_line": 188,
+        "rationale": "Fetch resolves normally for HTTP errors, but the response is discarded and the route always returns ok: true. Rejected payloads, expired webhook URLs, rate limits, and downstream server failures are therefore reported as successful deliveries.",
+        "suggestion": "Capture the response and check response.ok before returning success. Return an appropriate delivery error for non-success statuses.",
+        "confidence": 1,
+        "kind": "finding",
+        "trifecta_components": null,
+        "evidence": null,
+        "review_id": "dacdbaec-64b9-46f1-938a-2c842321f5cb",
+        "accepted_at": null,
+        "dismissed_at": "2026-10-12T18:11:15.381Z"
+      }
+    ]
+  }
+]

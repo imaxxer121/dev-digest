@@ -37,3 +37,21 @@ IDs before replacement (`src/modules/agents/service.ts:158`).
 PostgreSQL integration cases. Model evidence is independent of these test results.
 The actual traces show saved Skill order and exclusion of a disabled body
 (`src/modules/reviews/run-executor.ts:188`, `../docs/evidence/l02/skills-composition.json:1`).
+
+## 2026-10-12 — Persisted Smart Diff reads need aligned latest-review feeds
+
+Path classification requires no inference: ordered pure rules produce five
+groups before any review (`src/modules/reviews/smart-diff/constants.ts:3`).
+The read service checks PR workspace ownership before querying stored files
+and the latest kind=review (`src/modules/reviews/service.ts:177`). Excluding
+summaries and using a createdAt/id tie break keeps empty latest reviews from
+reviving older markers (`src/modules/reviews/repository/review.repo.ts:78`).
+
+The full reviews feed must use the same workspace predicate as Smart Diff;
+the schema permits malformed reviews whose workspace differs from their PR.
+Evidence: `src/modules/reviews/repository/review.repo.ts:66` and
+`test/smart-diff.it.test.ts:99`. The integration test verifies both endpoints
+exclude the foreign review. `pnpm typecheck` and final `pnpm test` passed
+185 tests in 28 files, including all PostgreSQL cases. These tests use provider
+spies; the separate actual run is documented in
+`../docs/evidence/l03/real-review.json`.

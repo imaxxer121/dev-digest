@@ -13,6 +13,7 @@ import type {
   ReviewRunResponse,
   RunEvent,
   RunSummary,
+  SmartDiffResponse,
 } from "@devdigest/shared";
 
 // ---- Active (in-flight) runs — server-side source of truth ----
@@ -30,20 +31,23 @@ export function usePrActiveRuns(prId: string | null | undefined) {
     queryKey: ["pr-active-runs", prId],
     queryFn: () => api.get<ActiveRun[]>(`/pulls/${prId}/runs/active`),
     enabled: !!prId,
-    refetchInterval: (query) => ((query.state.data?.length ?? 0) > 0 ? 4000 : false),
+    // Keep the page-level observer alive on Files changed and detect runs
+    // started elsewhere, not just ones already present in the first response.
+    refetchInterval: 4000,
   });
 }
 
 // ---- Full run history for a PR (every agent_runs row, any status) ----
 /** All runs for a PR — done, failed (with error), cancelled, running. Survives
-   reload (DB-backed). Polls while anything is running so it self-updates. */
+   reload (DB-backed). Polls terminal history even if running was never seen. */
 export function usePrRuns(prId: string | null | undefined) {
   return useQuery({
     queryKey: ["pr-runs", prId],
     queryFn: () => api.get<RunSummary[]>(`/pulls/${prId}/runs`),
     enabled: !!prId,
-    refetchInterval: (query) =>
-      (query.state.data ?? []).some((r) => r.status === "running") ? 4000 : false,
+    // A background run can finish between two active-run polls. Persisted
+    // terminal history must also refresh when running was never observed.
+    refetchInterval: 4000,
   });
 }
 
@@ -56,6 +60,33 @@ export function usePrReviews(prId: string | null | undefined) {
   });
 }
 
+export function usePrSmartDiff(prId: string | null | undefined) {
+  return useQuery({
+    queryKey: ["smart-diff", prId],
+    queryFn: () => api.get<SmartDiffResponse>(`/pulls/${prId}/smart-diff`),
+    enabled: !!prId,
+  });
+}
+
+/** Mounted by the PR page, so changing tabs cannot lose completion refresh. */
+export function usePrReviewRefresh(prId: string | null | undefined, runs: RunSummary[] | undefined, active: ActiveRun[] | undefined) {
+  const qc = useQueryClient();
+  const previous = React.useRef<{ prId: string; terminal: string; active: string } | null>(null);
+  const terminal = runs?.filter((run) => run.status !== "running")
+    .map((run) => `${run.run_id}:${run.status}`).sort().join(",");
+  const activeKey = active?.map((run) => run.run_id).sort().join(",");
+  React.useEffect(() => {
+    if (!prId || terminal === undefined || activeKey === undefined) return;
+    const before = previous.current?.prId === prId ? previous.current : null;
+    previous.current = { prId, terminal, active: activeKey };
+    if ((!before && terminal) || (before && (terminal !== before.terminal || (before.active && !activeKey)))) {
+      qc.invalidateQueries({ queryKey: ["reviews", prId] });
+      qc.invalidateQueries({ queryKey: ["smart-diff", prId] });
+    }
+    if (before && before.active !== activeKey) qc.invalidateQueries({ queryKey: ["pr-runs", prId] });
+  }, [qc, prId, terminal, activeKey]);
+}
+
 /** Delete one run from the PR's run history (+ its trace). */
 export function useDeleteRun(prId: string | null | undefined) {
   const qc = useQueryClient();
@@ -66,6 +97,7 @@ export function useDeleteRun(prId: string | null | undefined) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["pr-runs", prId] });
       qc.invalidateQueries({ queryKey: ["reviews", prId] });
+      qc.invalidateQueries({ queryKey: ["smart-diff", prId] });
     },
   });
 }
@@ -82,7 +114,10 @@ export function useDeleteReview(prId: string | null | undefined) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (reviewId: string) => api.del<{ ok: boolean }>(`/reviews/${reviewId}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["reviews", prId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["reviews", prId] });
+      qc.invalidateQueries({ queryKey: ["smart-diff", prId] });
+    },
   });
 }
 
@@ -129,8 +164,13 @@ export function useRunReview() {
         ...(agentId ? { agentId } : {}),
         ...(all ? { all } : {}),
       }),
-    onSuccess: (_d, { prId }) => {
+    // The POST acknowledges background runs. Refresh on acknowledgement and
+    // let the page's persisted-history poll detect their actual completion.
+    onSettled: (_d, _err, { prId }) => {
       qc.invalidateQueries({ queryKey: ["reviews", prId] });
+      qc.invalidateQueries({ queryKey: ["smart-diff", prId] });
+      qc.invalidateQueries({ queryKey: ["pr-active-runs", prId] });
+      qc.invalidateQueries({ queryKey: ["pr-runs", prId] });
     },
   });
 }
@@ -155,7 +195,10 @@ export function useFindingAction() {
         reply ? { reply } : undefined,
       ),
     onSuccess: (_d, { prId }) => {
-      if (prId) qc.invalidateQueries({ queryKey: ["reviews", prId] });
+      if (prId) {
+        qc.invalidateQueries({ queryKey: ["reviews", prId] });
+        qc.invalidateQueries({ queryKey: ["smart-diff", prId] });
+      }
     },
   });
 }

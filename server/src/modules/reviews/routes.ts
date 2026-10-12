@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { RunRequest } from '@devdigest/shared';
+import { RunRequest, SmartDiffResponse } from '@devdigest/shared';
 import type { RunEvent } from '@devdigest/shared';
 import { getContext } from '../_shared/context.js';
 import { IdParams } from '../_shared/schemas.js';
@@ -126,6 +126,13 @@ export default async function reviewsRoutes(appBase: FastifyInstance) {
   });
 
   // ---- Reads --------------------------------------------------------------
+  app.get('/pulls/:id/smart-diff', {
+    schema: { params: IdParams, response: { 200: SmartDiffResponse } },
+  }, async (req) => {
+    const { workspaceId } = await getContext(container, req);
+    return service.smartDiffForPull(workspaceId, req.params.id);
+  });
+
   app.get('/pulls/:id/reviews', { schema: { params: IdParams } }, async (req) => {
     const { workspaceId } = await getContext(container, req);
     return service.reviewsForPull(workspaceId, req.params.id);

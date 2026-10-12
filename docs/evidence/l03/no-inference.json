@@ -1,0 +1,76 @@
+{
+  "observed_at": "2026-10-12T18:00:45.7981956Z",
+  "pr_id": "a5649b82-15d4-4ea9-bb6a-473a4e3fc60d",
+  "smart_diff_reads": 3,
+  "run_ids_before": [],
+  "run_ids_after": [],
+  "response": {
+    "groups": [
+      {
+        "role": "core",
+        "files": [
+          {
+            "path": "server/src/modules/reviews/routes.ts",
+            "pseudocode_summary": null,
+            "additions": 40,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      },
+      {
+        "role": "tests",
+        "files": [
+          {
+            "path": "server/test/l03-diff-fixture.test.ts",
+            "pseudocode_summary": null,
+            "additions": 19,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      },
+      {
+        "role": "wiring",
+        "files": [
+          {
+            "path": "server/src/modules/reviews/index.ts",
+            "pseudocode_summary": null,
+            "additions": 1,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      },
+      {
+        "role": "docs",
+        "files": [
+          {
+            "path": "docs/l03-review-fixture.md",
+            "pseudocode_summary": null,
+            "additions": 13,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      },
+      {
+        "role": "boilerplate",
+        "files": [
+          {
+            "path": "server/pnpm-lock.yaml",
+            "pseudocode_summary": null,
+            "additions": 1,
+            "deletions": 0,
+            "finding_lines": []
+          }
+        ]
+      }
+    ],
+    "split_suggestion": {
+      "too_big": false,
+      "total_lines": 74,
+      "proposed_splits": []
+    }
+  }
+}

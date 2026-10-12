@@ -60,8 +60,12 @@ export class ReviewRepository {
   }
 
   /** Reviews for a PR (newest first), each with its findings. */
-  reviewsForPull(prId: string): Promise<{ review: ReviewRow; findings: FindingRow[] }[]> {
-    return reviewRepo.reviewsForPull(this.db, prId);
+  reviewsForPull(workspaceId: string, prId: string): Promise<{ review: ReviewRow; findings: FindingRow[] }[]> {
+    return reviewRepo.reviewsForPull(this.db, workspaceId, prId);
+  }
+
+  latestReviewForPull(workspaceId: string, prId: string) {
+    return reviewRepo.latestReviewForPull(this.db, workspaceId, prId);
   }
 
   getReview(reviewId: string): Promise<ReviewRow | undefined> {

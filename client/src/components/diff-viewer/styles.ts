@@ -3,6 +3,15 @@ import type { Line } from "./helpers";
 
 /** Co-located styles for the DiffViewer (extracted from inline styles). */
 export const s = {
+  group: { display: "flex", flexDirection: "column", gap: 10 } satisfies CSSProperties,
+  groupHeader: {
+    display: "flex", alignItems: "center", gap: 10, padding: "12px 8px",
+    border: 0, borderBottom: "1px solid var(--border)", background: "var(--bg-surface)",
+    color: "var(--text-secondary)", textAlign: "left", cursor: "pointer", width: "100%", fontSize: 13,
+  } satisfies CSSProperties,
+  groupCount: { marginLeft: "auto", color: "var(--warn)", fontSize: 12 } satisfies CSSProperties,
+  findingRail: { margin: "8px 14px 10px 58px", display: "flex", flexDirection: "column", gap: 8 } satisfies CSSProperties,
+  outsideLabel: { color: "var(--text-muted)", fontSize: 12, marginBottom: 6 } satisfies CSSProperties,
   list: { display: "flex", flexDirection: "column", gap: 10 } satisfies CSSProperties,
   empty: { padding: "24px", fontSize: 14, color: "var(--text-muted)", textAlign: "center" } satisfies CSSProperties,
   fileCard: {
@@ -17,6 +26,7 @@ export const s = {
     gap: 10,
     padding: "10px 12px",
     cursor: "pointer",
+    border: 0, background: "transparent", color: "var(--text-primary)", width: "100%", textAlign: "left",
   } satisfies CSSProperties,
   fileIcon: { color: "var(--text-muted)" } satisfies CSSProperties,
   filePath: {

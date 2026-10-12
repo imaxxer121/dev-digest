@@ -12,6 +12,8 @@ export interface DiffCommentApi {
   /** When false, existing comment threads are hidden (the "+" still works). */
   showComments: boolean;
   posting: boolean;
+  /** Viewer-owned drafts survive grouped/original layout remounts. */
+  drafts?: DiffDraftApi;
   onSubmit: (input: {
     path: string;
     line: number;
@@ -19,6 +21,19 @@ export interface DiffCommentApi {
     body: string;
     in_reply_to?: number;
   }) => Promise<unknown>;
+}
+
+export interface DiffDraftApi {
+  values: Record<string, { open: boolean; text: string }>;
+  update: (key: string, patch: Partial<{ open: boolean; text: string }>) => void;
+}
+
+export function commentDraftKey(path: string, line: number, side: "LEFT" | "RIGHT", reply?: number): string {
+  return `${JSON.stringify(path)}:${side}:${line}:${reply ?? ""}`;
+}
+
+export function hasOpenDraftFor(path: string, drafts?: DiffDraftApi): boolean {
+  return Object.entries(drafts?.values ?? {}).some(([key, value]) => key.startsWith(`${JSON.stringify(path)}:`) && value.open);
 }
 
 /** One review-comment thread anchored to a diff line (or outdated). */

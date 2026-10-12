@@ -4,7 +4,7 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { Icon } from "@devdigest/ui";
+import { Icon, SEV, type Severity } from "@devdigest/ui";
 import type { PrFile } from "@/lib/types";
 import { AUTO_EXPAND_MAX_LINES } from "../constants";
 import { parsePatch, type Line } from "../helpers";
@@ -12,12 +12,14 @@ import {
   buildThreads,
   keysForLine,
   partitionThreads,
+  hasOpenDraftFor,
   type CommentThread,
   type DiffCommentApi,
 } from "../comments";
 import { s, chevronFor } from "../styles";
 import { CodeLine } from "../CodeLine";
 import { OutdatedComments } from "../OutdatedComments";
+import { partitionFindings, type DiffFindingsApi } from "../findings";
 
 /** Threads anchored to a given parsed line (RIGHT=new, LEFT=old). */
 function threadsForLine(ln: Line, matched: Map<string, CommentThread[]>): CommentThread[] {
@@ -30,12 +32,17 @@ function threadsForLine(ln: Line, matched: Map<string, CommentThread[]>): Commen
   return out;
 }
 
-export function FileCard({ file, commenting }: { file: PrFile; commenting?: DiffCommentApi }) {
+export function FileCard({ file, commenting, reviewing }: { file: PrFile; commenting?: DiffCommentApi; reviewing?: DiffFindingsApi }) {
   const t = useTranslations("shell");
+  const smart = useTranslations("prReview.smartDiff");
   const [open, setOpen] = React.useState(
-    (file.additions ?? 0) + (file.deletions ?? 0) <= AUTO_EXPAND_MAX_LINES
+    (file.additions ?? 0) + (file.deletions ?? 0) <= AUTO_EXPAND_MAX_LINES || hasOpenDraftFor(file.path, commenting?.drafts)
   );
   const lines = React.useMemo(() => parsePatch(file.patch), [file.patch]);
+  const fileFindings = (reviewing?.findings ?? []).filter((f) => f.file === file.path);
+  const { byRow, outside } = partitionFindings(lines, fileFindings);
+  const dotSeverity = (["CRITICAL", "WARNING", "SUGGESTION", "INFO"] as Severity[])
+    .find((severity) => fileFindings.some((f) => f.severity === severity));
 
   // Group this file's comments into threads, then split into ones we can anchor
   // to a rendered line vs. "outdated" (GitHub dropped the line / it's not here).
@@ -53,26 +60,32 @@ export function FileCard({ file, commenting }: { file: PrFile; commenting?: Diff
     : 0;
 
   return (
-    <div style={s.fileCard}>
-      <div onClick={() => setOpen((o) => !o)} style={s.fileHeader}>
+    <div style={s.fileCard} data-diff-file={file.path}>
+      <button type="button" aria-expanded={open} aria-label={file.path} onClick={() => setOpen((o) => !o)} style={s.fileHeader}>
         <Icon.ChevronRight size={13} style={chevronFor(open)} />
         <Icon.FileText size={14} style={s.fileIcon} />
         <span className="mono" style={s.filePath}>
           {file.path}
         </span>
+        {fileFindings.length > 0 && <span
+          role="img" aria-label={smart("fileFindings", { count: fileFindings.length })}
+          title={smart("fileFindings", { count: fileFindings.length })}
+          style={{ width: 8, height: 8, flexShrink: 0, borderRadius: "50%", background: dotSeverity ? SEV[dotSeverity].c : "var(--text-muted)" }}
+        />}
         <span className="mono tnum" style={s.fileStat}>
           <span style={s.addText}>+{file.additions}</span>{" "}
           <span style={s.delText}>−{file.deletions}</span>
         </span>
         {commentCount > 0 && (
           <span
+            aria-label={smart("humanComments", { count: commentCount })}
             style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--text-muted)" }}
           >
             <Icon.MessageSquare size={12} />
             {commentCount}
           </span>
         )}
-      </div>
+      </button>
       {open && (
         <div style={s.fileBody}>
           {lines.length === 0 ? (
@@ -85,10 +98,16 @@ export function FileCard({ file, commenting }: { file: PrFile; commenting?: Diff
                 path={file.path}
                 threads={threadsForLine(ln, matched)}
                 commenting={commenting}
+                findings={byRow.get(i) ?? []}
+                reviewing={reviewing}
               />
             ))
           )}
           {commenting && commenting.showComments && <OutdatedComments threads={outdated} />}
+          {reviewing?.showComments && outside.length > 0 && <div style={s.findingRail} data-off-patch>
+            <div style={s.outsideLabel}>{smart("outsidePatch")}</div>
+            {outside.map((finding) => <React.Fragment key={finding.id}>{reviewing.renderFinding(finding)}</React.Fragment>)}
+          </div>}
         </div>
       )}
     </div>
