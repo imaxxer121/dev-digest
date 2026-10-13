@@ -30,6 +30,7 @@ import { SkillsRepository } from '../modules/skills/repository.js';
 import { ReviewRepository } from '../modules/reviews/repository.js';
 import { BriefRepository } from '../modules/brief/repository.js';
 import { ContextRepository } from '../modules/context/repository.js';
+import { EvalsRepository } from '../modules/evals/repository.js';
 import type { RepoIntel } from '../modules/repo-intel/types.js';
 import { RepoIntelService } from '../modules/repo-intel/service.js';
 import { type DepGraph, DepCruiseGraph } from '../adapters/depgraph/index.js';
@@ -80,6 +81,7 @@ export class Container {
   private _skillsRepo?: SkillsRepository;
   private _briefRepo?: BriefRepository;
   private _contextRepo?: ContextRepository;
+  private _evalsRepo?: EvalsRepository;
   private _repoIntel?: RepoIntel;
   private _depgraph?: DepGraph;
   private _tokenizer?: Tokenizer;
@@ -114,6 +116,7 @@ export class Container {
 
   get briefRepo(): BriefRepository { return (this._briefRepo ??= new BriefRepository(this.db)); }
   get contextRepo(): ContextRepository { return (this._contextRepo ??= new ContextRepository(this.db)); }
+  get evalsRepo(): EvalsRepository { return (this._evalsRepo ??= new EvalsRepository(this.db)); }
 
   get codeIndex(): CodeIndex {
     if (this.overrides.codeIndex) return this.overrides.codeIndex;

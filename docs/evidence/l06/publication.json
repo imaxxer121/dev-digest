@@ -1,0 +1,25 @@
+{
+  "observed_at_utc": "2026-10-13 08:56:45 UTC",
+  "pull_request": "https://github.com/imaxxer121/dev-digest/pull/14",
+  "base_branch": "feat/l05-pr-brief",
+  "feature_branch": "feat/l06-eval-pipeline",
+  "implementation_commit": "5286e3363e78b623415f4a4542326a71904ac674",
+  "course_url": "https://www.edu.goit.global/uk/learn/53989320/53167848/53168006/homework",
+  "course_status": "Завдання на перевірці",
+  "confirmation": "Ти відправив домашнє завдання",
+  "graded": false,
+  "github_video": "https://github.com/user-attachments/assets/bb5e325c-9642-45d4-a0a0-2649d9781be9",
+  "course_attachments": [
+    {
+      "name": "l06-eval-pipeline-demo.mp4",
+      "bytes": 4470700,
+      "url": "https://s3.eu-north-1.amazonaws.com/lms.goit.files/0aa45f4b-4cb1-4511-b0a7-6c8a21ea84e2l06-eval-pipeline-demo.mp4"
+    },
+    {
+      "name": "l06-comparison.png",
+      "url": "https://s3.eu-north-1.amazonaws.com/lms.goit.files/cff07d69-2c5a-4ecc-8598-6ea0d1bc9107l06-comparison.png"
+    }
+  ],
+  "verification": "Root observed actual post-submit DOM and saved local screenshot; mentor acceptance remains pending.",
+  "tool_substitution_disclosed": true
+}

@@ -1,0 +1,15 @@
+{
+  "chosen_before_eval_generation": true,
+  "rubric": "Security-focused diff reviewer: actionable injection, unsafe execution, path traversal, SSRF, token security and unsafe redirects. UI keyboard behavior and database query efficiency are outside this rubric; dismissing them does not claim those findings are factually false.",
+  "owner_agent_id": "ac7830a4-1f69-44c2-bac5-d3805070872a",
+  "sources": [
+    {"id":"17e48be2-3093-430f-a409-41af1e5194da","action":"accept","notes":"Security rubric: unsalted MD5 password hashing is an actionable credential-storage defect. Actual L01 Codex finding from PR5."},
+    {"id":"7e26e870-a6f4-4276-b477-924fc7c7547e","action":"accept","notes":"Security rubric: Math.random is unsuitable for password-reset tokens. Actual L01 Codex finding from PR5."},
+    {"id":"9ecdd1cd-4019-46eb-9bfd-a2e69cda89cb","action":"accept","notes":"Security rubric: caller-controlled preview URL creates SSRF exposure. Actual L01 Codex finding from PR5."},
+    {"id":"2660eaff-0365-42c0-afec-d889f7329fb3","action":"accept","notes":"Security rubric: instance-metadata credentials are forwarded to an arbitrary webhook. Actual L01 Codex finding from PR5."},
+    {"id":"b8b7111f-2300-48d7-9f97-8012d032addc","action":"accept","notes":"Security rubric: untrusted upload names can escape the upload directory. Actual L01 Codex finding from PR5."},
+    {"id":"633e91bd-d36c-4945-b304-afec55865a39","action":"accept","notes":"Security rubric: unchecked post-login redirect permits attacker-controlled destinations. Actual L01 Codex finding from PR5."},
+    {"id":"bd5a4bf6-bd23-4160-9150-8b6cc596ef69","action":"dismiss","notes":"This UI keyboard-bubbling issue may be valid, but is outside the security-focused evaluation rubric. Expected no finding at this UI-only location. Actual L01 Codex finding from PR1."},
+    {"id":"3bfc8487-6ee8-4de0-89e2-d66fbf1d563a","action":"dismiss","notes":"This N+1 performance issue may be valid, but is outside the security-focused evaluation rubric. Expected no comment at the aggregation location. Actual L01 Codex finding from PR3."}
+  ]
+}

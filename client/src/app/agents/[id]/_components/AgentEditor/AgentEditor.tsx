@@ -9,10 +9,11 @@ import { Tabs } from "@devdigest/ui";
 import type { Agent } from "@devdigest/shared";
 import { ConfigTab } from "./_components/ConfigTab";
 import { SkillsTab } from "./_components/SkillsTab";
+import { EvalsTab } from "./_components/EvalsTab";
 import { TABS } from "./constants";
 import { s } from "./styles";
 
-export function AgentEditor({ agent, tab, onTab }: { agent: Agent; tab: string; onTab: (t: string) => void }) {
+export function AgentEditor({ agent, tab, onTab, batchId }: { agent: Agent; tab: string; onTab: (t: string) => void; batchId?: string | null }) {
   const t = useTranslations("agents");
   const tabs = TABS.map((tb) => ({ key: tb.key, label: t(tb.labelKey), icon: tb.icon }));
   return (
@@ -23,6 +24,7 @@ export function AgentEditor({ agent, tab, onTab }: { agent: Agent; tab: string; 
       <div style={s.body}>
         {tab === "config" && <ConfigTab agent={agent} />}
         {tab === "skills" && <SkillsTab agentId={agent.id} />}
+        {tab === "evals" && <EvalsTab key={agent.id} agentId={agent.id} requestedBatchId={batchId} />}
       </div>
     </div>
   );

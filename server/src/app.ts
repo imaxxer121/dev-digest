@@ -40,6 +40,9 @@ export interface BuildAppOptions {
  */
 export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInstance> {
   const config = opts.config ?? loadConfig();
+  // Importing config loads .env. A test that omits its isolated DB must never
+  // open that inherited live database or run startup recovery against it.
+  if (config.nodeEnv === 'test' && !opts.db) throw new Error('Tests must inject an isolated database into buildApp');
   const handle = opts.db ? null : createDb(config.databaseUrl);
   const db = opts.db ?? handle!.db;
 
@@ -66,6 +69,9 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
 
   const container = new Container(config, db, opts.overrides);
   app.decorate('container', container);
+  // Single API process: every preexisting running eval is interrupted, never rerun.
+  // Fail startup if this cannot be persisted, so stale batches cannot look active.
+  await container.evalsRepo.reap();
 
   // Reap runs left 'running' by a previous (now-dead) process — otherwise they
   // show as perpetually "running" in the UI and can't be cancelled (no runner).

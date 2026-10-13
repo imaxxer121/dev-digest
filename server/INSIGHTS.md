@@ -1,5 +1,68 @@
 # Server engineering insights
 
+## 2026-10-13 — Eval snapshots retain raw noise and survive source changes
+
+Historical eval conversion recovers only the supported final saved diff wrapper
+(`src/modules/evals/source.ts:16`); escaped delimiters, mismatched hunk counts,
+deleted-only citations and oversized UTF-8 files are unsupported. Exact future
+raw diff/model-visible PR metadata is saved at `src/modules/reviews/run-executor.ts:263`.
+The source head remains null because a queued PR row cannot certify which
+revision a later stored-file/GitHub fallback returned. A targeted actual-loader
+test with queued H0 and injected GitHub H1 proves this conservative provenance
+(`test/evals-trace-provenance.test.ts:14`, 1/1 passed); no actual model is used.
+Unknown historical title/head remain null. Shared prompt assembly omits blank
+descriptions, so `src/modules/evals/digest.ts:12` normalizes them to one input
+digest; otherwise identical prompts would receive separate calls/denominators.
+
+Conversion locks the source finding, checks every workspace-bearing relationship
+and validates saved identity even on an idempotent return
+(`src/modules/evals/repository.ts:34`, `src/modules/evals/repository.ts:79`).
+Source finding/review IDs are provenance scalars; frozen cases remain readable
+after their source review is deleted. Batch creation explicitly uses REPEATABLE
+READ at `src/modules/evals/repository.ts:144`, and a partial unique running index
+prevents a same-agent race (`src/db/schema/eval.ts:36`). Snapshots retain configured
+strategy/schema while effective execution uses Review/single-pass/retries=0.
+
+The pure scorer performs maximum one-to-one positional matching and keeps every
+raw candidate in precision, including duplicates and rejected citations
+(`src/modules/evals/scorer.ts:13`). Aggregation sums unique-group integer counts
+before division; zero denominators, partial overall ratios and unknown cost stay
+null (`src/modules/evals/scorer.ts:41`). Startup interruption is awaited before
+requests (`src/app.ts:74`); even an orphan with every group already completed
+stays failed with null aggregate ratios (`src/modules/evals/snapshot.ts:77`).
+
+Fastify passes null to validation for an absent body. An optional object schema
+alone therefore rejects a true empty POST, unlike `{}`. The route preValidation
+hook normalizes only an absent request body to `{}`
+(`src/modules/evals/routes.ts:11`); explicit JSON null/arrays/primitives/unknown
+fields remain 422. Real no-payload/no-content-type conversion and Run all tests
+cover the browser action shape; the earlier 31-case suite only used `{}`.
+
+App construction performs startup recovery, so a "no DB" smoke test cannot
+rely on lazy postgres-js connection. `loadConfig` imports dotenv; inheriting its
+database URL let the old smoke tests run recovery against the local application
+database. Tests now must inject an isolated DB before client creation
+(`src/app.ts:45`), and `test/routes-smoke.test.ts:13` forbids real client creation
+while injecting a fake startup DB. This preserves production and PostgreSQL
+integration recovery. The isolated smoke suite (5 tests) and required eval
+PostgreSQL suite (38 tests) passed together, 43/43 with zero skips; server
+typecheck passed. No scorer, gold dataset or model inputs changed for this fix.
+
+Verified: native `pnpm typecheck` passed; `node node_modules/vitest/vitest.mjs run
+--exclude '**/*.it.test.ts'` passed 201 tests in 28 files. Focused final
+`node node_modules/vitest/vitest.mjs run test/evals.it.test.ts test/evals-pure.test.ts`
+passed 31 real PostgreSQL/Testcontainers tests and 34 pure tests, with zero skips.
+The required DB suite fails if Docker is unavailable. Providers are injected and
+live source I/O is forbidden in these tests; these results make no claim about
+actual model quality or the separate root-owned experiment. After the empty-body
+fix, `node node_modules/vitest/vitest.mjs run test/evals.it.test.ts` passed all
+38 PostgreSQL tests with zero skips and server `pnpm typecheck` passed again.
+Final root `pnpm verify:l06` after the isolation guard passed 203 server unit
+tests in 29 files, 38 mandatory real PostgreSQL tests, 119 client tests and
+23 reviewer-core tests, plus all three typechecks and mirrored contract parity.
+The actual three-prompt experiment is recorded separately in
+`../docs/evidence/l06/experiments.json`; it does not replace deterministic tests.
+
 ## 2026-10-12 — PR Brief captures coherent facts and generates explicitly
 
 `src/modules/brief/service.ts:36` captures PR head/files/specs before inference;

@@ -23,7 +23,6 @@ export const s = {
     alignItems: "flex-start",
     gap: 12,
     padding: "14px 16px",
-    cursor: "pointer",
   } satisfies CSSProperties,
   badgeWrap: { paddingTop: 1 } satisfies CSSProperties,
   headerMain: { flex: 1, minWidth: 0 } satisfies CSSProperties,
@@ -39,6 +38,7 @@ export const s = {
     color: muted ? "var(--text-muted)" : "var(--text-primary)",
     textDecoration: dismissed ? "line-through" : "none",
   }),
+  toggle: { display: "inline-flex", alignItems: "center", gap: 8, minWidth: 0, padding: 0, border: 0, borderRadius: 3, background: "transparent", textAlign: "left", cursor: "pointer", font: "inherit" } satisfies CSSProperties,
   acceptedTag: { fontSize: 12, fontWeight: 600, color: "var(--ok)" } satisfies CSSProperties,
   dismissedTag: {
     fontSize: 12,

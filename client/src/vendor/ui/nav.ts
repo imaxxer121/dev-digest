@@ -32,6 +32,7 @@ export const NAV: NavGroup[] = [
 
       { key: "skills", label: "Skills", icon: "Sparkles", href: "/skills", gKey: "s" },
       { key: "conventions", label: "Conventions", icon: "ListChecks", href: "/repos/:repoId/conventions" },
+      { key: "eval", label: "Eval Dashboard", icon: "FlaskConical", href: "/eval" },
     ],
   },
 ];

@@ -73,6 +73,7 @@ export function useShellContext({ onOpenCommandPalette }: ShellContextOptions): 
       // Sidebar badge = PRs that still NEED review, not the total PR count.
       // 0 → undefined so the badge hides entirely when nothing needs review.
       prCount: pulls?.filter((p) => p.status === "needs_review").length || undefined,
+      navLabels: { eval: t("nav.eval") },
     }),
     [
       pathname,
@@ -86,6 +87,7 @@ export function useShellContext({ onOpenCommandPalette }: ShellContextOptions): 
       onAddRepo,
       onRemoveRepo,
       pulls,
+      t,
     ],
   );
 }

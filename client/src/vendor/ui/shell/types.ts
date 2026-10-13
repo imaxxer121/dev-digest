@@ -34,6 +34,7 @@ export interface ShellContext {
   onRemoveRepo?: (id: string) => void;
   onRefresh?: () => void;
   prCount?: number;
+  navLabels?: Record<string, string>;
 }
 
 export interface Crumb {
