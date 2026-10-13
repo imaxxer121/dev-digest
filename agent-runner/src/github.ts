@@ -50,6 +50,7 @@ export async function postGithubReview(
   token: string,
   payload: GitHubReviewPayload,
   fetchImpl: FetchLike = fetch,
+  commitId?: string,
 ): Promise<void> {
   const url = `${GITHUB_API_BASE}/repos/${ctx.owner}/${ctx.repo}/pulls/${ctx.prNumber}/reviews`;
   const post = (body: Record<string, unknown>) =>
@@ -68,7 +69,7 @@ export async function postGithubReview(
   // still renders the "Approved ✅" summary, we just don't submit the formal
   // approval GitHub would reject.
   const event = payload.event === 'APPROVE' ? 'COMMENT' : payload.event;
-  const base = { body: payload.body, event };
+  const base = { body: payload.body, event, ...(commitId ? { commit_id: commitId } : {}) };
   const hasComments = !!payload.comments && payload.comments.length > 0;
   const withComments = hasComments
     ? { ...base, comments: payload.comments!.map((c) => ({ path: c.path, line: c.line, body: c.body })) }

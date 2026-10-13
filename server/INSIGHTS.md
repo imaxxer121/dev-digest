@@ -208,3 +208,37 @@ after a direct symbol caller (`src/modules/repo-intel/service.ts:666`). This is
 not a second-hop symbol call graph or proof of runtime invocation. Existing
 index writes are not atomic; snapshot guarantees during concurrent reindexing
 require a future versioned/transactional index change.
+
+## 2026-10-13 — CI artifacts require the executed workflow and repository identity
+
+Checking only a base workflow lets a PR replace the workflow that produces its
+artifact. Authenticated retrieval checks the actual head workflow, then hashes
+the trusted base runner, manifest, Skills and memory (`src/adapters/github/ci-artifacts.ts:44`,
+`src/modules/ci/provenance.ts:17`). Artifact redirects use a fresh request without
+the GitHub bearer token (`src/adapters/github/ci-artifacts.ts:31`). Exported memory
+must fit the runner budget before ZIP creation (`src/modules/ci/service.ts:36`).
+
+Duplicate installation exports must share the workspace/numeric repository/run/
+attempt identity. Transaction advisory locking plus a unique index prevent a
+concurrent first import from duplicating its run, review and original findings
+(`src/modules/ci/repository.ts:23`, `test/ci.it.test.ts:85`). The focused command
+`node node_modules/vitest/vitest.mjs run test/ci-pure.test.ts test/ci-adapter.test.ts
+test/ci.it.test.ts` passed 36 tests, including 8 mandatory isolated PostgreSQL
+cases. The server unit suite passed 231 tests and TypeScript checking passed.
+These provider/HTTP fixtures verify provenance and persistence, not model quality.
+
+An installation PR introduces its workflow before trusted base contains the
+runner. The generated guard verifies all three runtime files and the selected
+UUID manifest, skips inference/artifact with an explicit first-install notice,
+and fails an already-installed but damaged base (`src/modules/ci/workflow.ts:33`,
+`test/ci-bootstrap.test.ts:43`). Tests execute the actual generated Bash against
+absent, partial, complete and PR-only fixture files, rather than assuming a
+missing runner means a successful review. After the multi-agent merge, the full
+server suite passed 368 tests in 47 files; the subsequent bootstrap follow-up
+passed 44 focused CI tests, including 8 bootstrap and 8 PostgreSQL cases.
+
+Generate a concurrent feature's snapshot from the merged previous snapshot.
+The 0016 snapshot points to 0015 and preserves all 39 non-CI table definitions.
+Custom backfill SQL must use the same explicit FK names as the generated
+snapshot (`src/db/migrations/0016_l07_ci.sql:1`); unnamed inline REFERENCES would
+otherwise produce a different PostgreSQL name and cause later migration drift.

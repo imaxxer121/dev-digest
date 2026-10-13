@@ -1,6 +1,12 @@
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import type { LLMProvider, GitHubReviewPayload, CiResultArtifact } from '@devdigest/shared';
-import { reviewPullRequest, toReviewPayload, gateTriggered, countBlockers } from '@devdigest/reviewer-core';
+import { reviewPullRequest, toReviewPayload, gateTriggered, countBlockers, wrapUntrusted } from '@devdigest/reviewer-core';
+import { VerifiedCiArtifact, RunTrace } from '@devdigest/shared';
+import { createHash } from 'node:crypto';
+import { loadMemory } from './memory.js';
+import zodPackage from 'zod/package.json';
+import yamlPackage from 'yaml/package.json';
+import corePackage from '../../reviewer-core/package.json';
 import { loadManifest } from './manifest.js';
 import { loadSkillBodies } from './skills.js';
 import { resolvePrContext, type CiEnv } from './context.js';
@@ -38,7 +44,7 @@ export interface RunCiDeps {
   /** Directory containing `agents/` and `skills/` (checked-in `.devdigest/`). */
   devdigestDir: string;
   env: CiEnv;
-  /** Injected LLM provider — `OpenRouterProvider` in production, a stub in tests. */
+  /** Injected hosted runtime: OpenRouter or CI-only loopback Ollama. */
   llm: LLMProvider;
   /** How to post the result — `'github_review' | 'pr_comment' | 'none'` (AC-24). */
   postAs: PostAs;
@@ -58,6 +64,8 @@ export interface RunCiDeps {
     token: string,
     fetchImpl: FetchLike,
   ) => Promise<string>;
+  /** Production snapshots bracket diff retrieval; a moving head is rejected. */
+  fetchIdentity?: () => Promise<{ headSha: string; repositoryId: number; title: string; body: string; fork: boolean }>;
 }
 
 export interface RunCiSuccess {
@@ -90,11 +98,16 @@ export async function runCi(deps: RunCiDeps): Promise<RunCiResult> {
 
   try {
     // 1. Load + validate the manifest BEFORE it is used for anything (AC-20).
-    const manifest = loadManifest(deps.devdigestDir, { readFile, readDir });
+    const manifest = loadManifest(deps.devdigestDir, { readFile, readDir }, deps.env.DEVDIGEST_MANIFEST);
+    if (manifest.provider !== deps.llm.id) throw new RunnerError('Manifest provider differs from the injected CI runtime');
     const skills = loadSkillBodies(deps.devdigestDir, manifest.skills, readFile);
 
     // 2. Resolve CI context (PR number/title/body/repo) from env + event payload.
     const ctx = resolvePrContext(deps.env, readFile);
+    const identity = await deps.fetchIdentity?.();
+    if (identity && (!ctx.headSha || identity.headSha !== ctx.headSha)) throw new RunnerError('PR head differs from the triggering event; run the workflow for the current head');
+    if (identity?.fork || ctx.isFork) throw new RunnerError('Fork reviews are disabled in the write-capable CI job');
+    if (identity) { ctx.title = identity.title; ctx.body = identity.body; }
 
     const githubToken = deps.env.GITHUB_TOKEN;
     if (deps.postAs !== 'none' && !githubToken) {
@@ -106,6 +119,7 @@ export async function runCi(deps: RunCiDeps): Promise<RunCiResult> {
     //    minified runner bundle would otherwise fail the whole review with a
     //    GitHub 422 "diff too large", and reviewing our own config is noise.
     const rawDiff = await fetchDiffImpl(ctx, githubToken ?? '', fetchImpl);
+    if (identity && (await deps.fetchIdentity!()).headSha !== identity.headSha) throw new RunnerError('PR head changed during diff capture; retry the workflow');
     const diff = parseUnifiedDiff(stripIgnoredFiles(rawDiff));
 
     // 4. Run the SAME engine the studio uses. `reviewPullRequest` internally
@@ -122,8 +136,10 @@ export async function runCi(deps: RunCiDeps): Promise<RunCiResult> {
       llm: deps.llm,
       strategy: manifest.strategy,
       skills,
+      memory: loadMemory(deps.devdigestDir),
       prDescription: ctx.body,
-      task: `Review PR #${ctx.prNumber}: ${ctx.title}`,
+      task: `Review PR #${ctx.prNumber}\n${wrapUntrusted('pr-title', ctx.title)}`,
+      maxRetries: 0,
     });
     const durationMs = now() - start;
 
@@ -139,18 +155,36 @@ export async function runCi(deps: RunCiDeps): Promise<RunCiResult> {
 
     // 6. Build + write the artifact before posting, so a GitHub-side posting
     //    failure never loses the already-computed, already-grounded result.
-    const artifact = buildResultArtifact({
+    let artifact = buildResultArtifact({
       findings: outcome.review.findings,
       costUsd: outcome.costUsd,
       durationMs,
       agent: manifest.name,
       prNumber: ctx.prNumber,
     });
+    if (identity) {
+      const trace = RunTrace.parse({ source_diff: diff.raw, source_head_sha: identity.headSha,
+        source_pr: { title: ctx.title, description: ctx.body },
+        config: { agent: manifest.name, version: String(manifest.agent_version), provider: manifest.provider, model: manifest.model, pr: ctx.prNumber, source: 'ci' },
+        stats: { duration_ms: durationMs, tokens_in: outcome.tokensIn, tokens_out: outcome.tokensOut, cost_usd: outcome.costUsd, findings: outcome.review.findings.length, grounding: outcome.grounding },
+        prompt_assembly: outcome.assembly, tool_calls: [], raw_output: outcome.raw, memory_pulled: [], specs_read: [], log: [] });
+      const verified = VerifiedCiArtifact.parse({ schema_version: '2', agent_id: manifest.agent_id, agent: manifest.name, agent_version: manifest.agent_version,
+        manifest_digest: createHash('sha256').update(JSON.stringify(manifest)).digest('hex'), provider: manifest.provider, model: manifest.model, version: '2',
+        dependency_versions: { 'reviewer-core': corePackage.version, zod: zodPackage.version, yaml: yamlPackage.version, node: process.versions.node, ollama: manifest.provider === 'ollama' ? '0.6.8' : 'unused' },
+        repo: `${ctx.owner}/${ctx.repo}`, repository_id: identity.repositoryId, pr_number: ctx.prNumber, head_sha: identity.headSha,
+        workflow_sha: deps.env.DEVDIGEST_WORKFLOW_SHA, workflow_path: '.github/workflows/devdigest-review.yml',
+        github_run_id: Number(deps.env.GITHUB_RUN_ID), github_run_attempt: Number(deps.env.GITHUB_RUN_ATTEMPT), github_job: deps.env.GITHUB_JOB,
+        verdict: triggered ? 'request_changes' : outcome.review.findings.length ? 'comment' : 'approve', fail_on: manifest.ci_fail_on,
+        findings: outcome.review.findings, findings_count: outcome.review.findings.length, cost_usd: outcome.costUsd, duration_ms: durationMs,
+        tokens_in: outcome.tokensIn, tokens_out: outcome.tokensOut, trace });
+      artifact = verified;
+    }
     writeFile(deps.resultPath, `${JSON.stringify(artifact, null, 2)}\n`);
 
     // 7. Post per `post_as` (AC-24).
+    if (identity && (await deps.fetchIdentity!()).headSha !== identity.headSha) throw new RunnerError('PR head changed during inference; refusing stale publication');
     if (deps.postAs === 'github_review') {
-      await postGithubReview(ctx, githubToken as string, payload, fetchImpl);
+      await postGithubReview(ctx, githubToken as string, payload, fetchImpl, identity?.headSha);
     } else if (deps.postAs === 'pr_comment') {
       await postPrComment(ctx, githubToken as string, payload.body, fetchImpl);
     }

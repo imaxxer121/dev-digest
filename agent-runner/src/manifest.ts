@@ -77,7 +77,8 @@ export function loadAgentManifest(manifestPath: string, deps: FsDeps = {}): Agen
 }
 
 /** Convenience: locate + load + validate in one call. */
-export function loadManifest(devdigestDir: string, deps: FsDeps = {}): AgentManifest {
-  const manifestPath = findManifestPath(devdigestDir, deps);
+export function loadManifest(devdigestDir: string, deps: FsDeps = {}, selected?: string): AgentManifest {
+  if (selected !== undefined && !/^agents\/[a-z0-9][a-z0-9-]{0,79}\.yaml$/.test(selected)) throw new RunnerError('Selected manifest path is invalid');
+  const manifestPath = selected ? path.join(devdigestDir, selected) : findManifestPath(devdigestDir, deps);
   return loadAgentManifest(manifestPath, deps);
 }

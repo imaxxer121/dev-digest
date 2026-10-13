@@ -36,3 +36,22 @@ See also: `insights/gotchas.md` for known quirks at project start.
 ## Open Questions
 
 2026-07-08 — `AgentManifest` has no `post_as` field and the generated GHA workflow (`server/src/modules/ci/workflow.ts`) doesn't set a `POST_AS`-equivalent env var, so in production the runner will always fall back to `index.ts`'s default (`'github_review'`) regardless of what the studio's export dialog captured (`CiExportInput.post_as`). Should `post_as` be folded into `AgentManifest` (persisted per-agent, read by the runner) or threaded through the workflow as an explicit env var? Whoever owns the export/workflow-generation track should close this loop — `runCi()` already accepts `postAs` as a first-class parameter, so wiring either fix through only touches `index.ts` plus the manifest/workflow generator. ref: server/src/vendor/shared/contracts/eval-ci.ts (AgentManifest), agent-runner/src/index.ts:25
+
+## 2026-10-13 — Standalone ncc exports need emitted chunks and commit-bound reviews
+
+The current ncc build emits `index.js`, `300.index.js` and `package.json`, so the
+earlier single-file observation no longer describes the complete runtime.
+Export all three; `test/bundle-smoke.mjs:13` copies them to a temporary repository
+without node_modules, executes the real CLI/core, and checks a grounded critical
+gate plus commit-bound publication. Use pathToFileURL for the direct-entry check
+on Windows (`src/index.ts:79`). The explicit DEVDIGEST_MANIFEST path supports
+multiple exported agents; DEVDIGEST_POST_AS now comes from the workflow.
+
+A queued workflow must match the event head before diff capture, then recheck
+the head after inference and supply GitHub commit_id (`src/run.ts:108`,
+`src/run.ts:185`, `src/github.ts:72`). The CI-only Ollama adapter requests the
+actual JSON schema, bounds context and reads real token counters, with unknown
+cost retained as null (`src/ollama.ts:13`). `node node_modules/vitest/vitest.mjs
+run` passed 32 tests; TypeScript checking, ncc build and `node test/bundle-smoke.mjs`
+passed. The smoke uses injected fixture inference and is distinct from an actual
+model run. No studio authentication is included in the export.
