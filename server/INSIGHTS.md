@@ -27,6 +27,17 @@ failure, agent deletion, trace rollback, foreign/malformed parent scoping and
 simultaneous idempotent Learn. Migration 0015 includes the generated snapshot.
 No application database or real model was used by these checks.
 
+The legacy reviews integration suite shared enabled agents across cases: five
+created fixtures plus the three seeded presets made its final `all:true` request
+return 422 `invalid_run_selection`. Reset only that suite's workspace agents
+before each case (`test/reviews.it.test.ts:109`) and inject a deterministic
+OpenRouter provider for the seeded presets (`test/reviews.it.test.ts:121`). The
+existing run-all case now verifies exact enabled membership and completed saved
+reviews, then proves both all and explicit six-agent requests queue no rows
+(`test/reviews.it.test.ts:308`). The production 1–5 bound remains unchanged.
+Final direct server typecheck passed; `node node_modules/vitest/vitest.mjs run
+.it.test` passed all 114 PostgreSQL tests in 14 files with zero skips (50.67s).
+
 ## 2026-10-13 — Eval snapshots retain raw noise and survive source changes
 
 Historical eval conversion recovers only the supported final saved diff wrapper
