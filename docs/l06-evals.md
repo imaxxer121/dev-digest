@@ -110,3 +110,8 @@ The Next production build passed. [Saved output](evidence/l06/verification.txt).
 The required narrated video uses edited captures of the actual browser flow,
 with model waiting compressed and disclosed synthetic Russian narration.
 It does not claim to be a continuous recording or the user's own voice.
+
+Published as [PR #14](https://github.com/imaxxer121/dev-digest/pull/14), based
+on the L05 branch. The narrated video and comparison screenshot were attached
+to GoIT; the actual post-submit page shows **Завдання на перевірці**.
+Mentor acceptance is pending. [Publication evidence](evidence/l06/publication.json).
