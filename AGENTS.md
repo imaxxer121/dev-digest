@@ -11,7 +11,8 @@ diff → reviewer-core prompt and grounding → persisted reviews → client fin
 - `e2e/`: deterministic browser journeys over seeded data.
 
 These are independent packages. Install server/client with pnpm and reviewer-core
-with `npm ci`. There is no root package or shared workspace lockfile.
+with `npm ci`. The root package only exposes verification commands; there is no
+shared workspace or root dependency installation.
 
 ## Run and validate
 
@@ -34,6 +35,12 @@ Use Node path/url helpers for OS paths; use POSIX paths only for GitHub URLs.
 
 There is no separate lint script in these packages; run their configured typechecks.
 Reviewer-core and e2e also expose `npm run typecheck`.
+
+For evaluation-pipeline changes, run `pnpm verify:l06` from the root. It checks
+mirrored contracts, the three package typechecks, deterministic tests and the
+mandatory real PostgreSQL eval suite. Docker must be available; skipped DB
+tests cannot satisfy this command. Real model experiments are separate explicit
+actions and are never part of this verification command.
 
 Do not edit generated migrations or lockfiles as a side effect of a UI feature.
 Keep keys, local runtime files and `.env` out of commits. Tests use mocks or

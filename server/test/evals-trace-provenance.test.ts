@@ -1,0 +1,40 @@
+import { describe, expect, it, vi } from 'vitest';
+import type { RunTrace } from '@devdigest/shared';
+import type { Container } from '../src/platform/container.js';
+import type { AgentRow, PullRow } from '../src/db/rows.js';
+import type * as t from '../src/db/schema.js';
+import type { ReviewRepository } from '../src/modules/reviews/repository.js';
+import { ReviewRunExecutor } from '../src/modules/reviews/run-executor.js';
+import { MockGitClient, MockGitHubClient, MockLLMProvider } from '../src/adapters/mocks.js';
+import { RunBus } from '../src/platform/sse.js';
+import { historicalSource } from '../src/modules/evals/source.js';
+import { DIFF, FILE } from './helpers/evals.js';
+
+describe('future eval source head provenance', () => {
+  it('retains actual newer GitHub fallback diff without certifying the stale queued PR head', async () => {
+    const git = new MockGitClient({ diff: '' });
+    const patch = DIFF.slice(DIFF.indexOf('@@ '));
+    const github = new MockGitHubClient({ detail: { head_sha: 'H1', files: [{ path: FILE, additions: 2, deletions: 1, patch }] } });
+    const getPullRequest = vi.spyOn(github, 'getPullRequest');
+    const provider = new MockLLMProvider('anthropic', { structured: { verdict: 'approve', summary: 'Fixture', score: 95, findings: [] } });
+    let trace: RunTrace | undefined;
+    const repository = {
+      getPrFiles: vi.fn(async () => []), insertReview: vi.fn(async () => ({ id: 'review-id' })), insertFindings: vi.fn(async () => []),
+      markReviewed: vi.fn(async () => {}), completeAgentRun: vi.fn(async () => {}),
+      saveRunTrace: vi.fn(async (_id: string, value: RunTrace) => { trace = value; }),
+    } as unknown as ReviewRepository;
+    const agents = { linkedSkills: vi.fn(async () => []) } as unknown as Container['agentsRepo'];
+    const container = { git, github: async () => github, llm: async () => provider, runBus: new RunBus(), agentsRepo: agents } as unknown as Container;
+    const pull = { id: 'pull-id', repoId: 'repo-id', number: 1, title: 'Queued title', body: 'Saved model-visible description', base: 'main', headSha: 'H0' } as PullRow;
+    const agent = { id: 'agent-id', name: 'Fixture', provider: 'anthropic', model: 'fixture', systemPrompt: 'Review', version: 1,
+      strategy: 'single-pass', repoIntel: false, ciFailOn: 'critical' } as AgentRow;
+    const repo = { id: 'repo-id', owner: 'fixture', name: 'repo' } as typeof t.repos.$inferSelect;
+    await new ReviewRunExecutor(container, repository, agents).executeRuns('workspace-id', pull, repo, [{ agent, runId: 'run-id' }]);
+    expect(getPullRequest).toHaveBeenCalledTimes(1);
+    expect(repository.completeAgentRun).toHaveBeenCalledWith('run-id', expect.objectContaining({ status: 'done' }));
+    expect(trace).toBeDefined(); expect(trace!.source_head_sha).toBeNull(); expect(trace!.source_diff).toContain(patch);
+    const frozen = historicalSource(trace); expect(frozen.head).toBeNull(); expect(frozen.raw).toBe(trace!.source_diff);
+    expect(frozen).toMatchObject({ title: 'Queued title', description: 'Saved model-visible description', retrieval: 'trace-source-diff' });
+    expect(provider.calls.filter(call => call.method === 'completeStructured')).toHaveLength(1);
+  });
+});

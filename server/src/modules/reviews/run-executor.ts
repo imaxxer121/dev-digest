@@ -260,6 +260,11 @@ export class ReviewRunExecutor {
       });
 
       const trace: RunTrace = {
+        source_diff: diff.raw,
+        // The queued PullRow cannot certify the revision returned by a later
+        // stored-file/GitHub fallback. loadDiff does not carry a proven SHA.
+        source_head_sha: null,
+        source_pr: { title: pull.title, description: outcome.assembly.pr_description ?? null },
         config: {
           agent: agent.name,
           version: String(agent.version),

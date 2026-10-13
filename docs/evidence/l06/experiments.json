@@ -1,0 +1,153 @@
+{
+  "collected_at": "2026-10-13T08:43:01.628Z",
+  "tool_substitution": "Codex CLI using existing ChatGPT login; Claude Code was unavailable. No Claude execution is claimed.",
+  "rubric": "Security-focused diff reviewer: actionable injection, unsafe execution, path traversal, SSRF, token security and unsafe redirects. UI keyboard behavior and database query efficiency are outside this rubric; dismissing them does not claim those findings are factually false.",
+  "preflight_revision": "Before any eval inference, source 2660eaff-0365-42c0-afec-d889f7329fb3 returned 409 because its saved kind is lethal_trifecta, unsupported by the normal-finding converter. Replaced with real normal PR5 XSS finding f7ebabe0-49cb-4ddb-80bf-9de2598bcd9e. Initial selection is preserved separately. Final suite: 8 cases / 7 unique inputs.",
+  "fixed_before_eval": true,
+  "total_cases": 8,
+  "unique_inputs": 7,
+  "model": "codex/gpt-6.1-sol",
+  "skills": [],
+  "limitations": [
+    "Eight authentic saved findings, including two valid findings dismissed as outside a security-only rubric; neither dismissal claims factual falsehood.",
+    "Positional matching cannot establish semantic vulnerability correctness; unlabelled valid issues still count as false positives.",
+    "Single run per prompt; stochastic generation and small curated suite do not establish a general quality improvement.",
+    "Historical source_head_sha is unknown/null; frozen exact diff provenance is retained.",
+    "Subscription model cost is unknown/null; no dollar cost was fabricated.",
+    "First real batch was interrupted by an old no-DB smoke test using the local database. Preserved with null aggregate metrics; test isolation fixed before rerun."
+  ],
+  "runs": [
+    {
+      "id": "6efee98a-9f51-4d9e-a6c4-b302c7b98415",
+      "purpose": "old",
+      "started_at": "2026-10-13T08:22:55.865Z",
+      "status": "failed",
+      "error": "Interrupted by API restart; run evals explicitly again",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "agent_version": 1,
+      "cases_total": 8,
+      "groups_total": 7,
+      "groups_succeeded": 2,
+      "groups_failed": 5,
+      "cases_passed": 3,
+      "counts": {
+        "expected_positives": 3,
+        "true_positives": 3,
+        "false_negatives": 0,
+        "raw_candidates": 3,
+        "grounded_candidates": 3,
+        "false_positives": 0
+      },
+      "metrics": {
+        "recall": null,
+        "precision": null,
+        "citation_accuracy": null
+      },
+      "duration_ms": 156857,
+      "cost_usd": null,
+      "dataset_digest": "f4a6960390a3fc3070969eff04d69bc42d1ce316a386a112e6b533a51723fa42",
+      "config_digest": "645932b5993f1cf66baefb3d3fd11229ac1c3d5f1d640e528d308d4cfaaa85d4",
+      "comparison_key": "e09a6efaeced7e098528a89177b8992bee4e00d378c4315777ecddbe67fbf0ef"
+    },
+    {
+      "id": "9ed20862-50c4-4dab-bf3e-2e4cc6acb97f",
+      "purpose": "old",
+      "started_at": "2026-10-13T08:34:23.382Z",
+      "status": "completed",
+      "error": null,
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "agent_version": 1,
+      "cases_total": 8,
+      "groups_total": 7,
+      "groups_succeeded": 7,
+      "groups_failed": 0,
+      "cases_passed": 7,
+      "counts": {
+        "expected_positives": 6,
+        "true_positives": 6,
+        "false_negatives": 0,
+        "raw_candidates": 8,
+        "grounded_candidates": 8,
+        "false_positives": 2
+      },
+      "metrics": {
+        "recall": 1,
+        "precision": 0.75,
+        "citation_accuracy": 1
+      },
+      "duration_ms": 126312,
+      "cost_usd": null,
+      "dataset_digest": "f4a6960390a3fc3070969eff04d69bc42d1ce316a386a112e6b533a51723fa42",
+      "config_digest": "645932b5993f1cf66baefb3d3fd11229ac1c3d5f1d640e528d308d4cfaaa85d4",
+      "comparison_key": "e09a6efaeced7e098528a89177b8992bee4e00d378c4315777ecddbe67fbf0ef"
+    },
+    {
+      "id": "c0c353f9-3a8e-42b8-952a-ead3657b9ca0",
+      "purpose": "improved",
+      "started_at": "2026-10-13T08:37:35.477Z",
+      "status": "completed",
+      "error": null,
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "agent_version": 2,
+      "cases_total": 8,
+      "groups_total": 7,
+      "groups_succeeded": 7,
+      "groups_failed": 0,
+      "cases_passed": 8,
+      "counts": {
+        "expected_positives": 6,
+        "true_positives": 6,
+        "false_negatives": 0,
+        "raw_candidates": 7,
+        "grounded_candidates": 7,
+        "false_positives": 1
+      },
+      "metrics": {
+        "recall": 1,
+        "precision": 0.8571428571428571,
+        "citation_accuracy": 1
+      },
+      "duration_ms": 89034,
+      "cost_usd": null,
+      "dataset_digest": "f4a6960390a3fc3070969eff04d69bc42d1ce316a386a112e6b533a51723fa42",
+      "config_digest": "6eeb446c705af6d89bc7b2c93431d34cd6a30a7f06a4ea3fadccd722daaca2ba",
+      "comparison_key": "e09a6efaeced7e098528a89177b8992bee4e00d378c4315777ecddbe67fbf0ef"
+    },
+    {
+      "id": "7e48b28f-057e-4fb1-a54f-b10870f80ea3",
+      "purpose": "deliberately_bad",
+      "started_at": "2026-10-13T08:39:50.013Z",
+      "status": "completed",
+      "error": null,
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "agent_version": 3,
+      "cases_total": 8,
+      "groups_total": 7,
+      "groups_succeeded": 7,
+      "groups_failed": 0,
+      "cases_passed": 7,
+      "counts": {
+        "expected_positives": 6,
+        "true_positives": 6,
+        "false_negatives": 0,
+        "raw_candidates": 9,
+        "grounded_candidates": 9,
+        "false_positives": 3
+      },
+      "metrics": {
+        "recall": 1,
+        "precision": 0.6666666666666666,
+        "citation_accuracy": 1
+      },
+      "duration_ms": 166140,
+      "cost_usd": null,
+      "dataset_digest": "f4a6960390a3fc3070969eff04d69bc42d1ce316a386a112e6b533a51723fa42",
+      "config_digest": "05e898aa881da4d88cf6c0ae778d82e6f9c55fcf4aebb710b4b0020cf65643e4",
+      "comparison_key": "e09a6efaeced7e098528a89177b8992bee4e00d378c4315777ecddbe67fbf0ef"
+    }
+  ]
+}

@@ -12,7 +12,7 @@ import { AgentEditor } from "./_components/AgentEditor";
 import { useAgents, useAgent, useUpdateAgent } from "../../../lib/hooks/agents";
 import { ApiError } from "../../../lib/api";
 
-const VALID_TABS = ["config", "skills"];
+const VALID_TABS = ["config", "skills", "evals"];
 
 export default function AgentEditorPage() {
   const params = useParams<{ id: string }>();
@@ -114,7 +114,7 @@ export default function AgentEditorPage() {
               </div>
             </div>
             <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-              <AgentEditor agent={agent} tab={tab} onTab={setTab} />
+              <AgentEditor agent={agent} tab={tab} onTab={setTab} batchId={search.get("batch")} />
             </div>
           </div>
         )}

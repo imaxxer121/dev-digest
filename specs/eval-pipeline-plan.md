@@ -98,3 +98,16 @@ Capture actual Codex model/config snapshots, group call counts/pre-gate candidat
 | L06-18 | Artifact gate/verifier/screenshot/narrated video | Earlier artifact SHA, report, actual comparison screenshot/playable recording |
 
 After relevant checks pass, root records final file:line evidence and publication handoff. Planning is complete when independent review accepts the fixed contract/transactions/scorer/evidence plan; implementation remains forbidden until root commits the artifacts.
+
+## Actual source preflight adjustment — before any eval generation
+
+The first real conversion attempt rejected source `2660eaff-0365-42c0-afec-d889f7329fb3`
+with 409: its persisted kind is `lethal_trifecta`, outside this normal-finding
+converter. Before any eval inference, root preserved the original selection and
+replaced that source with genuine normal PR5 XSS finding
+`f7ebabe0-49cb-4ddb-80bf-9de2598bcd9e`. The final fixed suite remains six positive
+and two scope-negative cases, now across **seven** distinct inputs: three prompts
+plan **21** calls. No expectations were changed after seeing model output. The
+SSRF input also contains an unlabelled metadata defect; this positional scorer
+counts unmatched findings as noise, so precision measures agreement with this
+curated subset, not semantic truth for every potential vulnerability.

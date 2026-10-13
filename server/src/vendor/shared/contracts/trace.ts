@@ -71,6 +71,10 @@ export type RunStats = z.infer<typeof RunStats>;
 
 /** The single-document trace stored in `run_traces.trace`. */
 export const RunTrace = z.object({
+  /** Exact source input for future immutable eval conversion; absent on legacy traces. */
+  source_diff: z.string().optional(),
+  source_head_sha: z.string().nullable().optional(),
+  source_pr: z.object({ title: z.string().nullable(), description: z.string().nullable() }).optional(),
   config: z.object({
     agent: z.string(),
     version: z.string().nullish(),

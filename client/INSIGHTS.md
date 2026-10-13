@@ -1,5 +1,41 @@
 # Client engineering insights
 
+## 2026-10-13 — Eval history is stored data; only explicit actions start inference
+
+Eval queries validate the direct contract schema and read stored cases, batches
+and dashboard data. The two POST mutations disable retries. Run invalidation
+uses the originating mutation agent, while conversion uses the server-returned
+case owner (`src/lib/hooks/evals.ts:44`, `src/lib/hooks/evals.ts:52`); navigation
+during acknowledgement cannot refresh another agent's cache. Running detail
+polls until terminal and invalidates its stored owner's history and dashboard
+(`src/lib/hooks/evals.ts:28`). Keep Run disabled after 202 until the acknowledged
+batch is known terminal (`src/app/agents/[id]/_components/AgentEditor/_components/EvalsTab/EvalsTab.tsx:27`).
+
+Null ratios and true zero have separate meanings. Completed batches alone show
+numeric metrics; zero denominators show a reason. Deltas require different
+completed runs with equal comparison keys and two defined ratios
+(`src/components/eval-metrics/helpers.ts:5`, `src/components/eval-metrics/helpers.ts:14`).
+Full stored prompts, ordered skill bodies, immutable snapshots and group output
+remain inspectable rather than truncated to a summary
+(`src/app/agents/[id]/_components/AgentEditor/_components/EvalsTab/BatchSnapshot.tsx:26`).
+
+`pnpm test` passed 117 tests across 31 files, including 14 new eval interaction
+and query tests; `pnpm typecheck` passed. These prove explicit conversion/run,
+idempotent feedback, pending/error/retry, running-to-terminal refresh, exact
+stored diff/prompt inspection, null/zero semantics, comparable-only deltas,
+schema rejection and cache ownership. API fixtures are not model-quality
+evidence; actual curation, production browser checks and prompt experiments
+belong to the primary agent.
+
+Independent review found that a collapsed FindingCard's mouse-only header
+hid conversion from keyboard users. Its title/chevron is now a native expansion
+button, with file links outside the control and guarded Enter/Space handling
+(`src/app/repos/[repoId]/pulls/[number]/_components/FindingCard/FindingCard.tsx:66`).
+`pnpm exec vitest run EvalCaseAction.test.tsx FindingCard.test.tsx DiffTab.test.tsx
+FindingsTab.test.tsx` passed 20 tests across four files after the fix, and
+`pnpm typecheck` passed. New tests open collapsed accepted and dismissed cards,
+retain focus, reach explicit conversion, isolate file-link keys and collapse.
+
 ## 2026-10-12 — PR Brief is explicit and focus follows real RIGHT rows
 
 Runtime Zod imports must target the contract directly: the shared barrel's

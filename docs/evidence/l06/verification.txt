@@ -1,0 +1,174 @@
+$ node scripts/verify-l06.mjs
+
+[L06] Docker/PostgreSQL integration prerequisite
+28.5.1
+[L06] Mirrored contracts match
+
+[L06] server typecheck
+
+[L06] client typecheck
+
+[L06] reviewer-core typecheck
+
+[L06] Server deterministic unit tests
+
+ RUN  v2.1.9 <checkout>/work/dev-digest/server
+
+ ✓ test/extract.test.ts (7 tests) 7ms
+ ✓ test/astgrep.test.ts (10 tests) 12ms
+ ✓ test/indexer-walk.test.ts (6 tests) 86ms
+(node:50864) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:36088) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/indexer-pipeline.test.ts (11 tests) 78ms
+(node:7416) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/contracts.test.ts (8 tests) 9ms
+ ✓ test/blast-mapping.test.ts (4 tests) 7ms
+(node:7840) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/smart-diff.test.ts (41 tests) 13ms
+ ✓ test/pulls-status.test.ts (6 tests) 4ms
+ ✓ test/price-book.test.ts (3 tests) 3ms
+(node:37084) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/repo-intel-rank-map.test.ts (9 tests) 390ms
+   ✓ tokenizer > TiktokenTokenizer returns a positive count for non-empty text 382ms
+(node:39792) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:42480) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/grounding.test.ts (7 tests) 6ms
+(node:27632) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/prompt-callers.test.ts (5 tests) 3ms
+ ✓ test/adapters.test.ts (5 tests) 8ms
+ ✓ test/codex-brief.test.ts (1 test) 27ms
+ ✓ test/evals-trace-provenance.test.ts (1 test) 11ms
+ ✓ test/brief-grounding.test.ts (2 tests) 7ms
+ ✓ test/conventions-grounding.test.ts (2 tests) 2ms
+ ✓ test/prompt-structured.test.ts (5 tests) 9ms
+ ✓ test/evals-pure.test.ts (34 tests) 266ms
+ ✓ test/repo-intel-resync.test.ts (3 tests) 7ms
+ ✓ test/blast-cache.test.ts (5 tests) 21ms
+ ✓ test/repo-intel-facade-degraded.test.ts (10 tests) 13ms
+ ✓ test/run-cost.test.ts (2 tests) 3ms
+(node:47204) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/historical-run-stats.test.ts (1 test) 3ms
+ ✓ test/brief-contract.test.ts (2 tests) 9ms
+ ✓ test/reviews-helpers.test.ts (2 tests) 2ms
+(node:15672) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/depgraph-paths.test.ts (1 test) 191ms
+ ✓ test/routes-smoke.test.ts (5 tests) 123ms
+ ✓ test/brief-input.test.ts (5 tests) 5722ms
+   ✓ Brief prepared input > bounds Unicode/escaping/many entries deterministically and retains an attached spec prefix/digest 5714ms
+
+ Test Files  29 passed (29)
+      Tests  203 passed (203)
+   Start at  10:36:37
+   Duration  7.13s (transform 3.07s, setup 0ms, collect 16.99s, tests 7.04s, environment 7ms, prepare 5.07s)
+
+
+[L06] Required real PostgreSQL eval integration tests
+
+ RUN  v2.1.9 <checkout>/work/dev-digest/server
+
+(node:16004) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/evals.it.test.ts (38 tests) 8713ms
+   ✓ L06 immutable eval pipeline (required PostgreSQL integration) > groups shared inputs once, preserves all raw candidates and stores member rows atomically with null known cost 338ms
+   ✓ L06 immutable eval pipeline (required PostgreSQL integration) > durably snapshots prompt/skill/cases before async work; same-agent competing start returns409; later edits never affect inference 422ms
+   ✓ L06 immutable eval pipeline (required PostgreSQL integration) > continues distinct groups after provider failure, exposes partial/null aggregate ratios and never fabricates passes 376ms
+   ✓ L06 immutable eval pipeline (required PostgreSQL integration) > stored GET/history/dashboard reloads never infer or write; scopes batches and validates malformed snapshot tenancy 316ms
+
+ Test Files  1 passed (1)
+      Tests  38 passed (38)
+   Start at  10:36:45
+   Duration  11.34s (transform 572ms, setup 0ms, collect 2.25s, tests 8.71s, environment 0ms, prepare 83ms)
+
+JSON report written to C:/Users/User/AppData/Local/Temp/devdigest-l06-verify-sKYsAI/integration.json
+
+[L06] Client interaction tests
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+
+ RUN  v2.1.9 <checkout>/work/dev-digest/client
+
+ ✓ src/components/diff-viewer/helpers.test.ts (4 tests) 5ms
+ ✓ src/components/FindingsHoverCard/FindingsHoverCard.test.tsx (5 tests) 122ms
+ ✓ src/lib/hooks/reviews.test.tsx (4 tests) 58ms
+ ✓ src/lib/hooks/core.test.tsx (1 test) 83ms
+ ✓ src/components/FindingPreview/FindingPreview.test.tsx (4 tests) 121ms
+ ✓ src/components/eval-metrics/EvalMetrics.test.tsx (2 tests) 79ms
+ ✓ src/app/repos/[repoId]/conventions/_components/ConventionCard/ConventionCard.test.tsx (3 tests) 166ms
+ ✓ src/lib/hooks/evals.test.tsx (3 tests) 1789ms
+   ✓ Eval query and mutation lifecycle > polls running detail to terminal and refreshes history using stored ownership 1582ms
+ ✓ src/app/eval/_components/EvalDashboard/EvalDashboard.test.tsx (2 tests) 209ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/RunHistory/RunHistory.test.tsx (6 tests) 180ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/RunTraceDrawer/RunTraceDrawer.test.tsx (2 tests) 228ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/BlastRadius/BlastRadius.test.tsx (8 tests) 467ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/PrBrief/PrBrief.test.tsx (7 tests) 651ms
+ ✓ src/app/repos/[repoId]/context/_components/ContextEditor/ContextEditor.test.tsx (6 tests) 738ms
+   ✓ repository text context editor > saves, reloads, edits and replaces one logical path via scoped GET/PUT without automatic saving 311ms
+ ✓ src/components/diff-viewer/DiffViewer/focus.test.tsx (4 tests) 489ms
+   ✓ diff focus from PR navigation > opens a collapsed role and large special-character file, then scrolls/focuses the precise RIGHT row 320ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/EvalCaseAction/EvalCaseAction.test.tsx (5 tests) 624ms
+ ✓ src/components/diff-viewer/DiffViewer/DiffViewer.test.tsx (8 tests) 1123ms
+   ✓ Smart Diff rendering > preserves new-comment and reply drafts across grouped/original remounts 350ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/DiffTab/DiffTab.test.tsx (6 tests) 1108ms
+   ✓ Files changed latest persisted review > renders the full existing card and saves Accept/Reject with visible persisted state 489ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/FindingCard/FindingCard.test.tsx (4 tests) 191ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/FindingsTab/FindingsTab.test.tsx (5 tests) 869ms
+   ✓ per-run severity filters > filters only the selected run, preserves the other run, and makes no requests 362ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/FindingsPanel/FindingsPanel.test.tsx (2 tests) 116ms
+stderr | src/test/smoke.test.tsx > web smoke (both themes) > component gallery renders in dark
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+stderr | src/test/smoke.test.tsx > web smoke (both themes) > component gallery renders in light
+The width(0) and height(0) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+
+ ✓ src/test/smoke.test.tsx (3 tests) 300ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/focus.test.ts (8 tests) 5ms
+ ✓ src/lib/cost.test.ts (4 tests) 3ms
+ ✓ src/app/agents/[id]/_components/AgentEditor/_components/EvalsTab/EvalsTab.test.tsx (4 tests) 2085ms
+   ✓ Agent Evals tab > runs only on an explicit action, keeps acknowledgement pending disabled and refreshes terminal progress 1644ms
+ ✓ src/components/FindingsCountChips/FindingsCountChips.test.tsx (3 tests) 31ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/RunReviewDropdown/RunReviewDropdown.test.tsx (1 test) 38ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/VerdictBanner/VerdictBanner.test.tsx (1 test) 45ms
+ ✓ src/app/repos/[repoId]/pulls/[number]/_components/RunStatus/RunStatus.test.tsx (1 test) 11ms
+ ✓ src/app/agents/_components/AgentCard/AgentCard.test.tsx (2 tests) 57ms
+ ✓ src/app/agents/[id]/_components/AgentEditor/AgentEditor.test.tsx (1 test) 54ms
+
+ Test Files  31 passed (31)
+      Tests  119 passed (119)
+   Start at  10:36:56
+   Duration  7.72s (transform 4.37s, setup 6.28s, collect 50.31s, tests 12.05s, environment 34.08s, prepare 6.19s)
+
+
+[L06] Reviewer-core tests
+
+ RUN  v2.1.9 <checkout>/work/dev-digest/reviewer-core
+
+ ✓ test/prompt.test.ts (5 tests) 2ms
+(node:51988) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:43136) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ test/run.test.ts (4 tests) 5ms
+ ✓ test/to-review.test.ts (14 tests) 4ms
+
+ Test Files  3 passed (3)
+      Tests  23 passed (23)
+   Start at  10:37:04
+   Duration  596ms (transform 164ms, setup 0ms, collect 631ms, tests 11ms, environment 0ms, prepare 285ms)
+
+
+[L06] PASS — types, deterministic tests and real DB integration; no model calls
