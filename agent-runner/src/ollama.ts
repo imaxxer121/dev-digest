@@ -1,10 +1,11 @@
 import type { LLMProvider, StructuredRequest, StructuredResult } from '@devdigest/shared';
 import { toJsonSchema } from '@devdigest/reviewer-core';
+import { fetchOllamaLoopback } from './ollama-http.js';
 
 /** CI-only loopback inference. Credentials and PR code never enter this adapter. */
 export class OllamaProvider implements LLMProvider {
   readonly id = 'ollama' as const;
-  constructor(private fetchImpl: typeof fetch = fetch) {}
+  constructor(private fetchImpl: typeof fetch = fetchOllamaLoopback) {}
   async listModels() { return []; }
   async complete(): Promise<never> { throw new Error('CI Ollama supports structured review only'); }
   async embed(): Promise<never> { throw new Error('CI Ollama does not embed'); }

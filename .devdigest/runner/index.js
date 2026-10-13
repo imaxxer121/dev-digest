@@ -14975,7 +14975,7 @@ let auto = false;
 let kind = undefined;
 let registry_fetch = undefined;
 let Request = (/* unused pure expression or super */ null && (undefined));
-let Response = (/* unused pure expression or super */ null && (undefined));
+let registry_Response = (/* unused pure expression or super */ null && (undefined));
 let Headers = (/* unused pure expression or super */ null && (undefined));
 let FormData = undefined;
 let Blob = (/* unused pure expression or super */ null && (undefined));
@@ -14996,7 +14996,7 @@ function setShims(shims, options = { auto: false }) {
     kind = shims.kind;
     registry_fetch = shims.fetch;
     Request = shims.Request;
-    Response = shims.Response;
+    registry_Response = shims.Response;
     Headers = shims.Headers;
     FormData = shims.FormData;
     Blob = shims.Blob;
@@ -39493,13 +39493,49 @@ async function runCi(deps) {
     }
 }
 
+;// CONCATENATED MODULE: external "node:http"
+const external_node_http_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:http");
+;// CONCATENATED MODULE: ./src/ollama-http.ts
+
+/** Buffered loopback transport with the caller's deadline, including delayed headers. */
+const fetchOllamaLoopback = async (input, init) => {
+    if (input !== 'http://127.0.0.1:11434/api/chat' || init?.method !== 'POST' || typeof init.body !== 'string') {
+        throw new Error('CI Ollama transport accepts only the fixed loopback chat endpoint');
+    }
+    return new Promise((resolve, reject) => {
+        const req = (0,external_node_http_namespaceObject.request)(input, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            signal: init.signal ?? undefined,
+        }, res => {
+            const chunks = [];
+            let size = 0;
+            res.on('data', (chunk) => {
+                size += chunk.length;
+                if (size > 1_048_576) {
+                    const error = new Error('CI Ollama response exceeds the 1 MiB limit');
+                    reject(error);
+                    res.destroy(error);
+                    return;
+                }
+                chunks.push(chunk);
+            });
+            res.on('error', reject);
+            res.on('aborted', () => reject(new Error('CI Ollama response was aborted')));
+            res.on('end', () => resolve(new Response(Buffer.concat(chunks).toString('utf8'), { status: res.statusCode ?? 500 })));
+        });
+        req.on('error', reject);
+        req.end(init.body);
+    });
+};
+
 ;// CONCATENATED MODULE: ./src/ollama.ts
+
 
 /** CI-only loopback inference. Credentials and PR code never enter this adapter. */
 class OllamaProvider {
     fetchImpl;
     id = 'ollama';
-    constructor(fetchImpl = fetch) {
+    constructor(fetchImpl = fetchOllamaLoopback) {
         this.fetchImpl = fetchImpl;
     }
     async listModels() { return []; }
