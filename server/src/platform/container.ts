@@ -14,6 +14,9 @@ import { runBus, type RunBus } from './sse.js';
 import { LocalSecretsProvider } from '../adapters/secrets/local.js';
 import { LocalNoAuthProvider } from '../adapters/auth/local.js';
 import { OctokitGitHubClient } from '../adapters/github/octokit.js';
+import { GitHubCiArtifacts } from '../adapters/github/ci-artifacts.js';
+import { readCiRunnerBundle } from '../adapters/github/ci-bundle.js';
+import type { CiDependencies, CiGithubPort } from '../modules/ci/ports.js';
 import { SimpleGitClient } from '../adapters/git/simple-git.js';
 import { RipgrepCodeIndex } from '../adapters/codeindex/ripgrep.js';
 import { join } from 'node:path';
@@ -47,6 +50,8 @@ export interface ContainerOverrides {
   secrets?: SecretsProvider;
   auth?: AuthProvider;
   github?: GitHubClient;
+  ciGithub?: CiGithubPort;
+  ciRunner?: () => Promise<Record<string, string>>;
   git?: GitClient;
   codeIndex?: CodeIndex;
   embedder?: Embedder;
@@ -59,7 +64,7 @@ export interface ContainerOverrides {
   tokenizer?: Tokenizer;
 }
 
-export class Container {
+export class Container implements CiDependencies {
   readonly config: AppConfig;
   readonly db: Db;
   readonly secrets: SecretsProvider;
@@ -69,6 +74,7 @@ export class Container {
 
   private _git?: GitClient;
   private _github?: GitHubClient;
+  private _ciGithub?: CiGithubPort;
   private _codeIndex?: CodeIndex;
   private _embedder?: Embedder;
   private llmCache = new Map<string, LLMProvider>();
@@ -177,6 +183,18 @@ export class Container {
     return this._github;
   }
 
+  async ciGithub(): Promise<CiGithubPort> {
+    if (this.overrides.ciGithub) return this.overrides.ciGithub;
+    if (this._ciGithub) return this._ciGithub;
+    const token = await this.secrets.get('GITHUB_TOKEN');
+    this._ciGithub = new GitHubCiArtifacts(token ?? '');
+    return this._ciGithub;
+  }
+
+  async ciRunner(): Promise<Record<string, string>> {
+    return this.overrides.ciRunner ? this.overrides.ciRunner() : readCiRunnerBundle();
+  }
+
   /** Resolve an LLM provider by id; constructs from the secret key, cached. */
   async llm(id: 'openai' | 'anthropic' | 'openrouter' | 'codex'): Promise<LLMProvider> {
     const injected = this.overrides.llm?.[id];
@@ -233,6 +251,7 @@ export class Container {
   invalidateSecretCaches(): void {
     this.llmCache.clear();
     this._github = undefined;
+    this._ciGithub = undefined;
     this._embedder = undefined;
   }
 }

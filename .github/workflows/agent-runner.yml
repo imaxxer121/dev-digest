@@ -1,0 +1,40 @@
+name: agent runner
+on:
+  pull_request:
+    paths:
+      - 'agent-runner/**'
+      - 'reviewer-core/**'
+      - 'server/src/vendor/shared/**'
+      - '.github/workflows/agent-runner.yml'
+permissions:
+  contents: read
+concurrency:
+  group: agent-runner-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  runner:
+    name: runner contract and bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: agent-runner
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
+        with:
+          version: 10
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install shared contract dependencies
+        working-directory: server
+        run: pnpm install --frozen-lockfile
+      - name: Install reviewer-core dependencies
+        working-directory: reviewer-core
+        run: npm ci
+      - run: pnpm install --frozen-lockfile
+      - run: node node_modules/typescript/bin/tsc --noEmit -p tsconfig.json
+      - run: node node_modules/vitest/vitest.mjs run
+      - run: node node_modules/@vercel/ncc/dist/ncc/cli.js build src/index.ts -o dist
+      - run: node test/bundle-smoke.mjs
