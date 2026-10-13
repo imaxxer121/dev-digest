@@ -4,6 +4,6 @@ type Database = {
 type Request = { query: { name: string } };
 
 export function findAccount(database: Database, request: Request) {
-  const query = "SELECT id FROM accounts WHERE name = '" + request.query.name + "'";
-  return database.query(query);
+  const query = 'SELECT id FROM accounts WHERE name = $1';
+  return database.query(query, [request.query.name]);
 }
