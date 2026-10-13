@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
 import { AgentManifest, CiExportInput, VerifiedCiArtifact } from '@devdigest/shared';
 import { generateWorkflow, validateEditedWorkflow } from '../src/modules/ci/workflow.js';
 import { verifyArtifact } from '../src/modules/ci/provenance.js';
@@ -30,6 +31,17 @@ describe('safe CI export and authenticated provenance', () => {
     expect(CiExportInput.safeParse({ repo: 'fixture/ci', runtime: { provider: 'ollama', model: 'x; echo leaked' } }).success).toBe(false);
   });
   it('accepts the verified envelope and distinguishes unavailable cost from zero', () => { const { envelope, installation } = ciFixture(); expect(verifyArtifact(envelope, installation).artifact.cost_usd).toBeNull(); });
+  it('accepts Git newline conversion but rejects changed workflow content', () => {
+    const { envelope, installation } = ciFixture();
+    const lf = envelope.workflow.replace(/\r\n/g, '\n');
+    const crlf = lf.replace(/\n/g, '\r\n');
+    const stored = { ...installation, workflowDigest: createHash('sha256').update(crlf).digest('hex') };
+    expect(verifyArtifact({ ...envelope, workflow: lf }, stored).artifact.agent_id).toBe(installation.agentId);
+    expect(verifyArtifact({ ...envelope, workflow: crlf }, installation).artifact.agent_id).toBe(installation.agentId);
+    expect(() => verifyArtifact({ ...envelope, workflow: lf + 'malicious: true\n' }, stored)).toThrow();
+    const generated = generateWorkflow(input, manifest);
+    expect(validateEditedWorkflow(generated.replace(/\n/g, '\r\n'), generated)).toBe(generated);
+  });
   it.each(['repositoryId', 'runId', 'attempt', 'prNumber', 'event', 'status', 'headSha', 'workflowSha', 'workflowPath', 'workflow', 'repo'])('rejects mismatched GitHub identity %s', key => {
     const { envelope, installation } = ciFixture(); const changed = { ...envelope, [key]: typeof envelope[key as keyof typeof envelope] === 'number' ? 100 : 'wrong' }; expect(() => verifyArtifact(changed, installation)).toThrow();
   });
