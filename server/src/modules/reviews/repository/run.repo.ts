@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { Db } from '../../../db/client.js';
 import * as t from '../../../db/schema.js';
 import type { RunSummary, RunTrace } from '@devdigest/shared';
@@ -173,7 +173,8 @@ export async function completeAgentRun(
       blockers: values.blockers ?? null,
       error: values.error ?? null,
     })
-    .where(eq(t.agentRuns.id, runId));
+    .where(and(eq(t.agentRuns.id, runId), values.status === 'cancelled'
+      ? inArray(t.agentRuns.status, ['running', 'cancelled']) : eq(t.agentRuns.status, 'running')));
 }
 
 /** Persist the WHOLE run log as ONE document. PK = runId → agent_runs. */

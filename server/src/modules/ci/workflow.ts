@@ -1,9 +1,11 @@
-import type { CiExportInput, AgentManifest } from '@devdigest/shared';
+import { AgentManifest, type CiExportInput } from '@devdigest/shared';
 import { ValidationError } from '../../platform/errors.js';
 export const WORKFLOW_PATH = '.github/workflows/devdigest-review.yml';
 export const sha256 = async (text: string) => (await import('node:crypto')).createHash('sha256').update(text).digest('hex');
 
-export function generateWorkflow(input: CiExportInput, manifest: AgentManifest): string {
+export function generateWorkflow(input: CiExportInput, rawManifest: AgentManifest): string {
+  const manifest = AgentManifest.parse(rawManifest);
+  if (!manifest.agent_id) throw new ValidationError('CI workflow requires a studio agent identity');
   const ollama = manifest.provider === 'ollama';
   const posting = input.post_as !== 'none';
   return `name: DevDigest Review
@@ -28,10 +30,27 @@ jobs:
           ref: \${{ github.event.pull_request.base.sha }}
           path: trusted
           persist-credentials: false
+      - name: Verify trusted base installation
+        id: base_config
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f "trusted/.devdigest/runner/index.js" && -f "trusted/.devdigest/runner/300.index.js" && -f "trusted/.devdigest/runner/package.json" && -f "trusted/.devdigest/agents/agent-${manifest.agent_id}.yaml" ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            if [[ -f "trusted/.github/workflows/devdigest-review.yml" ]]; then
+              echo '::error::Trusted base CI installation is incomplete; repair its runner and selected agent configuration before review.'
+              exit 1
+            fi
+            echo '::notice::DevDigest configuration first appears in this installation PR; review starts after merge. No review or artifact was produced.'
+          fi
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        if: steps.base_config.outputs.ready == 'true'
         with:
           node-version: '22'
 ${ollama ? `      - name: Start verified local model runtime
+        if: steps.base_config.outputs.ready == 'true'
         shell: bash
         env:
           OLLAMA_HOST: 127.0.0.1:11434
@@ -48,6 +67,7 @@ ${ollama ? `      - name: Start verified local model runtime
           curl --fail --silent http://127.0.0.1:11434/api/version
           timeout 720 "$RUNNER_TEMP/ollama/bin/ollama" pull "$CI_MODEL"
 ` : ''}      - name: Review PR diff through grounded reviewer-core
+        if: steps.base_config.outputs.ready == 'true'
         run: node trusted/.devdigest/runner/index.js
         env:
           GITHUB_TOKEN: \${{ github.token }}
@@ -58,7 +78,7 @@ ${ollama ? `      - name: Start verified local model runtime
           DEVDIGEST_RESULT_PATH: \${{ github.workspace }}/devdigest-result.json
           DEVDIGEST_POST_AS: ${input.post_as}
 ${ollama ? '' : '          OPENROUTER_API_KEY: \${{ secrets.OPENROUTER_API_KEY }}\n'}      - name: Upload grounded review result
-        if: always()
+        if: always() && steps.base_config.outputs.ready == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: devdigest-result

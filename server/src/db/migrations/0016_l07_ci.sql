@@ -1,4 +1,4 @@
-ALTER TABLE ci_installations ADD COLUMN workspace_id uuid REFERENCES workspaces(id) ON DELETE CASCADE;
+ALTER TABLE ci_installations ADD COLUMN workspace_id uuid CONSTRAINT ci_installations_workspace_id_workspaces_id_fk REFERENCES workspaces(id) ON DELETE CASCADE;
 UPDATE ci_installations ci SET workspace_id = a.workspace_id FROM agents a WHERE a.id = ci.agent_id;
 ALTER TABLE ci_installations ALTER COLUMN workspace_id SET NOT NULL;
 ALTER TABLE ci_installations ADD COLUMN status text NOT NULL DEFAULT 'exported';
@@ -9,7 +9,7 @@ ALTER TABLE ci_installations ADD COLUMN runtime_model text NOT NULL DEFAULT '';
 ALTER TABLE ci_installations ADD COLUMN fail_on text NOT NULL DEFAULT 'critical';
 ALTER TABLE ci_installations ADD COLUMN workflow_version text NOT NULL DEFAULT '2';
 ALTER TABLE ci_installations ADD COLUMN bundle_digests jsonb NOT NULL DEFAULT '{}';
-ALTER TABLE ci_runs ADD COLUMN workspace_id uuid REFERENCES workspaces(id) ON DELETE CASCADE;
+ALTER TABLE ci_runs ADD COLUMN workspace_id uuid CONSTRAINT ci_runs_workspace_id_workspaces_id_fk REFERENCES workspaces(id) ON DELETE CASCADE;
 ALTER TABLE ci_runs ADD COLUMN github_run_id text;
 ALTER TABLE ci_runs ADD COLUMN github_repository_id text;
 ALTER TABLE ci_runs ADD COLUMN github_run_attempt integer;

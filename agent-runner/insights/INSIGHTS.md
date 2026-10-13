@@ -44,7 +44,7 @@ earlier single-file observation no longer describes the complete runtime.
 Export all three; `test/bundle-smoke.mjs:13` copies them to a temporary repository
 without node_modules, executes the real CLI/core, and checks a grounded critical
 gate plus commit-bound publication. Use pathToFileURL for the direct-entry check
-on Windows (`src/index.ts:81`). The explicit DEVDIGEST_MANIFEST path supports
+on Windows (`src/index.ts:79`). The explicit DEVDIGEST_MANIFEST path supports
 multiple exported agents; DEVDIGEST_POST_AS now comes from the workflow.
 
 A queued workflow must match the event head before diff capture, then recheck

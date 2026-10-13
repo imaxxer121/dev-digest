@@ -9,13 +9,8 @@ import { REVIEW_STRATEGY } from './constants.js';
 import { taskLine } from './helpers.js';
 import { loadDiff } from './diff-loader.js';
 
-/** Thrown by a run when the user cancels it mid-flight (between map files). */
-export class RunCancelledError extends Error {
-  constructor() {
-    super('Run cancelled');
-    this.name = 'RunCancelledError';
-  }
-}
+import { RunCancelledError } from './cancellation.js';
+export { RunCancelledError } from './cancellation.js';
 
 /** Minimal structured logger (pino-compatible: (obj, msg)) for runtime logs. */
 export type Logger = {
@@ -74,16 +69,17 @@ export class ReviewRunExecutor {
     // mark the rows failed and persist the buffered log so it survives a reload.
     const failAll = async (msg: string) => {
       for (const { runId, agent } of jobs) {
+        const cancelled = this.container.runBus.isCancelled(runId);
         await this.repo
           .completeAgentRun(runId, {
-            status: 'failed',
+            status: cancelled ? 'cancelled' : 'failed',
             durationMs: 0,
             tokensIn: 0,
             tokensOut: 0,
             costUsd: null,
             findingsCount: 0,
             grounding: '0/0 passed',
-            error: msg,
+            error: cancelled ? 'Cancelled by user' : msg,
           })
           .catch(() => undefined);
         await this.repo
@@ -105,14 +101,22 @@ export class ReviewRunExecutor {
     }
     runLog.info(`Diff ready — ${diff.files.length} changed file(s); starting ${jobs.length} agent run(s)`);
 
-    for (const { agent, runId } of jobs) {
+    const prepared = { callers: undefined as string | undefined, repoMap: undefined as string | undefined, rankNote: '' };
+    if (jobs.some(j => j.agent.repoIntel !== false)) {
+      [prepared.callers, prepared.repoMap, prepared.rankNote] = await Promise.all([
+        this.buildCallersDigest(pull.repoId, diff, runLog), this.buildRepoMapDigest(pull.repoId, runLog),
+        this.buildRankNote(pull.repoId, diff, runLog),
+      ]);
+    }
+
+    await Promise.allSettled(jobs.map(async ({ agent, runId }) => {
       const agentStart = Date.now();
       logger?.info(
         { runId, agent: agent.name, provider: agent.provider, model: agent.model, prId: pull.id },
         `review: agent "${agent.name}" started (${agent.provider}/${agent.model})`,
       );
       try {
-        const outcome = await this.runOneAgent(workspaceId, pull, repo, diff, agent, runId, runLog);
+        const outcome = await this.runOneAgent(workspaceId, pull, repo, structuredClone(diff), agent, runId, runLog, prepared);
         logger?.info(
           {
             runId,
@@ -132,7 +136,7 @@ export class ReviewRunExecutor {
           `review: agent "${agent.name}" ${cancelled ? 'cancelled' : 'failed'}`,
         );
       }
-    }
+    }));
   }
 
   /** Execute a single agent's review against a PR, streaming progress. */
@@ -144,8 +148,10 @@ export class ReviewRunExecutor {
     agent: AgentRow,
     runId: string,
     parentLog: RunLogger,
+    prepared: { callers?: string; repoMap?: string; rankNote: string },
   ): Promise<RunOutcome> {
     const start = Date.now();
+    let measured: { tokensIn: number; tokensOut: number; costUsd: number | null } | undefined;
     // Narrow the fanned-out pre-work logger to THIS run; the shared diff/intent
     // events are already in this run's buffer, so the persisted trace below
     // (built from the buffer) includes them too.
@@ -173,14 +179,14 @@ export class ReviewRunExecutor {
       // returns []; we omit the section and behavior is identical to the
       // pre-T1.3 prompt (acceptance #10).
       const callersDigest = repoIntelOn
-        ? await this.buildCallersDigest(pull.repoId, diff, runLog)
+        ? prepared.callers
         : undefined;
 
       // T3 — repo skeleton + "changed files are top-5%" framing. Both best-
       // effort: when repo-intel is off / unindexed the facade degrades and the
       // prompt is identical to the pre-T3 shape.
-      const repoMap = repoIntelOn ? await this.buildRepoMapDigest(pull.repoId, runLog) : undefined;
-      const rankNote = repoIntelOn ? await this.buildRankNote(pull.repoId, diff, runLog) : '';
+      const repoMap = repoIntelOn ? prepared.repoMap : undefined;
+      const rankNote = repoIntelOn ? prepared.rankNote : '';
 
       const task = taskLine(pull) + rankNote;
 
@@ -217,48 +223,16 @@ export class ReviewRunExecutor {
         },
       });
       const { tokensIn, tokensOut, costUsd, grounding } = outcome;
+      measured = { tokensIn, tokensOut, costUsd };
+
+      // Cancellation can arrive while the provider awaits its response.
+      if (this.container.runBus.isCancelled(runId)) throw new RunCancelledError();
 
       const keptFindings = outcome.review.findings;
 
       // ---- Persist review + findings ----------------------------------------
-      const review = await this.repo.insertReview({
-        workspaceId,
-        prId: pull.id,
-        agentId: agent.id,
-        runId,
-        kind: 'review',
-        verdict: outcome.review.verdict,
-        summary: outcome.review.summary,
-        score: outcome.review.score,
-        model: agent.model,
-      });
-      const findingRows = await this.repo.insertFindings(review.id, keptFindings);
-      runLog.result(`Persisted review ${review.id} with ${findingRows.length} finding(s)`);
-
-      // Mark the commit this review ran against so the PR list can tell
-      // reviewed / needs-review (head moved) / stale apart.
-      await this.repo.markReviewed(pull.id, pull.headSha);
-
       const durationMs = Date.now() - start;
-
-      // Deterministic blocker count (severity ≥ the agent's gate) — the signal
-      // the timeline colors on, NOT the model's self-reported verdict.
       const blockers = countBlockers(keptFindings, agent.ciFailOn);
-
-      // ---- Observability: agent_runs + ONE run_traces document --------------
-      await this.repo.completeAgentRun(runId, {
-        status: 'done',
-        durationMs,
-        tokensIn,
-        tokensOut,
-        costUsd,
-        findingsCount: findingRows.length,
-        grounding,
-        score: outcome.review.score,
-        blockers,
-        error: null,
-      });
-
       const trace: RunTrace = {
         source_diff: diff.raw,
         // The queued PullRow cannot certify the revision returned by a later
@@ -278,7 +252,7 @@ export class ReviewRunExecutor {
           tokens_in: tokensIn,
           tokens_out: tokensOut,
           cost_usd: costUsd,
-          findings: findingRows.length,
+          findings: keptFindings.length,
           grounding,
         },
         prompt_assembly: outcome.assembly,
@@ -295,15 +269,20 @@ export class ReviewRunExecutor {
         // diff load + intent), not just events recorded inside this method.
         log: runLog.logFor(runId),
       };
+      // Review, original findings, status and exact trace commit together.
+      const { review, findings: findingRows } = await this.repo.persistOutcome({
+        workspaceId, prId: pull.id, agentId: agent.id, runId, kind: 'review', verdict: outcome.review.verdict,
+        summary: outcome.review.summary, score: outcome.review.score, model: agent.model,
+      }, keptFindings, { durationMs, tokensIn, tokensOut, costUsd, grounding, score: outcome.review.score, blockers }, pull.headSha, trace);
+      runLog.result(`Persisted review ${review.id} with ${findingRows.length} finding(s)`);
       runLog.info('Run complete; trace persisted');
-      await this.repo.saveRunTrace(runId, trace);
       this.container.runBus.complete(runId);
 
       return { review, findings: findingRows, grounding, raw: outcome.review };
     } catch (err) {
       // Failure/cancel: persist status + the error text + the log-so-far so the
       // run (and WHY it failed) is visible on the UI after a reload.
-      const cancelled = err instanceof RunCancelledError;
+      const cancelled = err instanceof RunCancelledError || this.container.runBus.isCancelled(runId);
       const status = cancelled ? 'cancelled' : 'failed';
       const msg = cancelled ? 'Cancelled by user' : (err as Error).message;
       runLog.error(cancelled ? 'Run cancelled by user' : `Run failed: ${msg}`);
@@ -311,16 +290,16 @@ export class ReviewRunExecutor {
         .completeAgentRun(runId, {
           status,
           durationMs: Date.now() - start,
-          tokensIn: 0,
-          tokensOut: 0,
-          costUsd: null,
+          tokensIn: measured?.tokensIn ?? 0,
+          tokensOut: measured?.tokensOut ?? 0,
+          costUsd: measured?.costUsd ?? null,
           findingsCount: 0,
           grounding: '0/0 passed',
           error: msg,
         })
         .catch(() => undefined);
       await this.repo
-        .saveRunTrace(runId, this.traceFromBuffer(runId, pull, agent, '0/0 passed', Date.now() - start))
+        .saveRunTrace(runId, this.traceFromBuffer(runId, pull, agent, '0/0 passed', Date.now() - start, measured))
         .catch(() => undefined);
       this.container.runBus.complete(runId);
       throw err;
@@ -425,6 +404,7 @@ export class ReviewRunExecutor {
     agent: AgentRow,
     grounding: string,
     durationMs = 0,
+    measured?: { tokensIn: number; tokensOut: number; costUsd: number | null },
   ): RunTrace {
     return {
       config: {
@@ -435,7 +415,7 @@ export class ReviewRunExecutor {
         pr: pull.number,
         source: 'local',
       },
-      stats: { duration_ms: durationMs, tokens_in: 0, tokens_out: 0, cost_usd: null, findings: 0, grounding },
+      stats: { duration_ms: durationMs, tokens_in: measured?.tokensIn ?? 0, tokens_out: measured?.tokensOut ?? 0, cost_usd: measured?.costUsd ?? null, findings: 0, grounding },
       prompt_assembly: { system: agent.systemPrompt, skills: null, memory: null, specs: null, user: '' },
       tool_calls: [],
       raw_output: '',

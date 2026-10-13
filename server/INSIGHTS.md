@@ -1,5 +1,43 @@
 # Server engineering insights
 
+## 2026-10-13 — Multi-agent membership and outcome commit boundaries
+
+Group creation saves the immutable selected run IDs/names and all children in one
+transaction, rechecking enabled workspace agents under shared row locks
+(`src/modules/reviews/repository/multi-agent.repo.ts:30`). Execution prepares one
+diff and one set of cached enrichments, then starts isolated cloned contexts with
+`Promise.allSettled` (`src/modules/reviews/run-executor.ts:104`). Deferred injected
+providers prove all three calls enter before any resolves; this is a concurrency
+test, not a claim about model quality or provider latency.
+
+Outcome persistence locks the child and atomically commits review, original
+findings, exact trace and done status
+(`src/modules/reviews/repository/multi-agent.repo.ts:14`). Cancellation uses the
+same row's compare-and-set; a late model response cannot leave a cancelled review
+or overwrite its status. Failure updates preserve terminal results. Preserve the
+immutable membership when agent deletion nulls its live FK; absence/deletion of
+the child itself is unknown, never a completed negative.
+
+Verified: direct package `node node_modules/typescript/bin/tsc --noEmit -p
+tsconfig.json` passed; `node node_modules/vitest/vitest.mjs run --exclude
+'**/*.it.test.ts'` passed 218 tests. The required isolated Testcontainers suite
+`node node_modules/vitest/vitest.mjs run test/multi-agent.it.test.ts` passed all
+13 tests with zero skips, including post-inference cancellation, shared-prep
+failure, agent deletion, trace rollback, foreign/malformed parent scoping and
+simultaneous idempotent Learn. Migration 0015 includes the generated snapshot.
+No application database or real model was used by these checks.
+
+The legacy reviews integration suite shared enabled agents across cases: five
+created fixtures plus the three seeded presets made its final `all:true` request
+return 422 `invalid_run_selection`. Reset only that suite's workspace agents
+before each case (`test/reviews.it.test.ts:109`) and inject a deterministic
+OpenRouter provider for the seeded presets (`test/reviews.it.test.ts:121`). The
+existing run-all case now verifies exact enabled membership and completed saved
+reviews, then proves both all and explicit six-agent requests queue no rows
+(`test/reviews.it.test.ts:308`). The production 1–5 bound remains unchanged.
+Final direct server typecheck passed; `node node_modules/vitest/vitest.mjs run
+.it.test` passed all 114 PostgreSQL tests in 14 files with zero skips (50.67s).
+
 ## 2026-10-13 — Eval snapshots retain raw noise and survive source changes
 
 Historical eval conversion recovers only the supported final saved diff wrapper
@@ -188,3 +226,19 @@ concurrent first import from duplicating its run, review and original findings
 test/ci.it.test.ts` passed 36 tests, including 8 mandatory isolated PostgreSQL
 cases. The server unit suite passed 231 tests and TypeScript checking passed.
 These provider/HTTP fixtures verify provenance and persistence, not model quality.
+
+An installation PR introduces its workflow before trusted base contains the
+runner. The generated guard verifies all three runtime files and the selected
+UUID manifest, skips inference/artifact with an explicit first-install notice,
+and fails an already-installed but damaged base (`src/modules/ci/workflow.ts:33`,
+`test/ci-bootstrap.test.ts:43`). Tests execute the actual generated Bash against
+absent, partial, complete and PR-only fixture files, rather than assuming a
+missing runner means a successful review. After the multi-agent merge, the full
+server suite passed 368 tests in 47 files; the subsequent bootstrap follow-up
+passed 44 focused CI tests, including 8 bootstrap and 8 PostgreSQL cases.
+
+Generate a concurrent feature's snapshot from the merged previous snapshot.
+The 0016 snapshot points to 0015 and preserves all 39 non-CI table definitions.
+Custom backfill SQL must use the same explicit FK names as the generated
+snapshot (`src/db/migrations/0016_l07_ci.sql:1`); unnamed inline REFERENCES would
+otherwise produce a different PostgreSQL name and cause later migration drift.

@@ -4,7 +4,7 @@ import { generateWorkflow, validateEditedWorkflow } from '../src/modules/ci/work
 import { verifyArtifact } from '../src/modules/ci/provenance.js';
 import { ciFixture } from './helpers/ci.js';
 describe('safe CI export and authenticated provenance', () => {
-  const manifest = AgentManifest.parse({ name: 'Fixture', provider: 'ollama', model: 'qwen2.5-coder:7b-instruct', system_prompt: 'Fixture', skills: [] });
+  const manifest = AgentManifest.parse({ agent_id: '11111111-1111-4111-8111-111111111111', name: 'Fixture', provider: 'ollama', model: 'qwen2.5-coder:7b-instruct', system_prompt: 'Fixture', skills: [] });
   const input = CiExportInput.parse({ repo: 'fixture/ci', action: 'files', post_as: 'none' });
   it('pins actions/binary, uses trusted base, same-repo guard, bounded job and explicit publication', () => {
     const workflow = generateWorkflow(input, manifest);

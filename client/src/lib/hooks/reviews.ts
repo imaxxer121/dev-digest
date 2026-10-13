@@ -153,15 +153,17 @@ export function useCreatePrComment(prId: string | null | undefined) {
 export interface RunReviewInput {
   prId: string;
   agentId?: string;
+  agentIds?: string[];
   all?: boolean;
 }
 
 export function useRunReview() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ prId, agentId, all }: RunReviewInput) =>
+    mutationFn: ({ prId, agentId, agentIds, all }: RunReviewInput) =>
       api.post<ReviewRunResponse>(`/pulls/${prId}/review`, {
         ...(agentId ? { agentId } : {}),
+        ...(agentIds ? { agentIds } : {}),
         ...(all ? { all } : {}),
       }),
     // The POST acknowledges background runs. Refresh on acknowledgement and
@@ -171,6 +173,7 @@ export function useRunReview() {
       qc.invalidateQueries({ queryKey: ["smart-diff", prId] });
       qc.invalidateQueries({ queryKey: ["pr-active-runs", prId] });
       qc.invalidateQueries({ queryKey: ["pr-runs", prId] });
+      qc.invalidateQueries({ queryKey: ["multi-agent", prId] });
     },
   });
 }
@@ -198,6 +201,7 @@ export function useFindingAction() {
       if (prId) {
         qc.invalidateQueries({ queryKey: ["reviews", prId] });
         qc.invalidateQueries({ queryKey: ["smart-diff", prId] });
+        qc.invalidateQueries({ queryKey: ["multi-agent", prId] });
       }
     },
   });

@@ -8,17 +8,18 @@ import { spawnSync } from 'node:child_process';
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));
 const directory = mkdtempSync(join(tmpdir(), 'devdigest-bundle-'));
 try {
-  const target = join(directory, '.devdigest');
+  const target = join(directory, 'trusted', '.devdigest');
   mkdirSync(join(target, 'runner'), { recursive: true }); mkdirSync(join(target, 'agents')); mkdirSync(join(target, 'skills'));
   for (const name of ['index.js', '300.index.js', 'package.json']) copyFileSync(join(packageDir, 'dist', name), join(target, 'runner', name));
   const head = 'a'.repeat(40), base = 'b'.repeat(40), agentId = '11111111-1111-4111-8111-111111111111';
-  writeFileSync(join(target, 'agents', 'fixture.yaml'), JSON.stringify({ schema_version: '2', agent_id: agentId, agent_version: 1, name: 'Bundle fixture', provider: 'ollama', model: 'fixture-model', system_prompt: 'Review fixture only', skills: [], strategy: 'single-pass', ci_fail_on: 'critical' }));
+  const manifestPath = `agents/agent-${agentId}.yaml`;
+  writeFileSync(join(target, manifestPath), JSON.stringify({ schema_version: '2', agent_id: agentId, agent_version: 1, name: 'Bundle fixture', provider: 'ollama', model: 'fixture-model', system_prompt: 'Review fixture only', skills: [], strategy: 'single-pass', ci_fail_on: 'critical' }));
   writeFileSync(join(directory, 'event.json'), JSON.stringify({ pull_request: { number: 7, head: { sha: head, repo: { fork: false } }, title: 'Fixture' } }));
-  const env = { GITHUB_REPOSITORY: 'fixture/ci', GITHUB_TOKEN: 'fixture-not-a-real-token', GITHUB_EVENT_PATH: join(directory, 'event.json'), GITHUB_RUN_ID: '17', GITHUB_RUN_ATTEMPT: '1', GITHUB_JOB: 'review', DEVDIGEST_DIR: target, DEVDIGEST_MANIFEST: 'agents/fixture.yaml', DEVDIGEST_WORKFLOW_SHA: base, DEVDIGEST_POST_AS: 'github_review', DEVDIGEST_RESULT_PATH: join(directory, 'result.json') };
+  const env = { GITHUB_REPOSITORY: 'fixture/ci', GITHUB_TOKEN: 'fixture-not-a-real-token', GITHUB_EVENT_PATH: join(directory, 'event.json'), GITHUB_RUN_ID: '17', GITHUB_RUN_ATTEMPT: '1', GITHUB_JOB: 'review', DEVDIGEST_DIR: target, DEVDIGEST_MANIFEST: manifestPath, DEVDIGEST_WORKFLOW_SHA: base, DEVDIGEST_POST_AS: 'github_review', DEVDIGEST_RESULT_PATH: join(directory, 'result.json') };
   writeFileSync(join(directory, 'smoke.mjs'), `
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { main } from './.devdigest/runner/index.js';
+import { main } from './trusted/.devdigest/runner/index.js';
 const env = ${JSON.stringify(env)};
 let modelCalls = 0, posts = 0;
 globalThis.fetch = async (input, init) => {

@@ -1,0 +1,12 @@
+{
+  "title": "Multi-Agent Review", "configure": "Configure run", "intro": "Choose a pull request and up to five enabled agents. Each reviews the same diff independently, in parallel.",
+  "pull": "Pull request", "choosePull": "Select a pull request…", "agents": "Agents to run", "limit": "Select 1–5 enabled agents.",
+  "run": "Run multi-agent review ({count})", "unknown": "Unknown", "estimates": "Estimates use this PR’s completed historical runs; models and input changes can affect the result.",
+  "duration": "Duration", "cost": "Cost", "samples": "{count} measured runs", "columns": "Columns", "tabs": "Tabs + detail", "trace": "View trace",
+  "running": "Running", "done": "Completed", "failed": "Failed", "cancelled": "Cancelled", "deleted": "Deleted run", "noFindings": "No findings in this completed review.",
+  "noConclusion": "No completed conclusion is available.", "disagreement": "Where agents disagree", "conflictsOnly": "Show only conflicts", "severityDisagreement": "Severity disagreement",
+  "flagged": "Flagged", "did_not_flag": "Did not flag", "unknownConclusion": "Unknown — review incomplete or unavailable", "grouping": "Groups use the same file, overlapping lines, category and similar title tokens. Original findings remain separate and attributed.",
+  "empty": "No multi-agent runs yet.", "loading": "Loading saved runs…", "retry": "Retry", "history": "Saved run", "selectRepo": "Select a repository first.",
+  "learn": "Learn", "learned": "Saved to repository memory.", "learning": "Saving learning…", "cancel": "Cancel this agent", "noConflicts": "No completed disagreements found.",
+  "runError": "Could not start the selected review. Your selection is preserved.", "historical": "Historical estimate", "versionWarning": "Enabled agents only; disabled agents can be enabled in the agent editor."
+}
