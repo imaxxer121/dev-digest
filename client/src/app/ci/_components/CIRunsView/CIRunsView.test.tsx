@@ -6,7 +6,7 @@ import messages from '../../../../../messages/en/ci.json';
 import { CIRunsView } from './CIRunsView';
 const mocks = vi.hoisted(() => ({ refresh: { mutate: vi.fn(), isPending: false, error: null as Error | null, data: null as { created: boolean } | null }, runs: { data: [] as unknown[], isLoading: false, error: null, refetch: vi.fn() } }));
 vi.mock('@/lib/hooks/ci', () => ({ useCiRuns: () => mocks.runs, useCiInstallations: () => ({ data: [{ id: 'installation', repo: 'fixture/ci', runtime_provider: 'ollama', runtime_model: 'fixture-model', status: 'installed' }], error: null }), useCiRefresh: () => mocks.refresh }));
-vi.mock('@/app/repos/[repoId]/pulls/[number]/_components/RunTraceDrawer/RunTraceDrawer', () => ({ default: ({ runId }: { runId: string }) => <div role="dialog">Trace {runId}</div> }));
+vi.mock('@/app/repos/[repoId]/pulls/[number]/_components/RunTraceDrawer/RunTraceDrawer', () => ({ default: ({ runId, findings = [] }: { runId: string; findings?: { title: string }[] }) => <div role="dialog">Trace {runId}{findings.map((finding, index) => <p key={index}>{finding.title}</p>)}</div> }));
 function mount() { return render(<NextIntlClientProvider locale="en" messages={{ ci: messages }}><CIRunsView /></NextIntlClientProvider>); }
 describe('CI history and explicit authenticated refresh', () => {
   it('shows stored empty state and imports only numeric identity after an explicit click', () => {
@@ -27,5 +27,11 @@ describe('CI history and explicit authenticated refresh', () => {
   it('shows provenance/authentication errors without declaring a fabricated run', () => {
     mocks.runs.data = []; mocks.refresh.error = new Error('Artifact provenance mismatch'); mocks.refresh.data = null; mount();
     expect(screen.getByRole('alert')).toHaveTextContent('Artifact provenance mismatch'); expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+  it('shows the selected CI artifact findings in its trace', () => {
+    mocks.runs.data = [{ id: 'ci', pr_number: 20, run_id: 'ci-run', findings_count: 1, finding_details: [{ id: 'original-model-id', severity: 'CRITICAL', title: 'SQL injection', file: 'lookup.ts', start_line: 8, end_line: 8, rationale: 'Request input changes SQL syntax', confidence: 1, category: 'security' }] }];
+    mocks.refresh.error = null; mount();
+    fireEvent.click(screen.getByRole('button', { name: 'View trace' }));
+    expect(screen.getByRole('dialog')).toHaveTextContent('SQL injection');
   });
 });
