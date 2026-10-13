@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
 import { startPg, dockerAvailable, type PgFixture } from './helpers/pg.js';
 import { waitForPrRuns } from './helpers/runs.js';
 import { buildApp } from '../src/app.js';
 import { loadConfig } from '../src/platform/config.js';
 import { seed } from '../src/db/seed.js';
-import { MockLLMProvider, MockEmbedder, MockGitClient } from '../src/adapters/mocks.js';
+import { MockLLMProvider, MockEmbedder, MockGitClient, MockSecretsProvider } from '../src/adapters/mocks.js';
 import * as t from '../src/db/schema.js';
-import { eq } from 'drizzle-orm';
-import type { Review } from '@devdigest/shared';
+import { and, eq } from 'drizzle-orm';
+import type { LLMProvider, Review } from '@devdigest/shared';
 
 const hasDocker = await dockerAvailable();
 const d = hasDocker ? describe : describe.skip;
@@ -106,19 +106,35 @@ d('A2 reviews + agents (Testcontainers pg)', () => {
     const [ws] = await pg.handle.db.select().from(t.workspaces);
     workspaceId = ws!.id;
   });
+  beforeEach(async () => {
+    // Each case starts with the same enabled-agent set; CRUD/review fixtures
+    // must not silently enlarge a later all:true selection beyond its limit.
+    await pg.handle.db.delete(t.agents).where(eq(t.agents.workspaceId, workspaceId));
+    await seed(pg.handle.db);
+  });
   afterAll(async () => {
     await pg?.stop();
   });
 
   function appWith(structured: unknown, provider: 'openai' | 'anthropic' = 'openai') {
+    const reviewer = new MockLLMProvider(provider, { structured });
+    const openrouter: LLMProvider = {
+      id: 'openrouter',
+      completeStructured: reviewer.completeStructured.bind(reviewer),
+      complete: reviewer.complete.bind(reviewer),
+      embed: reviewer.embed.bind(reviewer),
+      listModels: reviewer.listModels.bind(reviewer),
+    };
     return buildApp({
       config: config(),
       db: pg.handle.db,
       overrides: {
+        secrets: new MockSecretsProvider(),
         embedder: new MockEmbedder(),
         git: new MockGitClient({ diff: DIFF }),
         llm: {
-          [provider]: new MockLLMProvider(provider, { structured }),
+          [provider]: reviewer,
+          openrouter,
         },
       },
     });
@@ -292,11 +308,55 @@ d('A2 reviews + agents (Testcontainers pg)', () => {
   it('run all enabled agents reviews with each enabled agent', async () => {
     const app = await appWith(REVIEW_FIXTURE);
     const { pr } = await setupRepoAndPr(pg.handle.db, workspaceId);
-    const body = (
-      await app.inject({ method: 'POST', url: `/pulls/${pr.id}/review`, payload: { all: true } })
-    ).json();
-    // seed has 2 enabled agents; we may have created more above in this PR's ws.
-    expect(body.runs.length).toBeGreaterThanOrEqual(2);
-    await app.close();
+    try {
+      const enabled = await pg.handle.db.select().from(t.agents).where(and(
+        eq(t.agents.workspaceId, workspaceId), eq(t.agents.enabled, true),
+      ));
+      expect(enabled).toHaveLength(3);
+      await pg.handle.db.insert(t.agents).values({
+        workspaceId, name: 'Disabled reviewer', provider: 'openrouter',
+        model: 'fixture', systemPrompt: 'fixture', enabled: false,
+      });
+
+      const response = await app.inject({
+        method: 'POST', url: `/pulls/${pr.id}/review`, payload: { all: true },
+      });
+      expect(response.statusCode, response.payload).toBe(200);
+      const body = response.json();
+      expect(body.runs.map((run: { agent_id: string }) => run.agent_id).sort())
+        .toEqual(enabled.map(agent => agent.id).sort());
+      expect(body.group_id).toEqual(expect.any(String));
+
+      const runs = await waitForPrRuns(pg.handle.db, pr.id, { expected: enabled.length });
+      expect(runs).toHaveLength(enabled.length);
+      expect(runs.every(run => run.status === 'done' && run.findingsCount === 1)).toBe(true);
+      const reviews = (await app.inject({ method: 'GET', url: `/pulls/${pr.id}/reviews` })).json();
+      expect(reviews).toHaveLength(enabled.length);
+      expect(reviews.every((review: { score: number; findings: unknown[] }) =>
+        review.score === 65 && review.findings.length === 1)).toBe(true);
+
+      // Legacy all:true and explicit selection share the same fan-out bound.
+      // Oversized requests must fail before any additional group/run is queued.
+      const extra = await pg.handle.db.insert(t.agents).values([0, 1, 2].map(index => ({
+        workspaceId, name: `Extra reviewer ${index}`, provider: 'openrouter' as const,
+        model: 'fixture', systemPrompt: 'fixture', enabled: true,
+      }))).returning();
+      const tooManyAll = await app.inject({
+        method: 'POST', url: `/pulls/${pr.id}/review`, payload: { all: true },
+      });
+      expect(tooManyAll.statusCode, tooManyAll.payload).toBe(422);
+      expect(tooManyAll.json().error.code).toBe('invalid_run_selection');
+      const tooManyExplicit = await app.inject({
+        method: 'POST', url: `/pulls/${pr.id}/review`,
+        payload: { agentIds: [...enabled, ...extra].map(agent => agent.id) },
+      });
+      expect(tooManyExplicit.statusCode, tooManyExplicit.payload).toBe(422);
+      const remainingRuns = await pg.handle.db.select().from(t.agentRuns).where(eq(t.agentRuns.prId, pr.id));
+      expect(remainingRuns.map(run => run.id).sort()).toEqual(runs.map(run => run.id).sort());
+      const groups = await pg.handle.db.select().from(t.multiAgentRuns).where(eq(t.multiAgentRuns.prId, pr.id));
+      expect(groups.map(group => group.id)).toEqual([body.group_id]);
+    } finally {
+      await app.close();
+    }
   });
 });

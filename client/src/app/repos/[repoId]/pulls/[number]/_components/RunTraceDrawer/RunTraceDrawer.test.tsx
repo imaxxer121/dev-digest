@@ -3,6 +3,7 @@ import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import type { RunTrace } from "@devdigest/shared";
 import messages from "../../../../../../../../messages/en/runs.json"; // apps/web/messages/en/runs.json
+const state = vi.hoisted(() => ({ trace: vi.fn(), events: vi.fn() }));
 
 // Mock the trace hooks so the drawer renders without a query client / SSE.
 const TRACE: RunTrace = {
@@ -20,10 +21,10 @@ const TRACE: RunTrace = {
 };
 
 vi.mock("../../../../../../../lib/hooks/trace", () => ({
-  useRunTrace: () => ({ data: TRACE, isLoading: false }),
+  useRunTrace: (id: string, enabled: boolean) => { state.trace(id, enabled); return { data: TRACE, isLoading: false }; },
 }));
 vi.mock("../../../../../../../lib/hooks/reviews", () => ({
-  useRunEvents: () => ({ events: [], running: false }),
+  useRunEvents: (ids: string[]) => { state.events(ids); return { events: [{ t: '12:00', kind: 'info', msg: 'Review currently running' }], running: false }; },
 }));
 
 import RunTraceDrawer from "./RunTraceDrawer";
@@ -55,5 +56,19 @@ describe("A5 Run Trace drawer (smoke)", () => {
     fireEvent.click(screen.getByText("log"));
     // LiveLogStream renders its filter input
     expect(screen.getByPlaceholderText("Filter log…")).toBeInTheDocument();
+  });
+  it('waits for persisted terminal status even if SSE disconnects, then loads the exact completed findings', () => {
+    state.trace.mockClear(); state.events.mockClear();
+    const finding = { id: 'original-one', review_id: 'review-one', severity: 'CRITICAL' as const, category: 'security' as const, title: 'Original access finding',
+      file: 'auth.ts', start_line: 2, end_line: 2, rationale: 'Original rationale', confidence: .95, accepted_at: null, dismissed_at: null };
+    const element = (running: boolean) => <NextIntlClientProvider locale="en" messages={{ runs: messages }}>
+      <RunTraceDrawer runId="r1" agentName="Security" running={running} findings={running ? [] : [finding]} onClose={() => {}} />
+    </NextIntlClientProvider>;
+    const view = render(element(true));
+    expect(state.trace).toHaveBeenLastCalledWith('r1', false); expect(state.events).toHaveBeenLastCalledWith(['r1']);
+    expect(screen.getByText('Review currently running')).toBeInTheDocument();
+    view.rerender(element(false)); expect(state.trace).toHaveBeenLastCalledWith('r1', true);
+    fireEvent.click(screen.getByText('trace')); expect(screen.getByText('Original access finding')).toBeInTheDocument();
+    expect(screen.queryByText('No findings for this run.')).not.toBeInTheDocument();
   });
 });

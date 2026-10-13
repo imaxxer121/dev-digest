@@ -19,7 +19,7 @@ describe('future eval source head provenance', () => {
     const provider = new MockLLMProvider('anthropic', { structured: { verdict: 'approve', summary: 'Fixture', score: 95, findings: [] } });
     let trace: RunTrace | undefined;
     const repository = {
-      getPrFiles: vi.fn(async () => []), insertReview: vi.fn(async () => ({ id: 'review-id' })), insertFindings: vi.fn(async () => []),
+      getPrFiles: vi.fn(async () => []), persistOutcome: vi.fn(async (_review, _findings, _stats, _head, value: RunTrace) => { trace = value; return { review: { id: 'review-id' }, findings: [] }; }),
       markReviewed: vi.fn(async () => {}), completeAgentRun: vi.fn(async () => {}),
       saveRunTrace: vi.fn(async (_id: string, value: RunTrace) => { trace = value; }),
     } as unknown as ReviewRepository;
@@ -31,7 +31,7 @@ describe('future eval source head provenance', () => {
     const repo = { id: 'repo-id', owner: 'fixture', name: 'repo' } as typeof t.repos.$inferSelect;
     await new ReviewRunExecutor(container, repository, agents).executeRuns('workspace-id', pull, repo, [{ agent, runId: 'run-id' }]);
     expect(getPullRequest).toHaveBeenCalledTimes(1);
-    expect(repository.completeAgentRun).toHaveBeenCalledWith('run-id', expect.objectContaining({ status: 'done' }));
+    expect(repository.persistOutcome).toHaveBeenCalledWith(expect.objectContaining({ runId: 'run-id' }), [], expect.any(Object), 'H0', expect.any(Object));
     expect(trace).toBeDefined(); expect(trace!.source_head_sha).toBeNull(); expect(trace!.source_diff).toContain(patch);
     const frozen = historicalSource(trace); expect(frozen.head).toBeNull(); expect(frozen.raw).toBe(trace!.source_diff);
     expect(frozen).toMatchObject({ title: 'Queued title', description: 'Saved model-visible description', retrieval: 'trace-source-diff' });

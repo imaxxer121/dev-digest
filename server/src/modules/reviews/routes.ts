@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { RunRequest, SmartDiffResponse } from '@devdigest/shared';
+import { ReviewSelection, SmartDiffResponse, MultiAgentReviewCollection } from '@devdigest/shared';
 import type { RunEvent } from '@devdigest/shared';
 import { getContext } from '../_shared/context.js';
 import { IdParams } from '../_shared/schemas.js';
@@ -15,7 +15,7 @@ import { ReviewService } from './service.js';
  *   GET    /pulls/:id/reviews                          → persisted reviews + findings for a PR
  *   POST   /findings/:id/(accept|dismiss)              → finding actions
  */
-const FINDING_ACTIONS = ['accept', 'dismiss'] as const;
+const FINDING_ACTIONS = ['accept', 'dismiss', 'learn'] as const;
 export default async function reviewsRoutes(appBase: FastifyInstance) {
   const app = appBase.withTypeProvider<ZodTypeProvider>();
   const { container } = app;
@@ -29,18 +29,19 @@ export default async function reviewsRoutes(appBase: FastifyInstance) {
     { schema: { params: IdParams }, config: { rateLimit: { max: 10, timeWindow: '1 minute' } } },
     async (req) => {
     const { workspaceId } = await getContext(container, req);
-    const body = RunRequest.parse(req.body ?? {});
+    const body = ReviewSelection.parse(req.body ?? {});
     const targets = await service.resolveTargets(workspaceId, {
       ...(body.agentId !== undefined ? { agentId: body.agentId } : {}),
+      ...(body.agentIds !== undefined ? { agentIds: body.agentIds } : {}),
       ...(body.all !== undefined ? { all: body.all } : {}),
     });
-    const { runs, reviews } = await service.runReview(
+    const { group_id, runs, reviews } = await service.runReview(
       workspaceId,
       req.params.id,
       targets,
       req.log,
     );
-    return { pr_id: req.params.id, runs, reviews };
+    return { pr_id: req.params.id, group_id, runs, reviews };
   });
 
   // ---- SSE: live run events (replay buffer first, then live; ends on done) -
@@ -49,15 +50,16 @@ export default async function reviewsRoutes(appBase: FastifyInstance) {
     '/runs/:id/events',
     { schema: { params: IdParams }, config: { rateLimit: false } },
     async (req, reply) => {
-    await getContext(container, req);
+    const { workspaceId } = await getContext(container, req);
     const runId = req.params.id;
+    const run = await service.requireRun(workspaceId, runId);
 
     reply.sse(
       (async function* () {
         // Bridge the in-memory RunBus to an async iterator the SSE plugin drains.
         const queue: RunEvent[] = [];
         let resolve: (() => void) | null = null;
-        let done = false;
+        let done = run.status !== 'running';
 
         const unsubscribe = container.runBus.subscribe(runId, (e) => {
           queue.push(e);
@@ -112,20 +114,24 @@ export default async function reviewsRoutes(appBase: FastifyInstance) {
 
   // ---- Cancel an in-flight run --------------------------------------------
   app.post('/runs/:id/cancel', { schema: { params: IdParams } }, async (req) => {
-    await getContext(container, req);
-    await service.cancelRun(req.params.id);
+    const { workspaceId } = await getContext(container, req);
+    await service.cancelRun(workspaceId, req.params.id);
     return { ok: true };
   });
 
   // ---- Run trace (single document; A5 enriches with multi-agent/stats) ----
   app.get('/runs/:id/trace', { schema: { params: IdParams } }, async (req) => {
-    await getContext(container, req);
-    const trace = await service.getRunTrace(req.params.id);
+    const { workspaceId } = await getContext(container, req);
+    const trace = await service.getRunTrace(workspaceId, req.params.id);
     if (!trace) throw new NotFoundError('Run trace not found');
     return trace;
   });
 
   // ---- Reads --------------------------------------------------------------
+  app.get('/pulls/:id/multi-agent', { schema: { params: IdParams, response: { 200: MultiAgentReviewCollection } } }, async req => {
+    const { workspaceId } = await getContext(container, req);
+    return service.multiAgentReviews(workspaceId, req.params.id);
+  });
   app.get('/pulls/:id/smart-diff', {
     schema: { params: IdParams, response: { 200: SmartDiffResponse } },
   }, async (req) => {

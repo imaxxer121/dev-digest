@@ -21,9 +21,19 @@ export type ReviewRow = typeof t.reviews.$inferSelect;
 import * as reviewRepo from './repository/review.repo.js';
 import * as runRepo from './repository/run.repo.js';
 import * as pullRepo from './repository/pull.repo.js';
+import * as multiRepo from './repository/multi-agent.repo.js';
+import type { AgentRow } from '../../db/rows.js';
 
 export class ReviewRepository {
   constructor(private db: Db) {}
+
+  createGroup(workspaceId: string, prId: string, agents: AgentRow[]) { return multiRepo.createGroup(this.db, workspaceId, prId, agents); }
+  groupsForPull(workspaceId: string, prId: string) { return multiRepo.groupsForPull(this.db, workspaceId, prId); }
+  getScopedRun(workspaceId: string, runId: string) { return multiRepo.getScopedRun(this.db, workspaceId, runId); }
+  learnFinding(workspaceId: string, findingId: string) { return multiRepo.learnFinding(this.db, workspaceId, findingId); }
+  persistOutcome(review: Parameters<typeof multiRepo.persistOutcome>[1], findings: Finding[], stats: Parameters<typeof multiRepo.persistOutcome>[3], head: string, trace: RunTrace) {
+    return multiRepo.persistOutcome(this.db, review, findings, stats, head, trace);
+  }
 
   // ---- PR lookup (workspace-scoped) --------------------------------------
 
