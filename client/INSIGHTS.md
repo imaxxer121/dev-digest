@@ -171,3 +171,22 @@ distinct from a successful empty index. `pnpm test` passed 77 tests across 21
 files, including eight Blast Radius query/interaction tests, and
 `pnpm typecheck` passed. The tests use API fixtures; actual repository indexing,
 browser checks and MCP parity are separate evidence owned by the primary agent.
+
+## 2026-10-13 — CI workflow regeneration must preserve safe preview edits
+
+Configure changes regenerate execution settings; preserving a separate title/
+comment draft keeps safe user edits while the server rejects changes to the
+trusted runner or permissions (`src/components/ExportToCI/ExportToCI.tsx:19`,
+`../server/src/modules/ci/workflow.ts:73`). The wizard reports a downloaded ZIP as
+exported and an opened installation PR as pending; verified execution is a
+separate authenticated import. Studio subscription models and the explicit
+CI-only Ollama runtime are disclosed separately.
+
+CI history reuses the existing persisted RunTraceDrawer and retains original
+artifact findings (`src/components/CIRunsTable/CIRunsTable.tsx:6`). Refresh sends
+only installation/run identity and invalidates persisted PR views as well as CI
+history (`src/lib/hooks/ci.ts:25`). `node node_modules/vitest/vitest.mjs run`
+passed 126 tests in 33 files, including workflow edit preservation, explicit
+installation/import actions, error recovery, trace links and unknown versus zero
+cost. TypeScript checking and a production Next build passed. These interaction
+tests use API fixtures; they do not demonstrate actual hosted inference.

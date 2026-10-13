@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { Verdict, Finding } from './findings.js';
-import { EvalRun, EvalOwnerKind, Conformance, Provider, CiFailOn } from './knowledge.js';
+import { Verdict, Finding } from './findings';
+import { EvalRun, EvalOwnerKind, Conformance, Provider, CiFailOn } from './knowledge';
 
 /**
  * A4 — Eval / CI / Compose / Conformance API contracts (L06).
@@ -130,7 +130,7 @@ export type ComposeReviewPreview = z.infer<typeof ComposeReviewPreview>;
 // Export-to-CI + CI Runs
 // ===========================================================================
 
-export const CiTarget = z.enum(['gha', 'circle', 'jenkins', 'cli']);
+export const CiTarget = z.enum(['gha']);
 export type CiTarget = z.infer<typeof CiTarget>;
 
 /** One generated file in the CI bundle (path + editable contents). */
@@ -151,14 +151,17 @@ export type CiFile = z.infer<typeof CiFile>;
  */
 export const AgentManifest = z.object({
   name: z.string().min(1),
-  provider: Provider.default('openrouter'),
+  schema_version: z.literal('2').default('2'),
+  agent_id: z.string().uuid().optional(),
+  agent_version: z.number().int().positive().default(1),
+  provider: z.enum(['openrouter', 'ollama']).default('openrouter'),
   model: z.string().min(1),
   system_prompt: z.string(),
   // Tolerate both a missing key and an explicit `null` (YAML `skills:` with no
   // value parses to null, which `.default([])` does NOT catch) — normalize both
   // to an empty array so manifests without skills validate cleanly.
   skills: z
-    .array(z.string())
+    .array(z.string().regex(/^[a-z0-9][a-z0-9-]{0,79}$/))
     .nullish()
     .transform((v) => v ?? []),
   strategy: z.enum(['auto', 'single-pass', 'map-reduce']).default('auto'),
@@ -172,13 +175,16 @@ export type AgentManifestInput = z.input<typeof AgentManifest>;
 
 /** Request body for `POST /agents/:id/export-ci`. */
 export const CiExportInput = z.object({
-  repo: z.string().min(1), // "owner/name"
+  repo: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9-]{0,38}\/(?!\.\.?$)[A-Za-z0-9_.-]{1,100}$/),
   target: CiTarget.default('gha'),
   /** "open_pr" opens a PR with the files; "files" just returns/persists them. */
   action: z.enum(['open_pr', 'files']).default('open_pr'),
   post_as: z.enum(['github_review', 'pr_comment', 'none']).default('github_review'),
-  triggers: z.array(z.string()).default(['opened', 'synchronize', 'reopened']),
-  base: z.string().default('main'),
+  triggers: z.array(z.enum(['opened', 'synchronize', 'reopened'])).min(1).default(['opened', 'synchronize']),
+  runtime: z.object({ provider: z.enum(['openrouter', 'ollama']), model: z.string().regex(/^[A-Za-z0-9_.:/-]+$/).max(160) }).optional(),
+  workflow: z.string().max(40000).optional(),
+  ci_fail_on: CiFailOn.optional(),
+  base: z.string().regex(/^[A-Za-z0-9_./-]+$/).default('main'),
 });
 export type CiExportInput = z.infer<typeof CiExportInput>;
 /** Caller-facing input type — `.default()` fields stay optional (web hooks). */
@@ -191,6 +197,13 @@ export const CiInstallation = z.object({
   repo: z.string(),
   target_type: CiTarget,
   installed_at: z.string(),
+  status: z.enum(['exported', 'pending', 'installed']).default('exported'),
+  workflow_version: z.string().default('2'),
+  manifest_digest: z.string().optional(),
+  workflow_digest: z.string().optional(),
+  runtime_provider: z.string().optional(),
+  runtime_model: z.string().optional(),
+  fail_on: CiFailOn.optional(),
 });
 export type CiInstallation = z.infer<typeof CiInstallation>;
 
@@ -218,6 +231,16 @@ export const CiRun = z.object({
   source: z.string().nullable(),
   agent: z.string().nullish(),
   duration_s: z.number().nullish(),
+  repo: z.string().optional(),
+  verdict: Verdict.optional(),
+  provider: z.string().optional(),
+  model: z.string().optional(),
+  tokens_in: z.number().int().nonnegative().optional(),
+  tokens_out: z.number().int().nonnegative().optional(),
+  run_id: z.string().nullable().optional(),
+  head_sha: z.string().optional(),
+  workflow_version: z.string().optional(),
+  finding_details: z.array(Finding).optional(),
 });
 export type CiRun = z.infer<typeof CiRun>;
 
@@ -237,6 +260,29 @@ export const CiResultArtifact = z.object({
   pr_number: z.number().int().nullish(),
 });
 export type CiResultArtifact = z.infer<typeof CiResultArtifact>;
+
+/** Strict authenticated ingestion contract; legacy count-only artifacts are never ingested. */
+export const VerifiedCiArtifact = z.object({
+  schema_version: z.literal('2'), agent_id: z.string().uuid(), agent: z.string(),
+  agent_version: z.number().int().positive(), manifest_digest: z.string().regex(/^[a-f0-9]{64}$/),
+  provider: z.enum(['openrouter', 'ollama']), model: z.string(), version: z.string(),
+  dependency_versions: z.record(z.string()), repo: z.string(), repository_id: z.number().int().positive(),
+  pr_number: z.number().int().positive(), head_sha: z.string().regex(/^[a-f0-9]{40}$/),
+  workflow_sha: z.string().regex(/^[a-f0-9]{40}$/), workflow_path: z.literal('.github/workflows/devdigest-review.yml'),
+  github_run_id: z.number().int().positive(), github_run_attempt: z.number().int().positive(),
+  github_job: z.literal('review'), verdict: Verdict, fail_on: CiFailOn,
+  findings: z.array(Finding).max(500), findings_count: z.number().int().nonnegative(),
+  cost_usd: z.number().nonnegative().nullable(), duration_ms: z.number().int().nonnegative(),
+  tokens_in: z.number().int().nonnegative(), tokens_out: z.number().int().nonnegative(),
+  trace: z.unknown(),
+}).strict().superRefine((v, ctx) => {
+  if (v.findings_count !== v.findings.length) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Finding count mismatch' });
+});
+export type VerifiedCiArtifact = z.infer<typeof VerifiedCiArtifact>;
+export const CiPreview = z.object({ files: z.array(CiFile), manifest: AgentManifest, manifest_digest: z.string(), workflow_digest: z.string() });
+export type CiPreview = z.infer<typeof CiPreview>;
+export const CiRefreshInput = z.object({ installation_id: z.string().uuid(), run_id: z.number().int().positive() }).strict();
+export const CiRefreshResult = z.object({ run: CiRun, created: z.boolean() });
 
 // ===========================================================================
 // Conformance (PRD ↔ PR) — API record (the analysis shape is `Conformance`)

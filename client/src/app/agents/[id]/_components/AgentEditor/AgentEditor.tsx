@@ -10,6 +10,7 @@ import type { Agent } from "@devdigest/shared";
 import { ConfigTab } from "./_components/ConfigTab";
 import { SkillsTab } from "./_components/SkillsTab";
 import { EvalsTab } from "./_components/EvalsTab";
+import { CITab } from "./_components/CITab";
 import { TABS } from "./constants";
 import { s } from "./styles";
 
@@ -25,6 +26,7 @@ export function AgentEditor({ agent, tab, onTab, batchId }: { agent: Agent; tab:
         {tab === "config" && <ConfigTab agent={agent} />}
         {tab === "skills" && <SkillsTab agentId={agent.id} />}
         {tab === "evals" && <EvalsTab key={agent.id} agentId={agent.id} requestedBatchId={batchId} />}
+        {tab === "ci" && <CITab key={agent.id} agent={agent} />}
       </div>
     </div>
   );

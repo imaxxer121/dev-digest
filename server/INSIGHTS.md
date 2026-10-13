@@ -170,3 +170,21 @@ after a direct symbol caller (`src/modules/repo-intel/service.ts:666`). This is
 not a second-hop symbol call graph or proof of runtime invocation. Existing
 index writes are not atomic; snapshot guarantees during concurrent reindexing
 require a future versioned/transactional index change.
+
+## 2026-10-13 — CI artifacts require the executed workflow and repository identity
+
+Checking only a base workflow lets a PR replace the workflow that produces its
+artifact. Authenticated retrieval checks the actual head workflow, then hashes
+the trusted base runner, manifest, Skills and memory (`src/adapters/github/ci-artifacts.ts:44`,
+`src/modules/ci/provenance.ts:17`). Artifact redirects use a fresh request without
+the GitHub bearer token (`src/adapters/github/ci-artifacts.ts:31`). Exported memory
+must fit the runner budget before ZIP creation (`src/modules/ci/service.ts:36`).
+
+Duplicate installation exports must share the workspace/numeric repository/run/
+attempt identity. Transaction advisory locking plus a unique index prevent a
+concurrent first import from duplicating its run, review and original findings
+(`src/modules/ci/repository.ts:23`, `test/ci.it.test.ts:85`). The focused command
+`node node_modules/vitest/vitest.mjs run test/ci-pure.test.ts test/ci-adapter.test.ts
+test/ci.it.test.ts` passed 36 tests, including 8 mandatory isolated PostgreSQL
+cases. The server unit suite passed 231 tests and TypeScript checking passed.
+These provider/HTTP fixtures verify provenance and persistence, not model quality.
