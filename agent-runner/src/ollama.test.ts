@@ -6,11 +6,11 @@ describe('CI-only Ollama structured adapter', () => {
   const request = { schema, schemaName: 'Answer', model: 'qwen2.5-coder:7b-instruct', messages: [{ role: 'user' as const, content: 'fixture' }] };
   it('requests loopback schema-format output and reports actual usage with unknown price', async () => {
     const fetcher = vi.fn<typeof fetch>(async (_input, _init) => new Response(JSON.stringify({ done: true, message: { content: '{"answer":"fixture"}' }, prompt_eval_count: 7, eval_count: 4 })));
-    const result = await new OllamaProvider(fetcher).completeStructured(request);
+    const result = await new OllamaProvider(fetcher).completeStructured({ ...request, messages: [{ role: 'user', content: 'x'.repeat(13000) }] });
     expect(result).toMatchObject({ data: { answer: 'fixture' }, tokensIn: 7, tokensOut: 4, costUsd: null, attempts: 1 });
     expect(fetcher.mock.calls[0]![0]).toBe('http://127.0.0.1:11434/api/chat');
     const body = JSON.parse(fetcher.mock.calls[0]![1]!.body as string);
-    expect(body).toMatchObject({ stream: false, format: { type: 'object' }, options: { temperature: 0, num_ctx: 16384, num_predict: 2048 } });
+    expect(body).toMatchObject({ stream: false, format: { type: 'object' }, options: { temperature: 0, num_ctx: 32768, num_predict: 2048 } });
   });
   it.each([
     { done: false, message: { content: '{"answer":"x"}' }, prompt_eval_count: 1, eval_count: 2 },
@@ -21,7 +21,7 @@ describe('CI-only Ollama structured adapter', () => {
   });
   it('rejects oversized input before inference rather than silently truncate', async () => {
     const fetcher = vi.fn();
-    await expect(new OllamaProvider(fetcher).completeStructured({ ...request, messages: [{ role: 'user', content: 'x'.repeat(13000) }] })).rejects.toThrow('context budget');
+    await expect(new OllamaProvider(fetcher).completeStructured({ ...request, messages: [{ role: 'user', content: 'x'.repeat(25000) }] })).rejects.toThrow('context budget');
     expect(fetcher).not.toHaveBeenCalled();
   });
 });

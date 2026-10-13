@@ -39507,14 +39507,14 @@ class OllamaProvider {
     async embed() { throw new Error('CI Ollama does not embed'); }
     async completeStructured(req) {
         const schema = toJsonSchema(req.schema, req.schemaName).schema;
-        if (Buffer.byteLength(JSON.stringify({ messages: req.messages, schema }), 'utf8') > 12_000)
-            throw new Error('CI Ollama input exceeds its conservative 12,000-byte context budget; use a smaller PR or OpenRouter');
+        if (Buffer.byteLength(JSON.stringify({ messages: req.messages, schema }), 'utf8') > 24_000)
+            throw new Error('CI Ollama input exceeds its conservative 24,000-byte context budget; use a smaller PR or OpenRouter');
         const response = await this.fetchImpl('http://127.0.0.1:11434/api/chat', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             signal: AbortSignal.timeout(req.timeoutMs ?? 900_000),
             body: JSON.stringify({ model: req.model, messages: req.messages, stream: false,
                 format: schema,
-                options: { temperature: 0, num_ctx: 16384, num_predict: Math.min(req.maxTokens ?? 2048, 2048) } }),
+                options: { temperature: 0, num_ctx: 32768, num_predict: Math.min(req.maxTokens ?? 2048, 2048) } }),
         });
         if (!response.ok)
             throw new Error(`Ollama inference failed (${response.status})`);
