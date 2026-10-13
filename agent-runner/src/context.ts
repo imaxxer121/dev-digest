@@ -38,7 +38,8 @@ interface PullRequestEventPayload {
     number?: number;
     title?: string;
     body?: string | null;
-    head?: { sha?: string; repo?: { fork?: boolean } | null };
+    head?: { sha?: string; repo?: { id?: number; full_name?: string; fork?: boolean } | null };
+    base?: { repo?: { id?: number; full_name?: string } | null };
   };
 }
 
@@ -90,7 +91,13 @@ export function resolvePrContext(
     prNumber,
     title: pr?.title ?? '',
     body: pr?.body ?? '',
-    isFork: pr?.head?.repo?.fork ?? false,
+    // `repo.fork` describes the repository's ancestry, not this PR's origin.
+    // A fork can still have an internal PR with identical head/base repo IDs.
+    isFork: pr?.head?.repo?.id != null && pr?.base?.repo?.id != null
+      ? pr.head.repo.id !== pr.base.repo.id
+      : pr?.head?.repo?.full_name && pr?.base?.repo?.full_name
+        ? pr.head.repo.full_name !== pr.base.repo.full_name
+        : pr?.head?.repo?.fork ?? false,
     headSha: pr?.head?.sha,
   };
 }
