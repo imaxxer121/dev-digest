@@ -32,11 +32,13 @@ export function RunReviewDropdown({
   onRunSettled?: () => void;
 }) {
   const t = useTranslations("prReview");
+  const multi = useTranslations("multiAgent");
   const router = useRouter();
   const { data: agents } = useAgents();
   const run = useRunReview();
   const all = agents ?? [];
   const hasEnabled = all.some((a) => a.enabled);
+  const canRunAll = hasEnabled && all.filter(a => a.enabled).length <= 5;
 
   const kick = async (opts: { all?: boolean; agentId?: string }) => {
     onRunStart?.();
@@ -48,11 +50,9 @@ export function RunReviewDropdown({
     }
   };
 
-  // List EVERY agent (not just enabled) so they're always visible; a specific
-  // agent can be run regardless of its enabled flag. "Run all" still targets
-  // only enabled agents.
+  // Manual review uses enabled agents; larger sets use the explicit selector.
   const agentItems: DropdownItemDef[] = all.length
-    ? all.map((a) => ({
+    ? all.filter(a => a.enabled).map((a) => ({
         label: a.name,
         icon: "Cpu" as const,
         hint: a.enabled ? a.model : `${a.model} · disabled`,
@@ -61,6 +61,7 @@ export function RunReviewDropdown({
     : [{ label: "No agents yet — create one", icon: "Plus", muted: true, onClick: () => router.push("/agents") }];
 
   const items: DropdownItemDef[] = [
+    { label: multi('configure'), icon: 'Users', onClick: () => router.push(`/multi-agent?prId=${encodeURIComponent(prId)}`) },
     // Merged/closed PRs can still be reviewed (informational only); lead with a
     // muted, non-actionable warning so the intent is clear.
     ...(warnMerged
@@ -72,8 +73,7 @@ export function RunReviewDropdown({
     {
       label: t("runReview.runAll"),
       icon: "Play",
-      ...(hasEnabled ? {} : { muted: true }),
-      onClick: () => kick({ all: true }),
+      ...(canRunAll ? { onClick: () => kick({ all: true }) } : { muted: true }),
     },
     { divider: true },
     ...agentItems,

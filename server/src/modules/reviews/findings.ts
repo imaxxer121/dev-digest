@@ -15,7 +15,8 @@ export async function actOnFinding(
   action: FindingActionKind,
 ): Promise<{ finding: ReviewDtoFinding }> {
   const ctx = await repo.findingContext(findingId);
-  if (!ctx || ctx.pull.workspaceId !== workspaceId) {
+  if (!ctx || ctx.pull.workspaceId !== workspaceId || ctx.review.workspaceId !== workspaceId ||
+      (await repo.getRepo(ctx.pull.repoId))?.workspaceId !== workspaceId) {
     throw new NotFoundError('Finding not found');
   }
 

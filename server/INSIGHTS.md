@@ -1,5 +1,32 @@
 # Server engineering insights
 
+## 2026-10-13 — Multi-agent membership and outcome commit boundaries
+
+Group creation saves the immutable selected run IDs/names and all children in one
+transaction, rechecking enabled workspace agents under shared row locks
+(`src/modules/reviews/repository/multi-agent.repo.ts:30`). Execution prepares one
+diff and one set of cached enrichments, then starts isolated cloned contexts with
+`Promise.allSettled` (`src/modules/reviews/run-executor.ts:104`). Deferred injected
+providers prove all three calls enter before any resolves; this is a concurrency
+test, not a claim about model quality or provider latency.
+
+Outcome persistence locks the child and atomically commits review, original
+findings, exact trace and done status
+(`src/modules/reviews/repository/multi-agent.repo.ts:14`). Cancellation uses the
+same row's compare-and-set; a late model response cannot leave a cancelled review
+or overwrite its status. Failure updates preserve terminal results. Preserve the
+immutable membership when agent deletion nulls its live FK; absence/deletion of
+the child itself is unknown, never a completed negative.
+
+Verified: direct package `node node_modules/typescript/bin/tsc --noEmit -p
+tsconfig.json` passed; `node node_modules/vitest/vitest.mjs run --exclude
+'**/*.it.test.ts'` passed 218 tests. The required isolated Testcontainers suite
+`node node_modules/vitest/vitest.mjs run test/multi-agent.it.test.ts` passed all
+13 tests with zero skips, including post-inference cancellation, shared-prep
+failure, agent deletion, trace rollback, foreign/malformed parent scoping and
+simultaneous idempotent Learn. Migration 0015 includes the generated snapshot.
+No application database or real model was used by these checks.
+
 ## 2026-10-13 — Eval snapshots retain raw noise and survive source changes
 
 Historical eval conversion recovers only the supported final saved diff wrapper

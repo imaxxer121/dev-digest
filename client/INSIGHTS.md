@@ -1,5 +1,28 @@
 # Client engineering insights
 
+## 2026-10-13 — Multi-agent comparison restores selection and follows stored status
+
+The comparison reads immutable server groups rather than reconstructing a fan-out
+from the latest run for each agent (`src/lib/hooks/multi-agent.ts:6`). The Configure
+screen permits 1–5 enabled agents and derives duration/cost estimates from completed
+historical rows for the selected PR. Unknown cost remains unknown
+(`src/app/multi-agent/_components/ConfigureRun/ConfigureRun.tsx:7`). Original
+finding IDs drive Accept/Dismiss, idempotent Learn and the existing frozen eval action.
+
+Both entry points pass the selected child's actual findings/name/running state to
+the trace drawer (`src/app/multi-agent/page.tsx:26`). A closed or disconnected SSE
+connection is not proof of completion; the persisted status transition enables
+trace fetching (`src/app/repos/[repoId]/pulls/[number]/_components/RunTraceDrawer/RunTraceDrawer.tsx:50`).
+The runtime review-api contract uses extensionless transitive imports in both
+vendor copies, matching the existing Next.js contract resolution pattern.
+
+Verified: direct package TypeScript check passed; `node
+node_modules/vitest/vitest.mjs run` passed 129 interaction tests, including explicit
+selection/limits, original action IDs, incomplete-peer uncertainty, history restore,
+Columns/Tabs/filtering and live-to-terminal trace props. `node
+node_modules/next/dist/bin/next build` passed and prerendered `/multi-agent`.
+API/event fixtures are distinguished from the root-owned real browser/model demo.
+
 ## 2026-10-13 — Eval history is stored data; only explicit actions start inference
 
 Eval queries validate the direct contract schema and read stored cases, batches

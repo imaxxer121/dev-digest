@@ -6,6 +6,8 @@ import type { FindingRecord, ReviewRecord, Severity } from "@devdigest/shared";
 import messages from "../../../../../../../../messages/en/prReview.json";
 import { FindingsTab } from "./FindingsTab";
 
+vi.mock('../MultiAgentReview', () => ({ MultiAgentReview: () => null }));
+
 vi.mock("../../../../../../../lib/hooks/reviews", () => ({
   useFindingAction: () => ({ mutate: vi.fn(), isPending: false }),
   useDeleteReview: () => ({ mutate: vi.fn(), isPending: false }),

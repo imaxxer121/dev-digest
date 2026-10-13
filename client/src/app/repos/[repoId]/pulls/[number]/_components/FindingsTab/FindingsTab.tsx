@@ -6,6 +6,7 @@ import { Icon, Badge, Button, SectionLabel, EmptyState } from "@devdigest/ui";
 import { RunStatus } from "../RunStatus";
 import { RunHistory } from "../RunHistory/RunHistory";
 import { ReviewRunAccordion } from "../ReviewRunAccordion";
+import { MultiAgentReview } from '../MultiAgentReview';
 import { s } from "./styles";
 import type { FindingRecord, ReviewRecord, RunSummary, PrCommit } from "@devdigest/shared";
 import type { UseMutationResult } from "@tanstack/react-query";
@@ -76,6 +77,7 @@ export function FindingsTab({
 
   return (
     <section>
+      {prId && <MultiAgentReview prId={prId} repoFullName={repoFullName} headSha={headSha} onOpenTrace={onOpenTrace} />}
       {liveRunIds.length > 0 && (
         <div style={s.liveRunSection}>
           <SectionLabel
