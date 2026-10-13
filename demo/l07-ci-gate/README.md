@@ -7,3 +7,6 @@ SQL through concatenation; the next revision binds the input as a parameter.
 
 The application never imports or executes this directory. Review results must
 come from the hosted model and reviewer-core, rather than a fabricated finding.
+
+The internal-PR context repair is now installed on the trusted base. This
+revision reruns the unchanged vulnerable query through that repaired runner.
