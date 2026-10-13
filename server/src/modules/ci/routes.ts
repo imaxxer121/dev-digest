@@ -5,10 +5,9 @@ import { CiExportInput, CiPreview, CiExport, CiInstallation, CiRun, CiRefreshInp
 import { IdParams } from '../_shared/schemas.js';
 import { getContext } from '../_shared/context.js';
 import { CiService } from './service.js';
-import type { CiDependencies } from './ports.js';
 export default async function ciRoutes(base: FastifyInstance) {
   const app = base.withTypeProvider<ZodTypeProvider>();
-  const service = new CiService(app.container, app.container as typeof app.container & CiDependencies);
+  const service = new CiService(app.container, app.container);
   app.post('/agents/:id/ci-preview', { schema: { params: IdParams, body: CiExportInput, response: { 200: CiPreview } } }, async req => service.preview((await getContext(app.container, req)).workspaceId, req.params.id, req.body));
   app.post('/agents/:id/export-ci', { schema: { params: IdParams, body: CiExportInput, response: { 200: CiExport } } }, async req => service.export((await getContext(app.container, req)).workspaceId, req.params.id, req.body));
   app.post('/agents/:id/ci-zip', { schema: { params: IdParams, body: CiExportInput } }, async (req, reply) => {

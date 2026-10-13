@@ -7,7 +7,6 @@ import { buildApp } from '../src/app.js';
 import { loadConfig } from '../src/platform/config.js';
 import { seed } from '../src/db/seed.js';
 import * as t from '../src/db/schema.js';
-import ciRoutes from '../src/modules/ci/routes.js';
 import { dockerAvailable, startPg, type PgFixture } from './helpers/pg.js';
 import { ciFixture, hash, CI_HEAD } from './helpers/ci.js';
 import type { CiArtifactEnvelope } from '../src/modules/ci/ports.js';
@@ -20,9 +19,8 @@ describe('L07 CI export and verified ingestion (required isolated PostgreSQL)', 
   beforeAll(async () => {
     if (!await dockerAvailable()) throw new Error('CI integration requires isolated PostgreSQL; cannot skip');
     pg = await startPg(); ({ workspaceId } = await seed(pg.handle.db));
-    app = await buildApp({ config: loadConfig({ ...process.env, NODE_ENV: 'test', LOG_LEVEL: 'silent' }), db: pg.handle.db });
-    Object.assign(app.container, { ciGithub: async () => ({ retrieve }), ciRunner: async () => runner });
-    await app.register(ciRoutes);
+    app = await buildApp({ config: loadConfig({ ...process.env, NODE_ENV: 'test', LOG_LEVEL: 'silent' }), db: pg.handle.db,
+      overrides: { ciGithub: { retrieve }, ciRunner: async () => runner } });
     const [agent] = await pg.handle.db.insert(t.agents).values({ workspaceId, name: 'CI fixture', provider: 'codex', model: 'studio-fixture', systemPrompt: 'Fixture prompt' }).returning(); agentId = agent!.id;
     const [repo] = await pg.handle.db.insert(t.repos).values({ workspaceId, owner: 'fixture', name: 'ci', fullName: 'fixture/ci' }).returning();
     await pg.handle.db.insert(t.pullRequests).values({ workspaceId, repoId: repo!.id, number: 7, title: 'Fixture PR', author: 'fixture', branch: 'feature', base: 'integration', headSha: CI_HEAD });
