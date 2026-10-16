@@ -19,15 +19,17 @@ try {
   writeFileSync(join(directory, 'smoke.mjs'), `
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createServer } from 'node:http';
 import { main } from './trusted/.devdigest/runner/index.js';
 const env = ${JSON.stringify(env)};
 let modelCalls = 0, posts = 0;
+const model = createServer((req, res) => {
+  assert.equal(req.url, '/api/chat'); assert.equal(req.method, 'POST'); req.resume(); modelCalls++;
+  res.end(JSON.stringify({ done: true, prompt_eval_count: 23, eval_count: 11, message: { content: JSON.stringify({ verdict: 'approve', summary: 'Fixture', score: 99, findings: [{ id: 'fixture', severity: 'CRITICAL', category: 'security', title: 'Fixture issue', file: 'x.ts', start_line: 1, end_line: 1, rationale: 'Fixture rationale', confidence: 1, kind: 'finding' }] }) } }));
+});
+await new Promise((resolve, reject) => { model.once('error', reject); model.listen(11434, '127.0.0.1', resolve); });
 globalThis.fetch = async (input, init) => {
   const url = String(input);
-  if (url === 'http://127.0.0.1:11434/api/chat') {
-    modelCalls++;
-    return new Response(JSON.stringify({ done: true, prompt_eval_count: 23, eval_count: 11, message: { content: JSON.stringify({ verdict: 'approve', summary: 'Fixture', score: 99, findings: [{ id: 'fixture', severity: 'CRITICAL', category: 'security', title: 'Fixture issue', file: 'x.ts', start_line: 1, end_line: 1, rationale: 'Fixture rationale', confidence: 1, kind: 'finding' }] }) } }));
-  }
   if (url === 'https://api.github.com/repos/fixture/ci/pulls/7/reviews' && init?.method === 'POST') {
     posts++; const body = JSON.parse(init.body); assert.equal(body.commit_id, '${head}'); assert.equal(body.event, 'REQUEST_CHANGES'); return new Response('{}', { status: 201 });
   }
@@ -37,7 +39,9 @@ globalThis.fetch = async (input, init) => {
   }
   throw new Error('Unexpected fixture network path: ' + url);
 };
-const code = await main(env); assert.equal(code, 1); assert.equal(modelCalls, 1); assert.equal(posts, 1);
+let code;
+try { code = await main(env); } finally { model.closeAllConnections(); await new Promise(resolve => model.close(resolve)); }
+assert.equal(code, 1); assert.equal(modelCalls, 1); assert.equal(posts, 1);
 const artifact = JSON.parse(readFileSync(env.DEVDIGEST_RESULT_PATH, 'utf8'));
 assert.equal(artifact.schema_version, '2'); assert.equal(artifact.verdict, 'request_changes'); assert.equal(artifact.tokens_in, 23); assert.equal(artifact.findings_count, 1); assert.equal(artifact.head_sha, '${head}');
 console.log('[bundle-smoke] Standalone export executed real reviewer-core with injected fixture inference; grounding, commit-bound publication, gate and artifact passed.');
