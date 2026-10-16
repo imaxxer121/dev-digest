@@ -55,3 +55,15 @@ cost retained as null (`src/ollama.ts:13`). `node node_modules/vitest/vitest.mjs
 run` passed 32 tests; TypeScript checking, ncc build and `node test/bundle-smoke.mjs`
 passed. The smoke uses injected fixture inference and is distinct from an actual
 model run. No studio authentication is included in the export.
+
+## 2026-10-13 — CPU inference needs a deadline that also covers headers
+
+Hosted run 38397516690 failed with `fetch failed` after 302 seconds before any
+artifact. Node's fetch uses Undici's separate 300-second headers timeout, which
+can expire before the adapter's 900-second AbortSignal when Ollama uses
+`stream: false`. `src/ollama-http.ts:4` uses Node HTTP only for the fixed loopback
+chat endpoint, with the same abort signal through the complete buffered response
+and a 1 MiB response limit. All 40 runner tests and TypeScript passed; five new
+transport tests exercise delayed headers, deadlines before/after headers, the
+buffer limit and endpoint restriction. The standalone fixture smoke passed with
+a real local HTTP server and injected GitHub responses; it is not a model run.
