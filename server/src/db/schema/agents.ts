@@ -30,6 +30,7 @@ export const agents = pgTable('agents', {
   // REPO_INTEL_ENABLED flag is the second gate (facade degrades when off).
   repoIntel: boolean('repo_intel').notNull().default(true),
   enabled: boolean('enabled').notNull().default(true),
+  attachedDocs: jsonb('attached_docs').$type<{ repo_id: string; path: string }[]>().notNull().default([]),
   version: integer('version').notNull().default(1),
   createdBy: uuid('created_by').references(() => users.id),
   createdAt: now(),

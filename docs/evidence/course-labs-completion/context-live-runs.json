@@ -1,0 +1,18 @@
+{
+  "run_id": "5518a1e8-c918-4508-a6bd-7537314bbb6f",
+  "agent_id": "8ebbc3e2-e40d-4b8c-bbbf-28f0b3c053f0",
+  "agent_name": "L05 Project Context Reviewer",
+  "provider": "codex",
+  "model": "gpt-6.1-sol",
+  "status": "done",
+  "error": null,
+  "duration_ms": 7814,
+  "tokens_in": 13686,
+  "tokens_out": 200,
+  "cost_usd": null,
+  "findings_count": 1,
+  "grounding": "1/1 passed",
+  "ran_at": "2026-10-16T14:08:44.515Z",
+  "score": 88,
+  "blockers": 0
+}

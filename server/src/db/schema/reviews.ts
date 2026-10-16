@@ -52,6 +52,15 @@ export const prIntent = pgTable('pr_intent', {
   intent: text('intent').notNull(),
   inScope: jsonb('in_scope').$type<string[]>().notNull().default(sql`'[]'::jsonb`),
   outOfScope: jsonb('out_of_scope').$type<string[]>().notNull().default(sql`'[]'::jsonb`),
+  // Nullable: historical Intent has no trustworthy head/model/usage provenance.
+  generationId: uuid('generation_id'),
+  headSha: text('head_sha'),
+  generatedAt: timestamp('generated_at', { withTimezone: true }),
+  provider: text('provider'),
+  model: text('model'),
+  tokensIn: integer('tokens_in'),
+  tokensOut: integer('tokens_out'),
+  costUsd: doublePrecision('cost_usd'),
 });
 
 export const prBrief = pgTable('pr_brief', {

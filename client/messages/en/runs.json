@@ -59,6 +59,14 @@
       "args": "args",
       "result": "result",
       "previewTruncated": "(preview truncated)"
+    },
+    "context": {
+      "title": "Project Context reads and budget",
+      "measurement": "≈ {tokens} estimated tokens · {bytes} UTF-8 bytes · method: {method}. Separate from billed provider usage.",
+      "limits": "Limits: {tokens} estimated tokens in the guarded block; {bytes} bytes per document.",
+      "skipped": "Skipped documents",
+      "unknown": "Project Context measurements are unknown for this legacy or CI trace.",
+      "intent": "Intent (untrusted)"
     }
   },
   "drawer": {

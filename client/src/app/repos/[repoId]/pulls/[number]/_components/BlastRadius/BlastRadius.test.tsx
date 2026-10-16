@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { BlastRadius as BlastRadiusData } from "@devdigest/shared";
 import messages from "../../../../../../../../messages/en/blast.json";
 import brief from "../../../../../../../../messages/en/brief.json";
+import intent from "../../../../../../../../messages/en/intent.json";
 import { api } from "@/lib/api";
 import { BlastRadius } from "./BlastRadius";
 import { OverviewTab } from "../OverviewTab";
@@ -28,7 +29,7 @@ const payload: BlastRadiusData = {
 
 function mount(ui = <BlastRadius prId={PR_ID} repoFullName="owner/repo" headSha="different-head" />) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(<QueryClientProvider client={client}><NextIntlClientProvider locale="en" messages={{ blast: messages, brief }}>{ui}</NextIntlClientProvider></QueryClientProvider>);
+  return render(<QueryClientProvider client={client}><NextIntlClientProvider locale="en" messages={{ blast: messages, brief, intent }}>{ui}</NextIntlClientProvider></QueryClientProvider>);
 }
 function stat(container: HTMLElement, key: string) {
   return container.querySelector(`[data-blast-stat="${key}"]`) as HTMLElement;
@@ -96,20 +97,23 @@ describe("Blast radius on PR Overview", () => {
 
   it("keeps loading and HTTP failure separate from empty results and retries without losing the description", async () => {
     let rejectRead!: (error: Error) => void;
-    vi.mocked(api.get).mockReturnValueOnce(new Promise((_resolve, reject) => { rejectRead = reject; }));
+    vi.mocked(api.get).mockImplementation(path => path.endsWith("/intent")
+      ? Promise.resolve({ intent: null, current_head_sha: SHA, freshness: "missing" })
+      : new Promise((_resolve, reject) => { rejectRead = reject; }));
     mount(<OverviewTab prId={PR_ID} repoFullName="owner/repo" headSha={SHA} prBody="Preserved PR description"
       brief={{ repoId: "repo1", loading: false, pending: false, onRetry: vi.fn(), onGenerate: vi.fn(), onFocus: vi.fn() }} />);
     expect(screen.getByText("Preserved PR description")).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Loading the indexed impact map");
+    const blast = within(screen.getByRole("region", { name: "Blast radius" }));
+    expect(blast.getByRole("status")).toHaveTextContent("Loading the indexed impact map");
     expect(screen.queryByText(/no downstream callers/)).not.toBeInTheDocument();
     rejectRead(new Error("Pull request was not found"));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Pull request was not found");
+    expect(await blast.findByRole("alert")).toHaveTextContent("Pull request was not found");
     expect(screen.queryByText("No indexed symbols were found in the changed files.")).not.toBeInTheDocument();
     vi.mocked(api.get).mockResolvedValue(payload);
-    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    fireEvent.click(blast.getByRole("button", { name: "Retry" }));
     expect(await screen.findByText("src/routes/ü users.ts:17")).toBeInTheDocument();
     expect(screen.getByText("Preserved PR description")).toBeInTheDocument();
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(blast.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("collapses one symbol without changing top totals or another symbol’s map", async () => {

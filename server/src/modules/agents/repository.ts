@@ -15,6 +15,7 @@ import type { AgentRow, AgentVersionRow } from '../../db/rows.js';
 export type { AgentRow, AgentVersionRow };
 
 export interface InsertAgent {
+  attachedDocs?: { repo_id: string; path: string }[];
   workspaceId: string;
   name: string;
   description?: string;
@@ -30,6 +31,7 @@ export interface InsertAgent {
 }
 
 export interface UpdateAgent {
+  attachedDocs?: { repo_id: string; path: string }[];
   name?: string;
   description?: string;
   provider?: Provider;
@@ -97,6 +99,7 @@ export class AgentsRepository {
         ...(values.ciFailOn !== undefined ? { ciFailOn: values.ciFailOn } : {}),
         ...(values.repoIntel !== undefined ? { repoIntel: values.repoIntel } : {}),
         enabled: values.enabled ?? true,
+        attachedDocs: values.attachedDocs ?? [],
         version: INITIAL_AGENT_VERSION,
         createdBy: values.createdBy ?? null,
       })
@@ -136,6 +139,7 @@ export class AgentsRepository {
         ...(patch.ciFailOn !== undefined ? { ciFailOn: patch.ciFailOn } : {}),
         ...(patch.repoIntel !== undefined ? { repoIntel: patch.repoIntel } : {}),
         ...(patch.enabled !== undefined ? { enabled: patch.enabled } : {}),
+        ...(patch.attachedDocs !== undefined ? { attachedDocs: patch.attachedDocs } : {}),
         ...(configChanged ? { version: nextVersion } : {}),
       })
       .where(and(eq(t.agents.workspaceId, workspaceId), eq(t.agents.id, id)))

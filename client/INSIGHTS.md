@@ -1,5 +1,22 @@
 # Client engineering insights
 
+## 2026-10-16 — Explicit Intent writes must cancel older reads for their original PR
+
+A cached background GET can finish after a successful recalculation POST and
+restore the old Intent. Capture the originating PR in mutation context, await
+cancellation of its exact query, then write the new data
+(`src/lib/hooks/intent.ts:25`, `src/lib/hooks/intent.ts:29`). Cancelling a broad
+query prefix would interrupt another PR after navigation. The card also keeps
+the API's stale state when its parent still holds an older head
+(`src/app/repos/[repoId]/pulls/[number]/_components/IntentCard/IntentCard.tsx:14`).
+
+Two deferred GET/POST regressions failed before the cancellation fix and passed
+after it. `node node_modules/vitest/vitest.mjs run src/lib/hooks/intent.test.tsx
+IntentCard.test.tsx` passed 9/9, including the visible card, navigation, another
+PR's active read and unrelated cache retention; client typechecking passed.
+These are API fixtures. Separate retained live Intent/reload observations are
+in `../docs/evidence/course-labs-completion/intent-cached-reload.json`.
+
 ## 2026-10-13 — Multi-agent comparison restores selection and follows stored status
 
 The comparison reads immutable server groups rather than reconstructing a fan-out

@@ -1,0 +1,154 @@
+{
+  "source": "Codex local session event metadata; conversation content excluded",
+  "measured_at": "2026-10-13T12:00:38.891616+00:00",
+  "agents": [
+    {
+      "agent": "/root/l07_multi_agent",
+      "depth": 1,
+      "parent_agent_in_scope": false,
+      "started_at": "2026-10-13T09:59:01.101Z",
+      "tokens": {
+        "input_tokens": 10869034,
+        "cached_input_tokens": 10636288,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 62309,
+        "reasoning_output_tokens": 15209,
+        "total_tokens": 10931343
+      },
+      "outer_tool_calls": {
+        "exec": 71,
+        "send_message": 13,
+        "list_agents": 1
+      },
+      "turns": [
+        {
+          "started_at": "2026-10-13T09:59:01.181Z",
+          "completed_at": "2026-10-13T10:33:43.727Z"
+        },
+        {
+          "started_at": "2026-10-13T10:38:25.260Z",
+          "completed_at": "2026-10-13T10:46:43.185Z"
+        }
+      ]
+    },
+    {
+      "agent": "/root/l07_ci",
+      "depth": 1,
+      "parent_agent_in_scope": false,
+      "started_at": "2026-10-13T09:59:26.891Z",
+      "tokens": {
+        "input_tokens": 15891566,
+        "cached_input_tokens": 15584384,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 92495,
+        "reasoning_output_tokens": 24620,
+        "total_tokens": 15984061
+      },
+      "outer_tool_calls": {
+        "exec": 96,
+        "send_message": 24,
+        "wait_agent": 2,
+        "followup_task": 1
+      },
+      "turns": [
+        {
+          "started_at": "2026-10-13T09:59:26.962Z",
+          "completed_at": "2026-10-13T10:45:27.029Z"
+        },
+        {
+          "started_at": "2026-10-13T10:46:19.136Z",
+          "completed_at": "2026-10-13T10:47:36.389Z"
+        },
+        {
+          "started_at": "2026-10-13T10:49:58.267Z",
+          "completed_at": "2026-10-13T11:05:37.543Z"
+        }
+      ]
+    },
+    {
+      "agent": "/root/l07_spec_review",
+      "depth": 1,
+      "parent_agent_in_scope": false,
+      "started_at": "2026-10-13T10:06:25.878Z",
+      "tokens": {
+        "input_tokens": 6682518,
+        "cached_input_tokens": 6546176,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 13749,
+        "reasoning_output_tokens": 5494,
+        "total_tokens": 6696267
+      },
+      "outer_tool_calls": {
+        "exec": 23,
+        "send_message": 20,
+        "list_agents": 1,
+        "wait_agent": 6
+      },
+      "turns": [
+        {
+          "started_at": "2026-10-13T10:06:25.952Z",
+          "completed_at": "2026-10-13T10:08:24.001Z"
+        },
+        {
+          "started_at": "2026-10-13T10:15:49.036Z",
+          "completed_at": "2026-10-13T10:20:05.761Z"
+        },
+        {
+          "started_at": "2026-10-13T10:33:55.061Z",
+          "completed_at": "2026-10-13T10:43:23.450Z"
+        },
+        {
+          "started_at": "2026-10-13T11:04:13.931Z",
+          "completed_at": "2026-10-13T11:05:25.774Z"
+        }
+      ]
+    }
+  ],
+  "orchestrator": {
+    "agent": "/root",
+    "scope": "L07 orchestration only, cumulative counter difference",
+    "started_at": "2026-10-13T09:48:39.113Z",
+    "cutoff": "2026-10-13T11:27:35Z",
+    "tokens": {
+      "input_tokens": 34075185,
+      "cached_input_tokens": 33402112,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 84563,
+      "reasoning_output_tokens": 33635,
+      "total_tokens": 34159748
+    },
+    "outer_tool_calls": {
+      "exec": 160,
+      "js": 77,
+      "request_user_input_async": 1,
+      "spawn_agent": 3,
+      "send_message": 22,
+      "followup_task": 5,
+      "list_agents": 1
+    }
+  },
+  "subagent_totals": {
+    "input_tokens": 33443118,
+    "cached_input_tokens": 32766848,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 168553,
+    "reasoning_output_tokens": 45323,
+    "total_tokens": 33611671
+  },
+  "deep_audit": {
+    "direct_agents": 3,
+    "nested_agents": 0,
+    "max_depth": 1,
+    "recursive_parent_ids_checked": true
+  },
+  "timing": {
+    "completed_turn_intervals": 9,
+    "active_turn_seconds_sum": 7372.072999999999,
+    "first_start_to_last_completion_seconds": 3996.362,
+    "actual_overlap_seconds": 2844.625,
+    "active_turn_sum_over_span": 1.844696001012921
+  },
+  "cost_usd": null,
+  "human_review_seconds": null,
+  "note": "Input includes cached input. Reasoning output is a subset of output. Internal approval guardian overhead is excluded and unavailable. Orchestration is separately scoped from coding and review."
+}

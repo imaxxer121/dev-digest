@@ -1,0 +1,17 @@
+{
+  "title": "PR Intent",
+  "recalculate": "Recalculate Intent",
+  "pendingAction": "Recalculating…",
+  "loading": "Loading saved Intent…",
+  "loadError": "Could not load Intent",
+  "retry": "Retry",
+  "pending": "Classifying the PR metadata. The saved Intent remains available.",
+  "failure": "Could not recalculate Intent. The saved result was retained",
+  "missing": "No saved Intent. Recalculate to infer the claimed purpose from PR metadata.",
+  "stale": "This saved Intent is stale because the PR head changed.",
+  "unknown": "Intent freshness is unknown because this saved result has no recorded PR head.",
+  "metadataOnly": "Derived from title, description and changed-file statistics. Purpose and scope never excuse a real defect.",
+  "inScope": "In scope",
+  "outOfScope": "Out of scope",
+  "emptyScope": "No scope claims recorded."
+}

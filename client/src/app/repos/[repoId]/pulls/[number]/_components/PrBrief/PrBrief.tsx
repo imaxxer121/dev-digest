@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import { Button, SectionLabel, Skeleton } from "@devdigest/ui";
 import type { BriefResponse, BriefProvenance } from "@devdigest/shared";
 import type { DiffFocusTarget } from "@/components/diff-viewer";
-import { IntentBlock } from "../IntentBlock";
 import { s } from "./styles";
 
 export interface PrBriefProps {
@@ -86,7 +85,6 @@ export function PrBrief({ response, loading, loadError, pending, generationError
       </div>
       <p style={s.muted}><Link href={`/repos/${repoId}/context`}>{t("manageContext")}</Link>{" · "}{t("contextHint")}</p>
     </div>
-    <IntentBlock intent={brief?.intent ?? null} generated={!!brief} />
     {children}
   </section>;
 }

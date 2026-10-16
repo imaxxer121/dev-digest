@@ -1,0 +1,24 @@
+{
+  "name": "@devdigest/harness-evals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic harness checks and explicitly opted-in Codex subscription trials",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "npm run build && node --test dist/test/*.test.js",
+    "eval": "npm test && npm run eval:quality",
+    "eval:quality": "npm run build && node dist/src/cli.js quality",
+    "eval:skills": "npm run build && node --test dist/test/skills.test.js",
+    "eval:agents": "npm run build && node --test dist/test/agents.test.js",
+    "eval:workflow": "npm run build && node --test dist/test/workflow.test.js dist/test/mcp.test.js",
+    "eval:live": "npm run build && node dist/src/cli.js live",
+    "eval:doctor": "npm run build && node dist/src/cli.js doctor",
+    "eval:repeat": "npm run build && node dist/src/cli.js repeat",
+    "eval:delta": "npm run build && node dist/src/cli.js delta",
+    "eval:benchmark": "npm run build && node dist/src/cli.js benchmark"
+  },
+  "devDependencies": { "@types/node": "22.10.2", "typescript": "5.7.3" }
+}

@@ -39,7 +39,7 @@ export function useCreateSkill() {
 
 export interface UpdateSkillInput {
   id: string;
-  patch: Partial<Pick<Skill, "name" | "description" | "type" | "source" | "body" | "enabled">> & { version_message?: string };
+  patch: Partial<Pick<Skill, "name" | "description" | "type" | "source" | "body" | "enabled" | "attached_docs">> & { version_message?: string };
 }
 
 export function useUpdateSkill() {

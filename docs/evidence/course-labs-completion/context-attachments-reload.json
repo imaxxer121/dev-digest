@@ -1,0 +1,25 @@
+{
+  "agent_docs": [
+    {
+      "path": "docs/course-context/api-boundary.md",
+      "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983"
+    }
+  ],
+  "skill_id": "a07ce53b-2aa2-430c-9233-d22f5771bbd9",
+  "skill_version": 1,
+  "browser_run_click": "Two CUA locator attempts failed without starting a run; one explicit local API POST started the recorded run.",
+  "observed_via": "UI save and reload, followed by API read",
+  "agent_version": 1,
+  "reference_source": "Two public reference documents copied from PR25 commit into the configured local clone. Clone HEAD was not changed.",
+  "skill_docs": [
+    {
+      "path": "docs/course-context/review-evidence.md",
+      "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983"
+    },
+    {
+      "path": "docs/course-context/api-boundary.md",
+      "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983"
+    }
+  ],
+  "agent_id": "8ebbc3e2-e40d-4b8c-bbbf-28f0b3c053f0"
+}

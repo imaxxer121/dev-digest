@@ -1,0 +1,254 @@
+{
+  "acceptance": "AC-COMP02",
+  "result": "PASS",
+  "kind": "deterministic recomputation of retained historical model requests",
+  "scope": "Application-controlled JSON.stringify({messages, schemaName, jsonSchema}) UTF-8 bytes plus a 1024-byte framing reserve. Provider-hidden prompts and provider token usage are outside this byte-budget assertion.",
+  "formula": "Buffer.byteLength(JSON.stringify({messages, schemaName: 'pr_risk_brief', jsonSchema}), 'utf8') + 1024 <= 32000",
+  "byte_budget_is_not_a_token_limit": true,
+  "current_baseline_ref": "7dc2a00",
+  "current_sources": [
+    {
+      "path": "server/src/modules/brief/input.ts",
+      "sha256_lf_normalized": "d494ec6ee043461284123f20ac93d58aa07293bf89ee6fa3a46f9366775b547d",
+      "unchanged_from_baseline": true
+    },
+    {
+      "path": "server/src/modules/brief/constants.ts",
+      "sha256_lf_normalized": "87fbbb178b01d39820643efb44f40486b5833f04c4b9fc85c18e64d438333fe3",
+      "unchanged_from_baseline": true
+    },
+    {
+      "path": "server/src/vendor/shared/contracts/brief.ts",
+      "sha256_lf_normalized": "ddfb13be4276888375b20f9492f2b4dd5254fa3777620aea20a49e642e3f8323",
+      "unchanged_from_baseline": true
+    },
+    {
+      "path": "reviewer-core/src/llm/structured.ts",
+      "sha256_lf_normalized": "975c40768e1f84a11c98ec7a82f610105781cf839088a58f158907e1b38805df",
+      "unchanged_from_baseline": true
+    },
+    {
+      "path": "server/test/brief-input.test.ts",
+      "sha256_lf_normalized": "ebdaf38a0ad83681289fccc04bbc0391c156f243a15c75a7064d5cc1616552ae",
+      "unchanged_from_baseline": true
+    }
+  ],
+  "calls": [
+    {
+      "label": "first",
+      "call_id": "815d4fd7-1dd0-402a-8833-b81d57c3ef87",
+      "generated_at": "2026-10-12T20:19:00.539Z",
+      "head_sha": "674794b9af6a7592251755c134441ee589a72134",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "saved_response": "work/l05-generated.json",
+      "hashes": {
+        "application_request_sha256": "15859978beeadae5d355e5c4f7a2839c96177885b9e756545f3a4cb555902a93",
+        "messages_json_sha256": "ae4e35dafe6d264008ee683a3dfd3784074eab5db081ac76cbd4111bbdd1dce7",
+        "schema_json_sha256": "6df509469f7bea3850863f93d420aa3181ecc698910abd6ce09f2b3d803b4191",
+        "saved_prompt_file_sha256": "a3b1c09838c41c26fac296beed8034c4f8da57fd8ec3fc933aeb0120354a5a11",
+        "saved_schema_file_sha256": "6df509469f7bea3850863f93d420aa3181ecc698910abd6ce09f2b3d803b4191",
+        "saved_events_file_sha256": "f6e89f56904384604c3124b3706eb8881a6df8c5935da121623366fe2bf1f473",
+        "saved_result_file_sha256": "71ef414755c4e3e876fa7d27efcbfcbcf010310ad964107bfd7e55dae22d39eb",
+        "saved_response_file_sha256": "f4c3c6e87414e5ed081b7d871dabb417ea0c081ea31dd4534723684e721a9c74"
+      },
+      "measured_payload_bytes": 12314,
+      "adapter_framing_allowance_bytes": 1024,
+      "budgeted_input_bytes": 13338,
+      "input_budget_bytes": 32000,
+      "budget_unit": "utf8_bytes",
+      "remaining_bytes": 18662,
+      "exact_saved_metrics_match": true,
+      "current_system_and_schema_match": true,
+      "within_budget": true,
+      "source_allowlist": {
+        "exact_field_allowlists": true,
+        "file_source_or_patch_fields": 0,
+        "diff_hunk_headers": 0,
+        "file_fields": [
+          "path",
+          "additions",
+          "deletions",
+          "role",
+          "candidate_lines"
+        ],
+        "numeric_candidate_lines_only": true,
+        "supplied_sources": [
+          "persisted PR description",
+          "persisted Blast metadata and caller identities",
+          "changed-file metadata and numeric anchors",
+          "truncated attached specification"
+        ],
+        "missing_sources": [
+          "saved Intent",
+          "linked issue"
+        ],
+        "source_bodies_permitted": [
+          "PR/issue descriptions, Intent prose, specification prose when available"
+        ]
+      },
+      "specifications": [
+        {
+          "path": "specs/l04-blast-radius.md",
+          "original_sha256": "29fe52449d321b40caf137206a591fb2702a488d92f7bd75fb06c473a50d6bb3",
+          "included_content_sha256": "29328b89887a3b8fdcbeb2f8307bca5ed4b164b4869fbcd3dd23364a38196993",
+          "original_bytes": 14387,
+          "included_bytes": 7365,
+          "truncated": true
+        }
+      ],
+      "saved_runtime_evidence": {
+        "application_calls": 1,
+        "attempts": 1,
+        "threads_started": 1,
+        "completed_turns": 1,
+        "completed_agent_messages": 1,
+        "completed_tool_items": 0,
+        "response_and_events_match": true,
+        "usage": {
+          "input_tokens": 13822,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 300,
+          "reasoning_output_tokens": 0
+        },
+        "cost_usd": null
+      }
+    },
+    {
+      "label": "regenerated",
+      "call_id": "a42a3859-08e4-45eb-834c-dc114c05dbc9",
+      "generated_at": "2026-10-12T20:26:36.616Z",
+      "head_sha": "674794b9af6a7592251755c134441ee589a72134",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "saved_response": "work/l05-regenerated.json",
+      "hashes": {
+        "application_request_sha256": "15859978beeadae5d355e5c4f7a2839c96177885b9e756545f3a4cb555902a93",
+        "messages_json_sha256": "ae4e35dafe6d264008ee683a3dfd3784074eab5db081ac76cbd4111bbdd1dce7",
+        "schema_json_sha256": "6df509469f7bea3850863f93d420aa3181ecc698910abd6ce09f2b3d803b4191",
+        "saved_prompt_file_sha256": "a3b1c09838c41c26fac296beed8034c4f8da57fd8ec3fc933aeb0120354a5a11",
+        "saved_schema_file_sha256": "6df509469f7bea3850863f93d420aa3181ecc698910abd6ce09f2b3d803b4191",
+        "saved_events_file_sha256": "1f2018a48e76dd02975956a6afac939b98317cb8fcef9d4951da7136ccc3d398",
+        "saved_result_file_sha256": "eda903e152ed45b7e853da178fd8b37efa8a0da2bccfa89927817476ff838495",
+        "saved_response_file_sha256": "4609e06b94f4c7d15570e0cffbac729a22f0c7cd5b5009226af6f520e0925cd2"
+      },
+      "measured_payload_bytes": 12314,
+      "adapter_framing_allowance_bytes": 1024,
+      "budgeted_input_bytes": 13338,
+      "input_budget_bytes": 32000,
+      "budget_unit": "utf8_bytes",
+      "remaining_bytes": 18662,
+      "exact_saved_metrics_match": true,
+      "current_system_and_schema_match": true,
+      "within_budget": true,
+      "source_allowlist": {
+        "exact_field_allowlists": true,
+        "file_source_or_patch_fields": 0,
+        "diff_hunk_headers": 0,
+        "file_fields": [
+          "path",
+          "additions",
+          "deletions",
+          "role",
+          "candidate_lines"
+        ],
+        "numeric_candidate_lines_only": true,
+        "supplied_sources": [
+          "persisted PR description",
+          "persisted Blast metadata and caller identities",
+          "changed-file metadata and numeric anchors",
+          "truncated attached specification"
+        ],
+        "missing_sources": [
+          "saved Intent",
+          "linked issue"
+        ],
+        "source_bodies_permitted": [
+          "PR/issue descriptions, Intent prose, specification prose when available"
+        ]
+      },
+      "specifications": [
+        {
+          "path": "specs/l04-blast-radius.md",
+          "original_sha256": "29fe52449d321b40caf137206a591fb2702a488d92f7bd75fb06c473a50d6bb3",
+          "included_content_sha256": "29328b89887a3b8fdcbeb2f8307bca5ed4b164b4869fbcd3dd23364a38196993",
+          "original_bytes": 14387,
+          "included_bytes": 7365,
+          "truncated": true
+        }
+      ],
+      "saved_runtime_evidence": {
+        "application_calls": 1,
+        "attempts": 1,
+        "threads_started": 1,
+        "completed_turns": 1,
+        "completed_agent_messages": 1,
+        "completed_tool_items": 0,
+        "response_and_events_match": true,
+        "usage": {
+          "input_tokens": 13824,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 266,
+          "reasoning_output_tokens": 0
+        },
+        "cost_usd": null
+      }
+    }
+  ],
+  "both_calls_have_identical_application_request": true,
+  "historical_cache_proof": {
+    "path": "work/dev-digest/docs/evidence/l05/cache-sha-proof.json",
+    "sha256": "49442549c1f0f72d9cd84e1d43602c79f82e557d9b2adfe3095551795cbfc85c",
+    "assertions_rechecked": [
+      "call IDs/metrics/usage match actual saved prompt/schema/events/result",
+      "unchanged reload",
+      "explicit regeneration uses a new call",
+      "stale brief retained",
+      "restored response equals regenerated response"
+    ],
+    "process_counts": "Historical counts retained in the original proof; no current cache-directory count was used or inferred."
+  },
+  "boundary_unit_results": {
+    "source": "work/course-labs-full-verification.log",
+    "sha256": "449011ca0d1cd93fe90ae8396d75132722edad25b8567521c7c5ef1103488766",
+    "evidence": [
+      {
+        "line": 68,
+        "text": "✓ test/brief-contract.test.ts (2 tests) 7ms"
+      },
+      {
+        "line": 83,
+        "text": "✓ test/brief-input.test.ts (5 tests) 5530ms"
+      },
+      {
+        "line": 84,
+        "text": "✓ Brief prepared input > bounds Unicode/escaping/many entries deterministically and retains an attached spec prefix/digest 5521ms"
+      },
+      {
+        "line": 87,
+        "text": "Tests  281 passed (281)"
+      }
+    ],
+    "cases_in_current_unchanged_test": [
+      "exact message/schema envelope plus reserve and patch-body exclusion",
+      "Unicode/escaping/large entry bounds, deterministic truncation, spec prefix and digest",
+      "fixed-envelope overflow fails before returning a request",
+      "Unicode code-point prefix and capped positive numeric anchors"
+    ],
+    "status": "Root verification log records all 5 brief-input tests passing; this helper does not run the unit suite."
+  },
+  "reproduction": {
+    "script": "docs/evidence/course-labs-completion/reproduce-brief-budget.mts",
+    "command": "node server/node_modules/tsx/dist/cli.mjs --tsconfig server/tsconfig.json docs/evidence/course-labs-completion/reproduce-brief-budget.mts --first-response <first-response.json> --first-call-dir <retained-first-call-directory> --regenerated-response <regenerated-response.json> --regenerated-call-dir <retained-regenerated-call-directory> --cache-proof <cache-sha-proof.json> --verification-log <course-labs-full-verification.log>",
+    "private_inputs": "Explicit local input paths are caller-supplied. Only call IDs, file digests and repository-relative teaching paths are published. No directory discovery, model invocation, network or application database access occurs."
+  },
+  "limitations": [
+    "The two model executions were retained from 2026-10-12; this is not a new live model run.",
+    "The current preparer/constants/output contract/schema converter are unchanged from the baseline, and the current system/schema match the historical requests; the helper does not recreate the original database snapshot.",
+    "The framing reserve is an application allowance, not a measurement or guarantee of provider-hidden prompt bytes or tokens.",
+    "Runtime usage is reported separately and is not converted to bytes; nullable USD cost remains unknown.",
+    "Original specification digest/byte count is retained provenance; only the included specification content and its UTF-8 byte count are independently hashed here."
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "scope": "User-approved temporary administrator exception for PR 21 only",
+  "started_at": "2026-10-13T11:50:39.687Z",
+  "before": {
+    "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection",
+    "required_status_checks": {
+      "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/required_status_checks",
+      "strict": false,
+      "contexts": [
+        "DevDigest review"
+      ],
+      "contexts_url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/required_status_checks/contexts",
+      "checks": [
+        {
+          "context": "DevDigest review",
+          "app_id": 15368
+        }
+      ]
+    },
+    "required_signatures": {
+      "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/required_signatures",
+      "enabled": false
+    },
+    "enforce_admins": {
+      "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/enforce_admins",
+      "enabled": true
+    },
+    "required_linear_history": {
+      "enabled": false
+    },
+    "allow_force_pushes": {
+      "enabled": false
+    },
+    "allow_deletions": {
+      "enabled": false
+    },
+    "block_creations": {
+      "enabled": false
+    },
+    "required_conversation_resolution": {
+      "enabled": false
+    },
+    "lock_branch": {
+      "enabled": false
+    },
+    "allow_fork_syncing": {
+      "enabled": false
+    }
+  },
+  "exception_at": "2026-10-13T11:50:40.065Z",
+  "merge": {
+    "sha": "e5d41ae095a73adba204f7a1f28beec82cf42649",
+    "merged": true,
+    "message": "Pull Request successfully merged"
+  },
+  "after": {
+    "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection",
+    "required_status_checks": {
+      "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/required_status_checks",
+      "strict": false,
+      "contexts": [
+        "DevDigest review"
+      ],
+      "contexts_url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/required_status_checks/contexts",
+      "checks": [
+        {
+          "context": "DevDigest review",
+          "app_id": 15368
+        }
+      ]
+    },
+    "required_signatures": {
+      "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/required_signatures",
+      "enabled": false
+    },
+    "enforce_admins": {
+      "url": "https://api.github.com/repos/imaxxer121/dev-digest/branches/feat/l07-integration/protection/enforce_admins",
+      "enabled": true
+    },
+    "required_linear_history": {
+      "enabled": false
+    },
+    "allow_force_pushes": {
+      "enabled": false
+    },
+    "allow_deletions": {
+      "enabled": false
+    },
+    "block_creations": {
+      "enabled": false
+    },
+    "required_conversation_resolution": {
+      "enabled": false
+    },
+    "lock_branch": {
+      "enabled": false
+    },
+    "allow_fork_syncing": {
+      "enabled": false
+    }
+  },
+  "restored_at": "2026-10-13T11:50:43.417Z"
+}

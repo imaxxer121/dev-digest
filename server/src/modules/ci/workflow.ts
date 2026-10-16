@@ -93,5 +93,6 @@ export function validateEditedWorkflow(proposed: string, generated: string): str
   const normalize = (text: string) => text.split(/\r?\n/).filter(line => line.trim() && !line.trimStart().startsWith('#')).map(line => line.startsWith('name: ') ? 'name: <editable>' : line).join('\n');
   if (normalize(proposed) !== normalize(generated)) throw new ValidationError('Workflow execution settings must match Configure. Only the workflow title and comments may be edited.');
   if (!/^name: [A-Za-z0-9 _.-]{1,80}$/m.test(proposed)) throw new ValidationError('Workflow title must be plain text');
-  return proposed.endsWith('\n') ? proposed : `${proposed}\n`;
+  const lf = proposed.replace(/\r\n/g, '\n');
+  return lf.endsWith('\n') ? lf : `${lf}\n`;
 }

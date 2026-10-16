@@ -21,6 +21,7 @@ async function install() { await preview(); fireEvent.click(screen.getByRole('bu
 describe('four-step CI export interactions', () => {
   it('discloses the actual CI override and performs no export on mount', () => {
     mount(); expect(screen.getByText(/Studio: codex\/studio-model. CI: ollama\/qwen2.5-coder:7b-instruct/)).toBeInTheDocument();
+    expect(screen.getByText(/Local filesystem attachments from agents and enabled Skills are not exported/)).toBeInTheDocument();
     expect(mocks.preview.mutateAsync).not.toHaveBeenCalled(); expect(mocks.install.mutateAsync).not.toHaveBeenCalled();
     expect(screen.queryByText('Jenkins')).not.toBeInTheDocument();
   });

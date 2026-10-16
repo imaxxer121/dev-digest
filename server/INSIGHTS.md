@@ -1,5 +1,27 @@
 # Server engineering insights
 
+## 2026-10-16 — Intent revisions and Context snapshots have different boundaries
+
+Intent capture selects only title, nullable body and file path/count metadata
+(`src/modules/reviews/repository/pull.repo.ts:58`). Saving locks the PR and checks
+both its captured head and saved generation identity (`:80`), so late or competing
+results cannot replace a newer success. Batch preparation receives the queued
+head and runs once before agent fan-out (`src/modules/reviews/run-executor.ts:118`);
+classifier usage stays separate from individual review totals. Nullable legacy
+provenance remains unknown. Eight isolated PostgreSQL Intent tests passed with
+zero skips; the retained live classifier record reports 11,722 input and 149
+output tokens, with unchanged cached reload, in
+`../docs/evidence/course-labs-completion/intent-live-before-reload.json`.
+
+Filesystem Context rechecks persisted agent/Skill links, reads fresh once per
+selected document and freezes each agent's snapshot
+(`src/modules/project-context/service.ts:38`). Budget the actual guarded block,
+skipping whole documents in saved order (`:60`), and measure the block returned
+by core for the saved trace (`src/modules/reviews/run-executor.ts:308`). This
+8,000-token estimate is distinct from provider usage and Brief's 32,000-byte
+envelope. `test/course-labs-runtime.it.test.ts` passed 4/4 in the saved root
+PostgreSQL log; these fixtures do not establish live Context/model quality.
+
 ## 2026-10-13 — Multi-agent membership and outcome commit boundaries
 
 Group creation saves the immutable selected run IDs/names and all children in one

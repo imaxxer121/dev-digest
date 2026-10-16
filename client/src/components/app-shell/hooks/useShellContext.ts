@@ -74,6 +74,7 @@ export function useShellContext({ onOpenCommandPalette }: ShellContextOptions): 
       // 0 → undefined so the badge hides entirely when nothing needs review.
       prCount: pulls?.filter((p) => p.status === "needs_review").length || undefined,
       navLabels: {
+        context: t('nav.context'),
         eval: t("nav.eval"),
         "multi-agent": t("nav.multi-agent"),
         "ci-runs": t("nav.ci-runs"),

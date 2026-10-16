@@ -1,0 +1,1 @@
+[{"id" : "6b2b4038-962f-4c9e-a295-5436a7511f4c", "source" : "ci", "status" : "done", "tokens_in" : 1005, "tokens_out" : 358, "findings_count" : 1}, {"id" : "01e5b9a4-32d8-4806-b589-69e37798175b", "source" : "ci", "status" : "done", "tokens_in" : 1008, "tokens_out" : 80, "findings_count" : 0}]

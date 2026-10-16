@@ -1,0 +1,44 @@
+{
+  "first": {
+    "finding": {
+      "id": "c7dfb467-343c-4ea8-918f-76b347634a8d",
+      "severity": "CRITICAL",
+      "category": "security",
+      "title": "Email input changes SQL syntax",
+      "file": "security-demo/db.ts",
+      "start_line": 8,
+      "end_line": 9,
+      "rationale": "If an attacker controls email, the value ' OR '1'='1 produces a query that returns all users instead of the requested user. The function passes the concatenated SQL directly to the database.",
+      "suggestion": "Extend Db.query to accept bound parameters and bind email through a placeholder.",
+      "confidence": 1,
+      "kind": "finding",
+      "trifecta_components": null,
+      "evidence": null,
+      "review_id": "1df92744-4168-40bf-a752-723c45a23019",
+      "accepted_at": "2026-10-13T11:39:18.566Z",
+      "dismissed_at": null
+    },
+    "memoryId": "16dd60ee-4f22-4fbe-84f3-27edc92724f4"
+  },
+  "second": {
+    "finding": {
+      "id": "c7dfb467-343c-4ea8-918f-76b347634a8d",
+      "severity": "CRITICAL",
+      "category": "security",
+      "title": "Email input changes SQL syntax",
+      "file": "security-demo/db.ts",
+      "start_line": 8,
+      "end_line": 9,
+      "rationale": "If an attacker controls email, the value ' OR '1'='1 produces a query that returns all users instead of the requested user. The function passes the concatenated SQL directly to the database.",
+      "suggestion": "Extend Db.query to accept bound parameters and bind email through a placeholder.",
+      "confidence": 1,
+      "kind": "finding",
+      "trifecta_components": null,
+      "evidence": null,
+      "review_id": "1df92744-4168-40bf-a752-723c45a23019",
+      "accepted_at": "2026-10-13T11:39:18.566Z",
+      "dismissed_at": null
+    },
+    "memoryId": "16dd60ee-4f22-4fbe-84f3-27edc92724f4"
+  }
+}

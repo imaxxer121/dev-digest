@@ -5,7 +5,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@devdigest/ui";
-import type { RunTrace, FindingRecord } from "@devdigest/shared";
+import type { RunTrace, Finding } from "@devdigest/shared";
 import { PROMPT_COLORS } from "../../constants";
 import { formatSeconds, formatTokens } from "../../helpers";
 import { formatCost } from "@/lib/cost";
@@ -16,7 +16,7 @@ import { PromptBlock } from "../PromptBlock";
 import { FindingsSection } from "../FindingsSection";
 import { Row, Stat } from "../atoms";
 
-export function TraceBody({ trace, findings }: { trace: RunTrace; findings: FindingRecord[] }) {
+export function TraceBody({ trace, findings }: { trace: RunTrace; findings: Finding[] }) {
   const t = useTranslations("runs");
   const stats = trace.stats;
   return (
@@ -52,6 +52,16 @@ export function TraceBody({ trace, findings }: { trace: RunTrace; findings: Find
         </div>
       </TraceSection>
 
+      <TraceSection icon="FileText" title={t('trace.context.title')}>
+        {trace.project_context ? <>
+          <p>{t('trace.context.measurement', { tokens: trace.project_context.estimated_tokens, bytes: trace.project_context.bytes, method: trace.project_context.estimate_method })}</p>
+          <p>{t('trace.context.limits', { tokens: trace.project_context.token_limit, bytes: trace.project_context.document_byte_limit })}</p>
+          <ul>{trace.project_context.reads.map(doc => <li key={`${doc.repo_id}/${doc.path}`}>{doc.repo_id}: {doc.path} · {doc.bytes} B</li>)}</ul>
+          <p>{t('trace.context.skipped')}</p>
+          {trace.project_context.skipped.length ? <ul>{trace.project_context.skipped.map((doc, i) => <li key={i}>{doc.repo_id}: {doc.path} · {doc.reason}</li>)}</ul> : <p>{t('trace.config.none')}</p>}
+        </> : <p>{t('trace.context.unknown')}</p>}
+      </TraceSection>
+
       <TraceSection
         icon="Gauge"
         title={t("trace.stats")}
@@ -85,6 +95,7 @@ export function TraceBody({ trace, findings }: { trace: RunTrace; findings: Find
         {trace.prompt_assembly.specs != null && (
           <PromptBlock label={t("trace.prompt.specs")} text={trace.prompt_assembly.specs} color={PROMPT_COLORS.specs} />
         )}
+        {trace.prompt_assembly.intent != null && <PromptBlock label={t('trace.context.intent')} text={trace.prompt_assembly.intent} color={PROMPT_COLORS.specs} />}
         {trace.prompt_assembly.callers != null && (
           <PromptBlock label={t("trace.prompt.callers")} text={trace.prompt_assembly.callers} color={PROMPT_COLORS.callers} />
         )}

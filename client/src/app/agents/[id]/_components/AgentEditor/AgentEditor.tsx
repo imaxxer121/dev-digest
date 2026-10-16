@@ -13,6 +13,7 @@ import { EvalsTab } from "./_components/EvalsTab";
 import { CITab } from "./_components/CITab";
 import { TABS } from "./constants";
 import { s } from "./styles";
+import { ContextEditor } from '@/components/project-context/ContextEditor';
 
 export function AgentEditor({ agent, tab, onTab, batchId }: { agent: Agent; tab: string; onTab: (t: string) => void; batchId?: string | null }) {
   const t = useTranslations("agents");
@@ -25,6 +26,7 @@ export function AgentEditor({ agent, tab, onTab, batchId }: { agent: Agent; tab:
       <div style={s.body}>
         {tab === "config" && <ConfigTab agent={agent} />}
         {tab === "skills" && <SkillsTab agentId={agent.id} />}
+        {tab === "context" && <ContextEditor key={agent.id} id={agent.id} kind="agent" attachedDocs={agent.attached_docs} />}
         {tab === "evals" && <EvalsTab key={agent.id} agentId={agent.id} requestedBatchId={batchId} />}
         {tab === "ci" && <CITab key={agent.id} agent={agent} />}
       </div>

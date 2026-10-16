@@ -36,8 +36,9 @@ is a bug — stop and tell the user.
 
 ## Count nested sub-agents (do not undercount)
 
-A sub-agent can spawn its **own** sub-agents (e.g. `spec-creator` and `implementation-planner` hold
-the `Agent` tool and fan out `researcher`s; a `Workflow()` fans out many). These **nested** agents
+A runtime or an older profile may have spawned its **own** sub-agents. The current
+development profiles have no delegation tool and forbid nested agents; do not infer
+historical topology from their current metadata. Any actually observed **nested** agents
 consume real tokens and tool calls and **must be included** in the per-agent breakdown and in every
 total.
 
@@ -68,6 +69,22 @@ analysing — do not silently pick.
 
 ## Data sources (both are real; prefer the cheap one)
 
+**Codex compatibility:** the Claude paths, `<usage>` blocks and helper below are
+upstream source formats, not evidence that a Codex run used Claude or exposed those
+counters. For a Codex run, use the actual available session journal, usage events,
+dispatch IDs, timestamps and agent result reports; cite each source and its scope.
+Record the actual configured/exposed model, or unknown when unavailable. Never
+substitute the profile's `inherit` setting or an upstream model label for identity.
+
+Missing input/output/cache/tool counters, model identity, timing and dollar cost
+are `unknown` in prose and null in structured data, with a reason. Do not turn a
+missing counter into measured zero. The bundled helper defaults missing Anthropic
+usage keys to zero; use it only for compatible complete Claude-format usage and
+validate that coverage before trusting totals. It is not a Codex journal parser.
+Incomplete sources cannot support complete totals; retain partial scope explicitly.
+Any cost derived from verified prices is an estimate with price source, timestamp
+and method, separate from actual reported cost. Subscription runs may have null cost.
+
 1. **In-context (default).** As orchestrator you saw every `Agent` result's `<usage>` block
    (`subagent_tokens`, `tool_uses`, `duration_ms`), every `<task-notification>`, the launch order,
    which agents were dispatched in the same message (parallel), and each agent's final report. This
@@ -85,7 +102,8 @@ analysing — do not silently pick.
      **parallelism factor** (Σ agent spans ÷ wall-clock). Nested sub-agents (spawnDepth > 1) are
      indented under their parent and **included in the totals** (the summary reports `nested=` and
      `max_depth=`). For a cost estimate pass `--prices prices.json`; **do not hard-code prices —
-     confirm current per-model rates via the `claude-api` skill first**, since they drift.
+     verify current official per-model rates and record their source/date first**,
+     since they drift. Do not assume an unavailable pricing skill exists.
 
    Find the project slug / session id from the symlink targets under the session's `tasks/`
    directory, or by matching the most recently modified `*.jsonl` under
@@ -93,12 +111,16 @@ analysing — do not silently pick.
 
 ## What to measure (the dimensions)
 
-Collect what you can; mark anything unavailable as `n/a` rather than guessing.
+Collect what you can; mark anything unavailable as `unknown`/null with its reason
+rather than guessing. Label estimates separately from measured counters.
 
 **Cost & resources (quantitative)**
 - Tokens — input / output / cache-read / cache-creation, **per agent and total**.
-- **Cache efficiency** = cache-read ÷ total input-side tokens. Low ratio = something is breaking
-  the prompt cache (a big cost lever).
+- **Cache efficiency** uses a named compatible measured denominator. In complete
+  Anthropic usage it is cache-read ÷ (uncached input + cache-read + cache-creation).
+  If a provider's input counter already includes cached tokens, do not add cached
+  tokens again. Missing/incompatible counters or a zero denominator give unknown,
+  not a measured 0%. Do not infer the cause of a low ratio without evidence.
 - Tool calls per agent and total.
 - Wall-clock per agent and total; **parallelism factor** = Σ(agent spans) ÷ wall-clock.
 - **Critical path** — the single agent that dominated wall-clock.

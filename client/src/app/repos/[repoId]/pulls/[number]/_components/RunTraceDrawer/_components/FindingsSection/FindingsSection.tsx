@@ -5,7 +5,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@devdigest/ui";
-import type { FindingRecord } from "@devdigest/shared";
+import type { Finding } from "@devdigest/shared";
 import { s } from "../../styles";
 import { TraceSection } from "../TraceSection";
 
@@ -15,7 +15,7 @@ const SEV_COLOR: Record<string, string> = {
   SUGGESTION: "var(--accent)",
 };
 
-export function FindingsSection({ findings }: { findings: FindingRecord[] }) {
+export function FindingsSection({ findings }: { findings: Finding[] }) {
   const t = useTranslations("runs");
   return (
     <TraceSection

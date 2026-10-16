@@ -63,5 +63,6 @@
   "gateNotice": "Each installation records its own gate policy.",
   "installations": "Installations",
   "statusFilter": "Status",
-  "inspectFindings": "Inspect findings"
+  "inspectFindings": "Inspect findings",
+  "localContextDisclosure": "Local filesystem attachments from agents and enabled Skills are not exported. CI does not receive this local Project Context."
 }
