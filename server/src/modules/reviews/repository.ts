@@ -1,6 +1,7 @@
 import type { Db } from '../../db/client.js';
 import * as t from '../../db/schema.js';
-import type { Finding, Intent, RunSummary, RunTrace } from '@devdigest/shared';
+import type { Finding, RunSummary, RunTrace } from '@devdigest/shared';
+import type { PrIntentRecord } from '../../vendor/shared/contracts/review-api.js';
 
 /**
  * A2 — review data-access. The ONLY layer touching the DB for the review
@@ -141,12 +142,16 @@ export class ReviewRepository {
 
   // ---- intent -------------------------------------------------------------
 
-  upsertIntent(prId: string, intent: Intent): Promise<void> {
-    return pullRepo.upsertIntent(this.db, prId, intent);
+  captureIntent(workspaceId: string, prId: string) {
+    return pullRepo.captureIntent(this.db, workspaceId, prId);
   }
 
-  getIntent(prId: string): Promise<Intent | undefined> {
-    return pullRepo.getIntent(this.db, prId);
+  getIntent(workspaceId: string, prId: string) {
+    return pullRepo.getIntent(this.db, workspaceId, prId);
+  }
+
+  saveIntent(workspaceId: string, prId: string, expected: { headSha: string; generationId: string | null }, record: PrIntentRecord) {
+    return pullRepo.saveIntent(this.db, workspaceId, prId, expected, record);
   }
 
   // ---- observability: agent_runs + run_traces ----------------------------

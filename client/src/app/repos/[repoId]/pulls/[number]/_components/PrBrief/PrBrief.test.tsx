@@ -29,13 +29,13 @@ function mount(props: React.ComponentProps<typeof Harness> = {}, client = new Qu
 }
 
 describe("explicit PR brief generation and cache", () => {
-  it("loads/reloads through GET without generating, with truthful initial Intent and context link", async () => {
+  it("loads/reloads through GET without generating and keeps Intent in its independent card", async () => {
     vi.mocked(api.get).mockResolvedValue(briefResponse(null));
     const first = mount();
     const generate = await screen.findByRole("button", { name: "Generate brief" });
     await waitFor(() => expect(generate).toBeEnabled());
     expect(screen.getByRole("region", { name: "PR Brief" })).toBeInTheDocument();
-    expect(screen.getByText("Intent is included when available after generation.")).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "PR Intent" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Project Context" })).toHaveAttribute("href", "/repos/repo1/context");
     expect(api.get).toHaveBeenCalledWith("/pulls/pr1/brief");
     expect(api.post).not.toHaveBeenCalled();
@@ -53,9 +53,8 @@ describe("explicit PR brief generation and cache", () => {
     expect(screen.getByText(/saved brief is stale/)).toBeInTheDocument();
     expect(screen.getByText("High")).toBeInTheDocument();
     expect(screen.getByText(savedBrief.risks.risks[0]!.explanation)).toBeInTheDocument();
-    expect(screen.getByText("Callback retries")).toBeInTheDocument();
-    expect(screen.getByText("Billing UI")).toBeInTheDocument();
-    expect(screen.getByText(/freshness is unknown/)).toBeInTheDocument();
+    expect(screen.queryByText("Callback retries")).not.toBeInTheDocument();
+    expect(screen.queryByText("Billing UI")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "src/payment.ts:24 — Check the idempotency boundary" }));
     expect(onFocus).toHaveBeenLastCalledWith(savedBrief.review_focus[0]);
     fireEvent.click(screen.getByRole("button", { name: "src/payment.ts" }));
@@ -104,7 +103,7 @@ describe("explicit PR brief generation and cache", () => {
       specs: { ...savedBrief.provenance.specs, truncated: true, total_count: 2, included_count: 1 } } };
     vi.mocked(api.get).mockResolvedValue(briefResponse(brief));
     mount();
-    expect(await screen.findByText("No saved Intent was available for this generation.")).toBeInTheDocument();
+    expect(await screen.findByText("Saved Intent: missing")).toBeInTheDocument();
     expect(screen.getByText("Changed file facts: missing")).toBeInTheDocument();
     expect(screen.getByText(/Linked issue: missing/)).toBeInTheDocument();
     expect(screen.getByText(/shortened to fit the input budget/)).toBeInTheDocument();

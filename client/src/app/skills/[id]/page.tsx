@@ -12,7 +12,7 @@ import { ImportDrawer } from "../_components/ImportDrawer";
 import { useSkills, useSkill, useUpdateSkill } from "../../../lib/hooks/skills";
 import { ApiError } from "../../../lib/api";
 
-const VALID_TABS = ["config", "preview", "versions", "stats"];
+const VALID_TABS = ["config", "preview", "versions", "stats", "context"];
 
 export default function SkillEditorPage() {
   const params = useParams<{ id: string }>();

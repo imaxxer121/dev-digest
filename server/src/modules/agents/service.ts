@@ -24,6 +24,7 @@ import { toAgentDto, toAgentVersionDto } from './helpers.js';
 export { toAgentDto } from './helpers.js';
 
 export interface CreateAgentInput {
+  attached_docs?: { repo_id: string; path: string }[];
   name: string;
   description?: string;
   provider: Provider;
@@ -37,6 +38,7 @@ export interface CreateAgentInput {
 }
 
 export interface UpdateAgentInput {
+  attached_docs?: { repo_id: string; path: string }[];
   name?: string;
   description?: string;
   provider?: Provider;
@@ -72,8 +74,10 @@ export class AgentsService {
   }
 
   async create(workspaceId: string, input: CreateAgentInput, userId?: string): Promise<Agent> {
+    const attachedDocs = input.attached_docs === undefined ? [] : await this.container.projectContext.validateAttachments(workspaceId, input.attached_docs);
     const row = await this.repo.insert({
       workspaceId,
+      attachedDocs,
       name: input.name,
       description: input.description,
       provider: input.provider,
@@ -94,7 +98,10 @@ export class AgentsService {
     id: string,
     patch: UpdateAgentInput,
   ): Promise<Agent | undefined> {
+    if (!await this.repo.getById(workspaceId, id)) return undefined;
+    const attachedDocs = patch.attached_docs === undefined ? undefined : await this.container.projectContext.validateAttachments(workspaceId, patch.attached_docs);
     const row = await this.repo.update(workspaceId, id, {
+      ...(attachedDocs !== undefined ? { attachedDocs } : {}),
       ...(patch.name !== undefined ? { name: patch.name } : {}),
       ...(patch.description !== undefined ? { description: patch.description } : {}),
       ...(patch.provider !== undefined ? { provider: patch.provider } : {}),

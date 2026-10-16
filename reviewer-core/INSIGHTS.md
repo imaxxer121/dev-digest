@@ -1,5 +1,22 @@
 # Reviewer-core engineering insights
 
+## 2026-10-16 — Optional Intent uses the same guarded assembly in both strategies
+
+The caller supplies resolved Intent; core reconstructs its three purpose/scope
+fields and wraps them as untrusted data (`src/prompt.ts:108`). With no Intent,
+the new assembly slot is omitted, preserving the prior prompt shape. Both
+single-pass and every map-reduce chunk receive the same prompt parts
+(`src/review/run.ts:138`); the shared grounding gate still runs after reduction
+(`:201`). The unconditional system guard forbids purpose or scope from waiving
+a real vulnerability/correctness finding (`src/prompt.ts:28`). Keep provider
+selection, classification, files and persistence outside this pure engine.
+
+`node node_modules/vitest/vitest.mjs run` passed 26/26, including both strategy
+captures, delimiter escaping and retained grounding; core typechecking passed.
+These injected-provider fixtures prove mechanics, not model compliance. Attached
+Context also uses the existing specs wrapper, so its caller must measure that
+assembled block rather than summing raw document estimates.
+
 ## 2026-10-12 — Inference and grounding have separate boundaries
 
 The review entry point receives an injected LLMProvider (`src/review/run.ts:52`)

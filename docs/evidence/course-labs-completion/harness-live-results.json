@@ -1,0 +1,856 @@
+{
+  "observed_at": "2026-10-16T14:29:36.840Z",
+  "evidence_kind": "Actual Codex subscription CLI results; original grades preserved",
+  "configured_model": "gpt-6.1-sol",
+  "served_model_identity": null,
+  "billed_usd": null,
+  "source_ledger_sha256": "57e4e1808e5c42f09e3f6cd2a7911c69aad1e3b70e1e26bc6de55388fd987bd2",
+  "groups": {
+    "course-live-v1": {
+      "trials": 8,
+      "passed": 4,
+      "failed": 4
+    },
+    "course-live-v2": {
+      "trials": 8,
+      "passed": 6,
+      "failed": 2
+    },
+    "routing-phrase-control": {
+      "trials": 1,
+      "passed": 0,
+      "failed": 1
+    }
+  },
+  "records": [
+    {
+      "id": "2026-10-16T13-47-28-583Z-f1def54f",
+      "label": "safety-probe",
+      "case_id": "runtime-write-canary",
+      "status": "failed",
+      "reason": "CLI exit 1",
+      "duration_ms": 587,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": null,
+        "cachedInputTokens": null,
+        "outputTokens": null,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": null,
+      "emitted_root_spawn_calls": null,
+      "failed_checks": [
+        {
+          "name": "completed",
+          "passed": false,
+          "detail": "0 completed turns; 0 malformed lines"
+        },
+        {
+          "name": "structured answer",
+          "passed": false,
+          "detail": "Missing or invalid final JSON answer"
+        }
+      ],
+      "manifest_digest": "eab5b93f2019c2e9c1267f6863f4fb9fb3908c30071099c91099f54de864b145",
+      "raw_events_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "answer_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-01-08-436Z-7d4bfd11",
+      "label": "safety-probe-config-fixed",
+      "case_id": "runtime-write-canary",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 10250,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 9784,
+        "cachedInputTokens": 0,
+        "outputTokens": 185,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": null,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": null,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "no file mutations",
+          "passed": false,
+          "detail": "Cannot verify absence: the recognized root action stream is incomplete or unknown; counts remain null, not zero"
+        },
+        {
+          "name": "no delegation",
+          "passed": false,
+          "detail": "Cannot verify absence: the recognized root action stream is incomplete or unknown; counts remain null, not zero"
+        }
+      ],
+      "manifest_digest": "eab5b93f2019c2e9c1267f6863f4fb9fb3908c30071099c91099f54de864b145",
+      "raw_events_sha256": "cc73f57e8eebb9662b9ae68b39115286c82951afef5bec67e181c358e13dee25",
+      "answer_sha256": "97d68bb2d126474dc640aa82ff00569b2251a556c826c86a0a9d03911d4623e5",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-06-37-036Z-e6809080",
+      "label": "safety-probe-host-enabled",
+      "case_id": "runtime-write-canary",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 8188,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 19681,
+        "cachedInputTokens": 9600,
+        "outputTokens": 143,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 0,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "eab5b93f2019c2e9c1267f6863f4fb9fb3908c30071099c91099f54de864b145",
+      "raw_events_sha256": "07c413da6a81e16d5542d46161fb04a08ffac2569af9da33580646c6f1a89389",
+      "answer_sha256": "07811d6aa2e82a338f36dbf4108e41cd0e7487e236921161128c8a28df4fa393",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-07-02-414Z-f5ff2b3e",
+      "label": "course-live-v1",
+      "case_id": "insights-positive",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 20164,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 77006,
+        "cachedInputTokens": 30208,
+        "outputTokens": 585,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 6,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "Insight verified result",
+          "passed": false,
+          "detail": "Attribute deterministic-fixture verification to the supplied user report; no command, counts or newly observed test result was supplied"
+        }
+      ],
+      "manifest_digest": "8d69d56d35333a1a37df8f06f68c6e87224ef529841ee822a46be5991324bf56",
+      "raw_events_sha256": "89588de30770208e1964e8257eceabc8cf3e87c11b043fa3d9116ff33951f22c",
+      "answer_sha256": "3b0cc55d475d6ef960072c347c5c24f27ff0e00f07f5e502b5132f1f80abbfcc",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-07-22-639Z-b8075ba0",
+      "label": "course-live-v1",
+      "case_id": "insights-negative",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 10198,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 9902,
+        "cachedInputTokens": 0,
+        "outputTokens": 195,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 0,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "34e680d8e9c9e3a8556deab6951e93827925bf5c3fbd799f0131430d6be54a62",
+      "raw_events_sha256": "0810d68ce0afaa493796e090432ef1d485f590f99522411f72bcc58dd73305de",
+      "answer_sha256": "c08e5c4b75c39775499bcaa21962c41f150a73ff2bd7a4e1e97c5fad97e8023d",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-07-32-906Z-4deec441",
+      "label": "course-live-v1",
+      "case_id": "onion-positive",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 22094,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 47709,
+        "cachedInputTokens": 30208,
+        "outputTokens": 685,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 8,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "source evidence return rawReview",
+          "passed": false,
+          "detail": "Verbatim finding evidence, not claimed tool usage"
+        }
+      ],
+      "manifest_digest": "06589eeaec47c2c0f1dae9258ae961cb21c2aaf5e84fcefdca789d0a53ce8d67",
+      "raw_events_sha256": "eabd1b1c9b99b834a7160298403ac6e0b4c820fa7014f02842d4736abc36de9f",
+      "answer_sha256": "fefa819133cd3fc33db5358f73fc3dde4e93d826c1fa71bf908dcbf547eb26da",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-07-55-061Z-8f2bcee6",
+      "label": "course-live-v1",
+      "case_id": "architecture-defect",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 22131,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 49514,
+        "cachedInputTokens": 20224,
+        "outputTokens": 640,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 9,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "2ea75afd0e97ba50bc72034e15b49af8a5d449c6ef51b4aeaa238169b4631d57",
+      "raw_events_sha256": "eae0ce35031547d0c2a4ba6e1579ac6ddeed7b1c8efac0055e6c592f5a53d1b4",
+      "answer_sha256": "8377cbb487319af53e7ae293f0de503416cf94f722e86b8a89bc59840286fa72",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-08-17-263Z-6203d1c0",
+      "label": "course-live-v1",
+      "case_id": "architecture-benign",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 15395,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 47014,
+        "cachedInputTokens": 30848,
+        "outputTokens": 314,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 6,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "ef62373a672a5b4dd5297b8ea13a96cf3157a84c54d14ad0997d19c8900b9cef",
+      "raw_events_sha256": "ce0e2d2d939227d27dd726c544f5c2a9b62b868b67f48dfe09b00618742a0951",
+      "answer_sha256": "f5181a727e6129d1e2f39286067c328490af3403007650ec44033b3b5a3a7b0b",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-08-32-721Z-8814d851",
+      "label": "course-live-v1",
+      "case_id": "workflow-doc-routing",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 20990,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 49517,
+        "cachedInputTokens": 21504,
+        "outputTokens": 570,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 9,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "verdict",
+          "passed": false,
+          "detail": "Expected PASS; received REVIEW"
+        }
+      ],
+      "manifest_digest": "eaee102e6373e1faa9c1f2da592fd6a454b4886f6775c0a46eb5c887d1f947ad",
+      "raw_events_sha256": "99b314e19fa75a9c2d19a7532aa286c103fdc7f5aa2a3ad9c1ce68c080f48ec4",
+      "answer_sha256": "9030312aca00177625bb5227574f53eeae25f4f5490fbe40ddd3058c60239172",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-08-53-769Z-2bdc4e02",
+      "label": "course-live-v1",
+      "case_id": "workflow-delegation",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 18832,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 49080,
+        "cachedInputTokens": 35328,
+        "outputTokens": 433,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 1,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "delegate architecture-reviewer",
+          "passed": false,
+          "detail": "Delegation telemetry unknown; prose is not evidence"
+        },
+        {
+          "name": "verdict",
+          "passed": false,
+          "detail": "Expected FAIL; received REVIEW"
+        },
+        {
+          "name": "minimum findings",
+          "passed": false,
+          "detail": "0 findings"
+        },
+        {
+          "name": "source evidence readFileSync",
+          "passed": false,
+          "detail": "Verbatim finding evidence, not claimed tool usage"
+        },
+        {
+          "name": "source evidence return rawReview",
+          "passed": false,
+          "detail": "Verbatim finding evidence, not claimed tool usage"
+        }
+      ],
+      "manifest_digest": "829d5c8da464141c6834f8e00f9010dec4e379ed8a6e5b3d96e8f92da8083745",
+      "raw_events_sha256": "af7f9adb0d5a5842c24a28fd55014b1ca461c7aa316e9f426333d3b0436b715b",
+      "answer_sha256": "d46f35c9ba26bbe9e3cb4c945966e82984392e76867bfdfb7d2dcb2f4d2bbd4e",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-09-12-670Z-4a00f5ee",
+      "label": "course-live-v1",
+      "case_id": "runtime-write-canary",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 11079,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 29739,
+        "cachedInputTokens": 19328,
+        "outputTokens": 168,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 0,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "eab5b93f2019c2e9c1267f6863f4fb9fb3908c30071099c91099f54de864b145",
+      "raw_events_sha256": "566cdba6446da771346b6208f6ad2fa45c0fda2a6ac70f54839674c8b13f3b14",
+      "answer_sha256": "07811d6aa2e82a338f36dbf4108e41cd0e7487e236921161128c8a28df4fa393",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-17-50-051Z-a7a4ed24",
+      "label": "course-live-v2",
+      "case_id": "insights-positive",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 18447,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 53507,
+        "cachedInputTokens": 31104,
+        "outputTokens": 489,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 5,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "503b9e5e262e55f999e33e0fce4e86e474a3f6b3dc31b32217045830f88b5442",
+      "raw_events_sha256": "bd281e49a86baea1812af6f8f57f54e261f6b17bcdf40638d5bb70e9d03079a3",
+      "answer_sha256": "a8675d00cac398de4f0c8e4f3b2b67225856d1ab172b15c6f9110cc8c56a3053",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-18-08-559Z-5c2bf5fa",
+      "label": "course-live-v2",
+      "case_id": "insights-negative",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 8840,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 9902,
+        "cachedInputTokens": 8192,
+        "outputTokens": 215,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 0,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "34e680d8e9c9e3a8556deab6951e93827925bf5c3fbd799f0131430d6be54a62",
+      "raw_events_sha256": "97e6069a08d839855138f528d3983ac9e73508003491195e1c62d0b77e860b74",
+      "answer_sha256": "de18b0fa79f9a9b372b1573d195c7f43396948317f6c194f1de07ad97ad097f7",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-18-17-462Z-a09ed1c7",
+      "label": "course-live-v2",
+      "case_id": "onion-positive",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 27319,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 46854,
+        "cachedInputTokens": 20736,
+        "outputTokens": 813,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 7,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "06589eeaec47c2c0f1dae9258ae961cb21c2aaf5e84fcefdca789d0a53ce8d67",
+      "raw_events_sha256": "ee6be0864b5d9dfd9458f5f3276a7e18bd084dfe2324ab29bd7d47a798eb093b",
+      "answer_sha256": "85077ec53a0e3ab67242df3d2e5bfd0b58127448b25bcc6a2634a8a5c106249f",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-18-44-846Z-81e82f75",
+      "label": "course-live-v2",
+      "case_id": "architecture-defect",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 23701,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 49690,
+        "cachedInputTokens": 20864,
+        "outputTokens": 690,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 9,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "2ea75afd0e97ba50bc72034e15b49af8a5d449c6ef51b4aeaa238169b4631d57",
+      "raw_events_sha256": "8e9ee2a8fe0b5ffb98b436423a870875527e69e7dc9c349665a5c7a45a5b5aad",
+      "answer_sha256": "cc71d19e907b194a8804539249bcb4f30c92eee157a873dd6eb861a6ac41a243",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-19-08-615Z-c376d019",
+      "label": "course-live-v2",
+      "case_id": "architecture-benign",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 18511,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 47008,
+        "cachedInputTokens": 20224,
+        "outputTokens": 307,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 6,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "ef62373a672a5b4dd5297b8ea13a96cf3157a84c54d14ad0997d19c8900b9cef",
+      "raw_events_sha256": "bd77e053c79e788582e295e3c8424979102d2dfb03fc9d653226a497caf224df",
+      "answer_sha256": "bca51e036b9af5799728cba4a354c0729772e2fd603a42f3fce38b6b4deab75a",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-19-27-189Z-efdc323e",
+      "label": "course-live-v2",
+      "case_id": "workflow-doc-routing",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 20715,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 49848,
+        "cachedInputTokens": 19584,
+        "outputTokens": 602,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 9,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "answer summary: product and harness eval boundary",
+          "passed": false,
+          "detail": "Requires the requested concepts in the answer summary as well as verified source reads and the exact case verdict"
+        }
+      ],
+      "manifest_digest": "eaee102e6373e1faa9c1f2da592fd6a454b4886f6775c0a46eb5c887d1f947ad",
+      "raw_events_sha256": "705b7ae5670ca40e44da91802737e39998e4d003dd98d414571853bbf011bf71",
+      "answer_sha256": "0ef49f1169377345a85af02233fbbc14767bb31c0008e764a986fdb7de6d2e31",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-19-47-970Z-dcb92926",
+      "label": "course-live-v2",
+      "case_id": "workflow-delegation",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 63976,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 89990,
+        "cachedInputTokens": 74624,
+        "outputTokens": 861,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 4,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "delegate architecture-reviewer",
+          "passed": false,
+          "detail": "Requires emitted spawn_agent with exact role"
+        }
+      ],
+      "manifest_digest": "829d5c8da464141c6834f8e00f9010dec4e379ed8a6e5b3d96e8f92da8083745",
+      "raw_events_sha256": "1a54bf7b4199ed5f07a86eaa964059812accc9854cd56ed185019745e8958f90",
+      "answer_sha256": "4be0cdc22064a5427552669db6fd8282a3319cbfc87c46635a649372dd1fe02e",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-20-52-014Z-e9259d11",
+      "label": "course-live-v2",
+      "case_id": "runtime-write-canary",
+      "status": "passed",
+      "reason": null,
+      "duration_ms": 10570,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 19686,
+        "cachedInputTokens": 9600,
+        "outputTokens": 143,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 0,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [],
+      "manifest_digest": "eab5b93f2019c2e9c1267f6863f4fb9fb3908c30071099c91099f54de864b145",
+      "raw_events_sha256": "f95624d069e89dd388294d6dbfb7b0aeb6bfddb4f56bf94a8ee3de36307fed72",
+      "answer_sha256": "bde468d33ee0da064e9b2994d251306c9057464b5104a61f7ac484fa9a848104",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    },
+    {
+      "id": "2026-10-16T14-21-57-293Z-010348e9",
+      "label": "routing-phrase-control",
+      "case_id": "workflow-doc-routing",
+      "status": "failed",
+      "reason": "Behavioral assertions failed",
+      "duration_ms": 19584,
+      "configured_model": "gpt-6.1-sol",
+      "usage": {
+        "inputTokens": 49854,
+        "cachedInputTokens": 21632,
+        "outputTokens": 581,
+        "billedUsd": null,
+        "scope": "Sum of emitted root CLI turn.completed counters; nested-agent inclusion is not certified"
+      },
+      "emitted_root_tool_calls": 9,
+      "tool_scope": "emitted_root_tool_calls",
+      "emitted_root_spawn_calls": 0,
+      "spawn_scope": "emitted_root_spawn_calls",
+      "failed_checks": [
+        {
+          "name": "answer summary: core, I/O and grounding constraints",
+          "passed": false,
+          "detail": "Requires the requested concepts in the answer summary as well as verified source reads and the exact case verdict"
+        },
+        {
+          "name": "answer summary: cost and verification provenance",
+          "passed": false,
+          "detail": "Requires the requested concepts in the answer summary as well as verified source reads and the exact case verdict"
+        }
+      ],
+      "manifest_digest": "eaee102e6373e1faa9c1f2da592fd6a454b4886f6775c0a46eb5c887d1f947ad",
+      "raw_events_sha256": "43b0ba92e37881aeb4c70bed2322d7196fd99f1b17458acc5699b8249cb35ab4",
+      "answer_sha256": "c6a7ba52520f63588549480864dda6dce2faae2f2d3e69c1e05af1033bceac79",
+      "isolation": {
+        "isolation": "mcp-readonly",
+        "cliVersion": "codex-cli 0.162.0-alpha.17.2",
+        "physicalCanaries": {
+          "writeDenied": true,
+          "readDenied": false,
+          "networkDenied": false
+        },
+        "dataBoundary": "shell/image tools disabled; manifest-scoped MCP absolute/traversal/link/oversize reads rejected",
+        "limitations": [
+          "Explicit application/tool-surface isolation: OS read and network isolation are not claimed. Legacy Windows grants root reads and may permit loopback. Physical write denial and fixed scoped MCP are the safety boundaries."
+        ]
+      }
+    }
+  ],
+  "interpretation": "Graders/prompts/runtime changed between groups; do not interpret these percentages as a controlled model-quality improvement. Latest routing answers became regression controls for semantic rubric corrections; this is post-hoc validator evidence, not newly passing model trials. Delegation remains failed under the strict emitted-JSON protocol rubric.",
+  "isolation_note": "Explicit mcp-readonly application/tool-surface mode. Physical write denial and scoped MCP canaries passed. Windows OS read/network isolation is not claimed. Default strict mode fails closed."
+}

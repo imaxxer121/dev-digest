@@ -1,0 +1,8 @@
+diff --git a/reviewer-core/src/grounding.ts b/reviewer-core/src/grounding.ts
+--- a/reviewer-core/src/grounding.ts
++++ b/reviewer-core/src/grounding.ts
+@@ -8,2 +8,2 @@
+-const result = findings.filter(isGrounded);
+-return result;
++const groundedFindings = findings.filter(isGrounded);
++return groundedFindings;

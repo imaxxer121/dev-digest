@@ -1,0 +1,177 @@
+{
+  "format": "H.264 Baseline / AAC narration / MP4 faststart",
+  "voice": "Synthetic Microsoft Irina Desktop ru-RU",
+  "duration_seconds": 312.67,
+  "bytes": 5990697,
+  "full_decode_passed": true,
+  "edited_real_browser_captures": true,
+  "continuous_screencast": false,
+  "timeline": [
+    {
+      "start_s": 0.0,
+      "end_s": 19.121904761904762,
+      "id": "01",
+      "captures": [
+        "l07-a-merged.png",
+        "l07-b-merged.png"
+      ],
+      "caption": "L07 · Две фичи: Multi-Agent Review и Export to CI",
+      "narration": "В этой работе реализованы две фичи DevDigest: ревью одного запроса несколькими агентами и экспорт агента в GitHub Actions. У каждой фичи была своя спецификация, ветка и рабочее дерево. Обе реализованы с помощью субагентов Codex."
+    },
+    {
+      "start_s": 19.121904761904762,
+      "end_s": 40.953151927437645,
+      "id": "02",
+      "captures": [
+        "l07-foundation-merged.png",
+        "l07-composition-merged.png"
+      ],
+      "caption": "Спеки до кода · A → обновление B → общий merge",
+      "narration": "Общие контракты зафиксированы до начала параллельной работы. Сначала слита фича A, затем B обновлена от её результата. Единственный конфликт возник в журнале миграций. После композиции отдельно проверены маршруты, навигация, база данных и автономный runner."
+    },
+    {
+      "start_s": 40.953151927437645,
+      "end_s": 58.75659863945579,
+      "id": "03",
+      "captures": [
+        "l07-one-configure.png",
+        "l07-one-completed.png"
+      ],
+      "caption": "Один Security Reviewer · 78.170 с · 14 139 input / 2 475 output",
+      "narration": "Для контрольного замера выбран один Security Reviewer. Это настоящий запуск Codex CLI на сохранённом учебном PR, а не подготовленный ответ. Успешный прогон занял около семидесяти восьми секунд и вернул тринадцать находок."
+    },
+    {
+      "start_s": 58.75659863945579,
+      "end_s": 76.3869387755102,
+      "id": "04",
+      "captures": [
+        "l07-three-configure.png",
+        "l07-three-live.png"
+      ],
+      "caption": "Тот же frozen PR · Security + Stack + Conventions",
+      "narration": "Затем на том же commit запущены три агента: Security, Stack и Conventions. Профили, skills и память до сравнения не менялись. Diff загружается один раз, а статусы и результаты агентов обновляются отдельно."
+    },
+    {
+      "start_s": 76.3869387755102,
+      "end_s": 98.21936507936508,
+      "id": "05",
+      "captures": [
+        "l07-three-completed-columns.png",
+        "l07-three-completed.png"
+      ],
+      "caption": "Три агента · 42 496 input / 4 814 output · 23 находки → 20 групп",
+      "narration": "Три агента суммарно использовали сорок две тысячи четыреста девяносто шесть входных токенов. Самый долгий inference занял примерно семьдесят пять секунд. Двадцать три оригинальные находки собраны в двадцать эвристических групп. Это один опыт, а не универсальная оценка ускорения."
+    },
+    {
+      "start_s": 98.21936507936508,
+      "end_s": 118.56131519274376,
+      "id": "06",
+      "captures": [
+        "l07-tabs.png",
+        "l07-trace.png"
+      ],
+      "caption": "Columns / Tabs + detail · Авторство, confidence и grounding сохранены",
+      "narration": "Можно переключаться между колонками и подробными вкладками. У каждой находки сохраняются автор, уверенность и предложенное исправление. Trace позволяет посмотреть конфигурацию, prompt assembly, время, токены и результат проверки ссылок на строки."
+    },
+    {
+      "start_s": 118.56131519274376,
+      "end_s": 139.49024943310658,
+      "id": "07",
+      "captures": [
+        "l07-partial-failure-columns.png",
+        "l07-partial-disagreement.png"
+      ],
+      "caption": "Частичный отказ · failed = Unknown, успешные результаты остаются",
+      "narration": "Отдельно проверен частичный отказ. Агент с OpenRouter не смог запуститься без ключа, но Security и Conventions завершились. Ошибка одного провайдера не уничтожила их результаты. В разногласиях такой агент показан как Unknown, а не как отсутствие проблемы."
+    },
+    {
+      "start_s": 139.49024943310658,
+      "end_s": 160.74843537414966,
+      "id": "08",
+      "captures": [
+        "l07-learning.png",
+        "l07-sql-eval.png"
+      ],
+      "caption": "Accept → Learn → frozen eval · 1/1 passed · precision 50%",
+      "narration": "SQL-находка принята, сохранена в память и превращена в frozen eval case. Реальный повторный eval нашёл нужную проблему. Recall и citation accuracy составили сто процентов, precision — пятьдесят. В отчёте объяснено ограничение рубрики из одного кейса."
+    },
+    {
+      "start_s": 160.74843537414966,
+      "end_s": 180.64625850340136,
+      "id": "09",
+      "captures": [
+        "l07-ci-target.png",
+        "l07-ci-preview.png"
+      ],
+      "caption": "Export Wizard · Target → Preview → Configure → Install",
+      "narration": "Экспорт проходит четыре шага. В Preview можно изменить название workflow и комментарии. Настройки выполнения выбираются в Configure. Изменения сохраняются между шагами. Install создаёт отдельный pull request, также доступен ZIP."
+    },
+    {
+      "start_s": 180.64625850340136,
+      "end_s": 201.14888888888888,
+      "id": "10",
+      "captures": [
+        "l07-ci-manifest.png",
+        "l07-ci-configure.png",
+        "l07-ci-install.png"
+      ],
+      "caption": "Сохранённые prompt и skill · Явный Ollama runtime · Все runner chunks",
+      "narration": "Manifest содержит UUID агента, полный prompt и подключённый skill. Для CI явно выбран Ollama, потому что внешнего ключа модели нет. ZIP включает память и полный автономный bundle. На момент экспорта память была пустой; Learn выполнен позже."
+    },
+    {
+      "start_s": 201.14888888888888,
+      "end_s": 224.04040816326528,
+      "id": "11",
+      "captures": [
+        "l07-ci-installed.png",
+        "l07-ci-live.png"
+      ],
+      "caption": "Реальный GitHub Actions · Trusted base · Код PR не исполняется",
+      "narration": "Установка слита через отдельный PR. Actions запускает настоящий inference на CPU. Runner и конфигурация берутся из trusted base; код запроса не исполняется. Разрешения ограничены, внешние actions закреплены SHA, официальный Ollama проверяется контрольной суммой."
+    },
+    {
+      "start_s": 224.04040816326528,
+      "end_s": 246.04371882086167,
+      "id": "12",
+      "captures": [
+        "l07-ci-red-trace.png",
+        "l07-ci-red-blocked.png"
+      ],
+      "caption": "SQL injection · CRITICAL · Required check красный · Merge недоступен",
+      "narration": "Первая версия учебного запроса объединяет входные данные с SQL. Модель нашла одну критическую проблему, grounding подтвердил ссылку. Обязательный check завершился ошибкой, и GitHub отключил кнопку слияния. Это результат модели, а не искусственная ошибка workflow."
+    },
+    {
+      "start_s": 246.04371882086167,
+      "end_s": 264.3203174603175,
+      "id": "13",
+      "captures": [
+        "l07-ci-green-merge-enabled.png",
+        "l07-ci-red-green-history.png"
+      ],
+      "caption": "Связанный SQL-параметр → approve · 0 находок · Merge доступен",
+      "narration": "После привязки значения через SQL-параметр запущен второй настоящий прогон. Он вернул approve без находок, required check стал зелёным и слияние снова доступно. В Studio сохранены обе версии с разными commit SHA."
+    },
+    {
+      "start_s": 264.3203174603175,
+      "end_s": 286.08045351473925,
+      "id": "14",
+      "captures": [
+        "l07-ci-red-green-history.png",
+        "l07-ci-red-trace.png"
+      ],
+      "caption": "Защищённый import · source=ci · Повторный import без дубля",
+      "narration": "Studio получает артефакт через авторизованный запрос к GitHub. Проверяются repository, run, attempt, workflow, head SHA и файлы trusted base. Повторный импорт не создаёт дубль. CI trace сохраняет реальные токены, время и оригинальную находку."
+    },
+    {
+      "start_s": 286.08045351473925,
+      "end_s": 312.5051700680272,
+      "id": "15",
+      "captures": [
+        "l07-composition-merged.png",
+        "l07-b-merged.png"
+      ],
+      "caption": "569 тестов в полном запуске + отдельные регрессии · Метрики и ledger в отчёте",
+      "narration": "Полный запуск после композиции прошёл пятьсот шестьдесят девять тестов, включая PostgreSQL без пропусков. Поздние исправления имеют отдельные регрессии. В отчёте и ledger записаны измеренные токены, время, реальное перекрытие агентов и один merge conflict. Неизвестная стоимость и время человеческого ревью обозначены явно."
+    }
+  ]
+}

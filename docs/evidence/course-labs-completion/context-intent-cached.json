@@ -1,0 +1,26 @@
+{
+  "intent": {
+    "intent": "Create an educational Project Context review example with a standalone offline fixture that deliberately violates a documented API-to-database import boundary, plus supporting documentation. This describes the claimed purpose from metadata only; no source code was supplied.",
+    "in_scope": [
+      "Add the demo API and database modules and fixture README.",
+      "Add API-boundary and review-evidence documentation.",
+      "Demonstrate review evidence that distinguishes a boundary-policy violation from SQL injection and preserves agent/Skill context inheritance.",
+      "Claimed validation that the standalone module executes and returns the expected constant status."
+    ],
+    "out_of_scope": [
+      "Application-build integration and imports by product code, according to the PR body.",
+      "Production behavior changes, according to the PR body."
+    ],
+    "pr_id": "c53e955e-902c-4c80-99b7-61bd304cc0a7",
+    "generation_id": "bc153f00-c89a-4524-89af-500e9a487da6",
+    "head_sha": "b8135def31f1938f876175c05de87c3b5b3b94b7",
+    "generated_at": "2026-10-16T14:08:54.096Z",
+    "provider": "codex",
+    "model": "gpt-6.1-sol",
+    "tokens_in": 11533,
+    "tokens_out": 149,
+    "cost_usd": null
+  },
+  "current_head_sha": "b8135def31f1938f876175c05de87c3b5b3b94b7",
+  "freshness": "current"
+}

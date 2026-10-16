@@ -6,6 +6,7 @@ import { getContext } from '../_shared/context.js';
 import { IdParams } from '../_shared/schemas.js';
 import { NotFoundError } from '../../platform/errors.js';
 import { AgentsService } from './service.js';
+import { AttachedDocuments } from '@devdigest/shared';
 
 /** `/providers/:id` addresses a provider by name, not a uuid. */
 const ProviderParams = z.object({ id: Provider });
@@ -31,6 +32,7 @@ const VersionParams = z.object({
  */
 
 const CreateAgentBody = z.object({
+  attached_docs: AttachedDocuments.optional(),
   name: z.string().min(1),
   description: z.string().optional(),
   provider: Provider,
@@ -44,6 +46,7 @@ const CreateAgentBody = z.object({
 });
 
 const UpdateAgentBody = z.object({
+  attached_docs: AttachedDocuments.optional(),
   name: z.string().min(1).optional(),
   description: z.string().optional(),
   provider: Provider.optional(),
@@ -93,6 +96,7 @@ export default async function agentsRoutes(appBase: FastifyInstance) {
         provider: body.provider,
         model: body.model,
         system_prompt: body.system_prompt,
+        ...(body.attached_docs !== undefined ? { attached_docs: body.attached_docs } : {}),
         ...(body.description !== undefined ? { description: body.description } : {}),
         ...(body.output_schema !== undefined ? { output_schema: body.output_schema } : {}),
         ...(body.strategy !== undefined ? { strategy: body.strategy } : {}),

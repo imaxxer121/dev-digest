@@ -26,3 +26,4 @@ export * from './contracts/observability.js';
 export * from './contracts/productionize.js';
 export * from './adapters.js';
 export * from './contracts/eval-pipeline.js';
+export * from './contracts/project-context.js';

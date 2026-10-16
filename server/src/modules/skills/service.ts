@@ -9,6 +9,7 @@ import { ValidationError } from '../../platform/errors.js';
 export type { SkillStats };
 
 export interface CreateSkillInput {
+  attached_docs?: { repo_id: string; path: string }[];
   name: string;
   description?: string;
   type?: 'rubric' | 'convention' | 'security' | 'custom';
@@ -19,6 +20,7 @@ export interface CreateSkillInput {
 }
 
 export interface UpdateSkillInput {
+  attached_docs?: { repo_id: string; path: string }[];
   name?: string;
   description?: string;
   type?: 'rubric' | 'convention' | 'security' | 'custom';
@@ -68,8 +70,10 @@ export class SkillsService {
   }
 
   async create(workspaceId: string, input: CreateSkillInput): Promise<Skill> {
+    const attachedDocs = input.attached_docs === undefined ? [] : await this.container.projectContext.validateAttachments(workspaceId, input.attached_docs);
     const row = await this.repo.insert({
       workspaceId,
+      attachedDocs,
       name: input.name,
       description: input.description ?? '',
       type: input.type ?? 'custom',
@@ -86,7 +90,10 @@ export class SkillsService {
     id: string,
     patch: UpdateSkillInput,
   ): Promise<Skill | undefined> {
+    if (!await this.repo.getById(workspaceId, id)) return undefined;
+    const attachedDocs = patch.attached_docs === undefined ? undefined : await this.container.projectContext.validateAttachments(workspaceId, patch.attached_docs);
     const row = await this.repo.update(workspaceId, id, {
+      ...(attachedDocs !== undefined ? { attachedDocs } : {}),
       ...(patch.name !== undefined ? { name: patch.name } : {}),
       ...(patch.description !== undefined ? { description: patch.description } : {}),
       ...(patch.type !== undefined ? { type: patch.type } : {}),

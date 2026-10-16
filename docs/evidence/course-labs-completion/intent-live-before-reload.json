@@ -1,0 +1,29 @@
+{
+  "repo_id": "7b59db39-cd55-4c11-8690-faf47a579983",
+  "pr_id": "fd51e301-89e8-4ac3-adba-e4ef49e9805b",
+  "number": 22,
+  "response": {
+    "intent": {
+      "intent": "Complete verified CI imports by accepting exact CRLF/LF newline variants while preserving other bytes, emit LF for new edited exports, and show original artifact findings alongside saved statistics in CI trace drawers.",
+      "in_scope": [
+        "Newline-variant handling during CI ingestion and LF output for newly edited exports.",
+        "Preservation of required origin, manifest, trusted-base bundle, and accounting checks, as claimed in the metadata.",
+        "Displaying original artifact findings with saved statistics in CI trace drawers.",
+        "Allowing shared read-only traces to accept base Finding snapshots without inventing database IDs.",
+        "Related CI import and trace component tests; validation and authenticated, duplicate-free import results are reported in the metadata."
+      ],
+      "out_of_scope": [],
+      "pr_id": "fd51e301-89e8-4ac3-adba-e4ef49e9805b",
+      "generation_id": "349055a0-2b65-4d7c-b8f4-3a39e5cf9e3c",
+      "head_sha": "b82685756b52e583c4bf4b01abb15055ba74cbb5",
+      "generated_at": "2026-10-16T13:40:16.504Z",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "tokens_in": 11722,
+      "tokens_out": 149,
+      "cost_usd": null
+    },
+    "current_head_sha": "b82685756b52e583c4bf4b01abb15055ba74cbb5",
+    "freshness": "current"
+  }
+}

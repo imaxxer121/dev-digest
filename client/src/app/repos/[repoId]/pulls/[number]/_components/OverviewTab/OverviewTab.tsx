@@ -5,6 +5,7 @@ import { SectionLabel } from "@devdigest/ui";
 import { s } from "./styles";
 import { BlastRadius } from "../BlastRadius";
 import { PrBrief, type PrBriefProps } from "../PrBrief";
+import { IntentCard } from "../IntentCard";
 
 interface OverviewTabProps {
   prBody: string | null | undefined;
@@ -23,6 +24,7 @@ export function OverviewTab({ prBody, prId, repoFullName, headSha, brief }: Over
           <div style={s.descriptionBox}>{prBody}</div>
         </section>
       )}
+      <IntentCard key={prId} prId={prId} headSha={headSha} />
       <PrBrief {...brief} headSha={headSha}>
         <BlastRadius key={prId} prId={prId} repoFullName={repoFullName} headSha={headSha} />
       </PrBrief>

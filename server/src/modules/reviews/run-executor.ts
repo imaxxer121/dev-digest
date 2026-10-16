@@ -8,6 +8,8 @@ import type { ReviewRepository, FindingRow, PullRow, ReviewRow } from './reposit
 import { REVIEW_STRATEGY } from './constants.js';
 import { taskLine } from './helpers.js';
 import { loadDiff } from './diff-loader.js';
+import { IntentService, type PreparedIntent } from '../intent/service.js';
+import { AppError } from '../../platform/errors.js';
 
 import { RunCancelledError } from './cancellation.js';
 export { RunCancelledError } from './cancellation.js';
@@ -101,7 +103,34 @@ export class ReviewRunExecutor {
     }
     runLog.info(`Diff ready — ${diff.files.length} changed file(s); starting ${jobs.length} agent run(s)`);
 
-    const prepared = { callers: undefined as string | undefined, repoMap: undefined as string | undefined, rankNote: '' };
+    if (jobs.every(job => this.container.runBus.isCancelled(job.runId))) {
+      await failAll('Cancelled by user');
+      return;
+    }
+
+    // One metadata-only classification/cache lookup per batch. Its usage belongs
+    // to this shared stage, never to an individual review's provider totals.
+    let intent: PreparedIntent;
+    try {
+      intent = await new IntentService(this.container, event => {
+        logger?.info(event, 'PR Intent');
+        runLog.info(`Intent: ${String(event.event)}`, event);
+      }).prepareForBatch(workspaceId, pull.id, pull.headSha);
+    } catch (error) {
+      // Ownership failure is not a best-effort classifier failure. Do not run
+      // a review after the scoped PR/parent repository can no longer be read.
+      if (error instanceof AppError && error.statusCode === 404) {
+        await failAll(error.message);
+        return;
+      }
+      intent = { intent: undefined, status: 'degraded', record: null,
+        error: error instanceof Error ? error.message : 'Intent preparation failed' };
+    }
+    runLog.info(intent.status === 'degraded'
+      ? `Intent unavailable; continuing review without Intent: ${intent.error}`
+      : `Intent ${intent.status}; shared by ${jobs.length} agent run(s)`);
+
+    const prepared = { callers: undefined as string | undefined, repoMap: undefined as string | undefined, rankNote: '', intent };
     if (jobs.some(j => j.agent.repoIntel !== false)) {
       [prepared.callers, prepared.repoMap, prepared.rankNote] = await Promise.all([
         this.buildCallersDigest(pull.repoId, diff, runLog), this.buildRepoMapDigest(pull.repoId, runLog),
@@ -148,7 +177,7 @@ export class ReviewRunExecutor {
     agent: AgentRow,
     runId: string,
     parentLog: RunLogger,
-    prepared: { callers?: string; repoMap?: string; rankNote: string },
+    prepared: { callers?: string; repoMap?: string; rankNote: string; intent: PreparedIntent },
   ): Promise<RunOutcome> {
     const start = Date.now();
     let measured: { tokensIn: number; tokensOut: number; costUsd: number | null } | undefined;
@@ -191,8 +220,17 @@ export class ReviewRunExecutor {
       const task = taskLine(pull) + rankNote;
 
       const linked = await this.container.agentsRepo.linkedSkills(agent.id);
-      const skillBodies = linked.filter(link => link.skill.enabled).map(link => link.skill.body);
+      const loadedSkills = linked.filter(link => link.skill.enabled && link.skill.workspaceId === workspaceId).map(link => link.skill);
+      const skillBodies = loadedSkills.map(skill => skill.body);
       if (skillBodies.length) runLog.info(`skills: ${skillBodies.length} enabled skill(s), in saved order`);
+
+      // Resolve fresh once for THIS agent after its enabled Skill bodies load.
+      // The service rechecks persisted ownership/link order and freezes a bounded
+      // snapshot; core receives only copied strings and keeps them across chunks.
+      const projectContext = await this.container.projectContext.resolveForAgent(workspaceId, pull.repoId, agent, loadedSkills);
+      if (projectContext.trace.reads.length || projectContext.trace.skipped.length) {
+        runLog.info(`Project Context: ${projectContext.trace.reads.length} document(s) read; ${projectContext.trace.skipped.length} skipped`);
+      }
 
       // ---- Engine: assemble → single-pass → grounding -----------------------
       // The pure review pipeline lives in @devdigest/reviewer-core (shared with
@@ -216,6 +254,8 @@ export class ReviewRunExecutor {
         ...(pull.body ? { prDescription: pull.body } : {}),
         task,
         ...(skillBodies.length ? { skills: skillBodies } : {}),
+        specs: [...projectContext.specs],
+        ...(prepared.intent.intent ? { intent: structuredClone(prepared.intent.intent) } : {}),
         sessionId: `${repo.owner}/${repo.name}#${pull.number}:${agent.name}`,
         onEvent: (e) => runLog.event(e.kind, e.msg, e.data),
         checkCancelled: () => {
@@ -264,7 +304,9 @@ export class ReviewRunExecutor {
         })),
         raw_output: outcome.raw,
         memory_pulled: [],
-        specs_read: [],
+        specs_read: projectContext.trace.reads.map(document => document.path),
+        project_context: { ...projectContext.trace, ...this.container.projectContext.measureBlock(outcome.assembly.specs) },
+        intent: this.intentTrace(prepared.intent),
         // Persisted log = the run's FULL event buffer (incl. shared pre-work:
         // diff load + intent), not just events recorded inside this method.
         log: runLog.logFor(runId),
@@ -299,11 +341,26 @@ export class ReviewRunExecutor {
         })
         .catch(() => undefined);
       await this.repo
-        .saveRunTrace(runId, this.traceFromBuffer(runId, pull, agent, '0/0 passed', Date.now() - start, measured))
+        .saveRunTrace(runId, this.traceFromBuffer(runId, pull, agent, '0/0 passed', Date.now() - start, measured, prepared.intent))
         .catch(() => undefined);
       this.container.runBus.complete(runId);
       throw err;
     }
+  }
+
+  private intentTrace(prepared: PreparedIntent): NonNullable<RunTrace['intent']> {
+    const record = prepared.record;
+    return {
+      status: prepared.status,
+      generation_id: record?.generation_id ?? null,
+      head_sha: record?.head_sha ?? null,
+      provider: record?.provider ?? null,
+      model: record?.model ?? null,
+      tokens_in: record?.tokens_in ?? null,
+      tokens_out: record?.tokens_out ?? null,
+      cost_usd: record?.cost_usd ?? null,
+      error: prepared.error,
+    };
   }
 
   /**
@@ -405,6 +462,7 @@ export class ReviewRunExecutor {
     grounding: string,
     durationMs = 0,
     measured?: { tokensIn: number; tokensOut: number; costUsd: number | null },
+    intent?: PreparedIntent,
   ): RunTrace {
     return {
       config: {
@@ -421,6 +479,7 @@ export class ReviewRunExecutor {
       raw_output: '',
       memory_pulled: [],
       specs_read: [],
+      ...(intent ? { intent: this.intentTrace(intent) } : {}),
       log: this.container.runBus.buffer(runId).map((e) => ({ t: e.t, kind: e.kind, msg: e.msg })),
     };
   }

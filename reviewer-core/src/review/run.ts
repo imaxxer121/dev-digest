@@ -5,6 +5,7 @@ import type {
   Review,
   RunEventKind,
   UnifiedDiff,
+  Intent,
 } from '@devdigest/shared';
 import { Review as ReviewSchema } from '@devdigest/shared';
 import { assemblePrompt } from '../prompt.js';
@@ -58,6 +59,8 @@ export interface ReviewInput {
   memory?: string[];
   /** Project-context spec chunks (untrusted; delimiter-wrapped downstream). */
   specs?: string[];
+  /** Claimed PR purpose/scope, resolved by the caller without source in classification. */
+  intent?: Intent;
   /**
    * Optional callers-of-changed-symbols digest (T1.3). Untrusted; rendered
    * before the diff section. Empty/undefined → section omitted.
@@ -132,6 +135,7 @@ export async function reviewPullRequest(input: ReviewInput): Promise<ReviewOutco
     skills: input.skills,
     memory: input.memory,
     specs: input.specs,
+    intent: input.intent,
     callers: input.callers,
     repoMap: input.repoMap,
     prDescription: input.prDescription,

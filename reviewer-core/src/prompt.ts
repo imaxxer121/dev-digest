@@ -1,4 +1,4 @@
-import type { ChatMessage, PromptAssembly } from '@devdigest/shared';
+import type { ChatMessage, PromptAssembly, Intent } from '@devdigest/shared';
 
 /**
  * Prompt assembly + prompt-injection hardening.
@@ -45,6 +45,8 @@ export interface PromptParts {
   memory?: string[];
   /** Project-context spec chunks (untrusted content). */
   specs?: string[];
+  /** Metadata-derived claimed purpose/scope, untrusted and never a review exemption. */
+  intent?: Intent;
   /**
    * Repo skeleton / map (T3): top-ranked symbols by signature, token-budgeted.
    * Untrusted (derived from repo code) — delimiter-wrapped. Rendered before
@@ -103,6 +105,10 @@ export function assemblePrompt(parts: PromptParts): AssembledPrompt {
 
   const userSections: string[] = [];
   if (parts.task) userSections.push(parts.task);
+  const intentBlock = parts.intent ? wrapUntrusted('pr-intent', JSON.stringify({
+    intent: parts.intent.intent, in_scope: parts.intent.in_scope, out_of_scope: parts.intent.out_of_scope,
+  })) : undefined;
+  if (intentBlock) userSections.push(`## Claimed PR purpose and scope\n${intentBlock}`);
   if (prDescription) {
     userSections.push(`## PR description\n${wrapUntrusted('pr-description', prDescription)}`);
   }
@@ -135,6 +141,7 @@ export function assemblePrompt(parts: PromptParts): AssembledPrompt {
     repo_map: parts.repoMap ?? null,
     pr_description: prDescription ?? null,
     user,
+    ...(intentBlock ? { intent: intentBlock } : {}),
   };
 
   return { messages, assembly };

@@ -38,6 +38,9 @@ import type { RepoIntel } from '../modules/repo-intel/types.js';
 import { RepoIntelService } from '../modules/repo-intel/service.js';
 import { type DepGraph, DepCruiseGraph } from '../adapters/depgraph/index.js';
 import { type Tokenizer, TiktokenTokenizer } from '../adapters/tokenizer/index.js';
+import { LocalProjectContextFiles, fallbackEstimator } from '../adapters/project-context/files.js';
+import { ProjectContextService } from '../modules/project-context/service.js';
+import type { ProjectContextFiles, ContextEstimator } from '../modules/project-context/ports.js';
 
 /**
  * DI container. One per app instance. Holds config, db, the JobRunner,
@@ -62,6 +65,8 @@ export interface ContainerOverrides {
   /** repo-intel T3 adapters — only the indexer pipeline reads these. */
   depgraph?: DepGraph;
   tokenizer?: Tokenizer;
+  projectContextFiles?: ProjectContextFiles;
+  contextEstimator?: ContextEstimator;
 }
 
 export class Container implements CiDependencies {
@@ -92,6 +97,7 @@ export class Container implements CiDependencies {
   private _depgraph?: DepGraph;
   private _tokenizer?: Tokenizer;
   private _priceBook?: PriceBook;
+  private _projectContext?: ProjectContextService;
 
   constructor(config: AppConfig, db: Db, private overrides: ContainerOverrides = {}) {
     this.config = config;
@@ -122,6 +128,14 @@ export class Container implements CiDependencies {
 
   get briefRepo(): BriefRepository { return (this._briefRepo ??= new BriefRepository(this.db)); }
   get contextRepo(): ContextRepository { return (this._contextRepo ??= new ContextRepository(this.db)); }
+  get projectContext(): ProjectContextService {
+    // Explicit method prevents a tokenizer's silent internal fallback being mislabeled.
+    const estimator = this.overrides.contextEstimator ?? (this.overrides.tokenizer
+      ? { count: (text: string) => this.overrides.tokenizer!.count(text), method: 'injected tokenizer' }
+      : fallbackEstimator);
+    return (this._projectContext ??= new ProjectContextService(this,
+      this.overrides.projectContextFiles ?? new LocalProjectContextFiles(this.config.projectContextRoots, estimator), estimator));
+  }
   get evalsRepo(): EvalsRepository { return (this._evalsRepo ??= new EvalsRepository(this.db)); }
 
   get codeIndex(): CodeIndex {

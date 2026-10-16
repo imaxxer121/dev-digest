@@ -50,6 +50,7 @@ export function ExportToCI({ agent, onClose }: { agent: Agent; onClose: () => vo
     <section ref={dialog} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 12, width: 'min(850px,95vw)', maxHeight: '92vh', overflow: 'auto', padding: 24 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><h2>{t('exportTitle')}</h2><Button aria-label={t('close')} onClick={onClose} disabled={busy}>{t('close')}</Button></div>
       <p style={{ color: 'var(--text-secondary)' }}>{agent.name} · {t('exportDescription')}</p>
+      <p style={{ color: 'var(--warn)' }}>{t('localContextDisclosure')}</p>
       <ExportWizardSteps step={step} labels={[t('target'), t('preview'), t('configure'), t('install')]} />
       <div style={{ padding: '24px 0', minHeight: 330 }}>
         {step === 0 && <>

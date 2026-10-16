@@ -49,6 +49,19 @@ describe("A5 Run Trace drawer (smoke)", () => {
     expect(screen.getByText("COST")).toBeInTheDocument();
     expect(screen.getByText("$0.06")).toBeInTheDocument();
     expect(screen.getByText("Tool calls")).toBeInTheDocument();
+    expect(screen.getByText('Project Context measurements are unknown for this legacy or CI trace.')).toBeInTheDocument();
+  });
+
+  it('renders measured Context bytes and labeled estimate separately from provider tokens, including whole-document skips', () => {
+    TRACE.project_context = { reads: [{ repo_id: 'repo-a', path: 'docs/invariant.md', kind: 'docs', bytes: 12, estimated_tokens: 3, estimate_method: 'fixture tokenizer' }],
+      skipped: [{ repo_id: 'repo-a', path: 'docs/large.md', reason: 'Whole document exceeds budget' }], estimated_tokens: 22, estimate_method: 'fixture tokenizer', bytes: 88, token_limit: 8000, document_byte_limit: 65536 };
+    TRACE.specs_read = ['docs/invariant.md']; TRACE.prompt_assembly.specs = '<untrusted source="spec-0">exact context</untrusted>';
+    try {
+      renderWithIntl(<RunTraceDrawer runId="r1" agentName="Security" onClose={() => {}} />);
+      expect(screen.getByText(/22 estimated tokens · 88 UTF-8 bytes · method: fixture tokenizer/)).toBeInTheDocument();
+      expect(screen.getByText(/docs\/large.md · Whole document exceeds budget/)).toBeInTheDocument();
+      expect(screen.getByText(/repo-a: docs\/invariant.md · 12 B/)).toBeInTheDocument();
+    } finally { delete TRACE.project_context; TRACE.specs_read = []; TRACE.prompt_assembly.specs = null; }
   });
 
   it("switches to the live log tab", () => {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ProjectContextTrace } from './project-context';
 
 /**
  * Run trace. The ENTIRE trace of one run is persisted as a SINGLE
@@ -41,6 +42,7 @@ export const PromptAssembly = z.object({
   skills: z.string().nullish(),
   memory: z.string().nullish(),
   specs: z.string().nullish(),
+  intent: z.string().nullish(),
   /** Callers-of-changed-symbols digest (T1.3); null when absent. */
   callers: z.string().nullish(),
   /** Repo skeleton / map (T3); null when absent. Enables per-slot token
@@ -71,6 +73,12 @@ export type RunStats = z.infer<typeof RunStats>;
 
 /** The single-document trace stored in `run_traces.trace`. */
 export const RunTrace = z.object({
+  project_context: ProjectContextTrace.optional(),
+  intent: z.object({
+    status: z.enum(['cached', 'classified', 'degraded']), generation_id: z.string().nullable(), head_sha: z.string().nullable(),
+    provider: z.string().nullable(), model: z.string().nullable(), tokens_in: z.number().nullable(), tokens_out: z.number().nullable(),
+    cost_usd: z.number().nullable(), error: z.string().nullable(),
+  }).optional(),
   /** Exact source input for future immutable eval conversion; absent on legacy traces. */
   source_diff: z.string().optional(),
   source_head_sha: z.string().nullable().optional(),

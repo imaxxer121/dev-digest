@@ -6,6 +6,7 @@ import { getContext } from '../_shared/context.js';
 import { IdParams } from '../_shared/schemas.js';
 import { NotFoundError } from '../../platform/errors.js';
 import { SkillsService } from './service.js';
+import { AttachedDocuments } from '@devdigest/shared';
 
 /** `/skills/:id/restore` — id is a uuid, version a positive integer. */
 const RestoreBody = z.object({
@@ -13,6 +14,7 @@ const RestoreBody = z.object({
 });
 
 const CreateSkillBody = z.object({
+  attached_docs: AttachedDocuments.optional(),
   name: z.string().min(1),
   description: z.string().optional(),
   type: SkillType.optional(),
@@ -22,6 +24,7 @@ const CreateSkillBody = z.object({
 });
 
 const UpdateSkillBody = z.object({
+  attached_docs: AttachedDocuments.optional(),
   name: z.string().min(1).optional(),
   description: z.string().optional(),
   type: SkillType.optional(),
@@ -80,6 +83,7 @@ export default async function skillsRoutes(appBase: FastifyInstance) {
       ...(body.type !== undefined ? { type: body.type } : {}),
       ...(body.source !== undefined ? { source: body.source } : {}),
       body: body.body,
+      ...(body.attached_docs !== undefined ? { attached_docs: body.attached_docs } : {}),
       ...(body.enabled !== undefined ? { enabled: body.enabled } : {}),
     });
     reply.status(201);

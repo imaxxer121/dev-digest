@@ -19,14 +19,22 @@ describe('future eval source head provenance', () => {
     const provider = new MockLLMProvider('anthropic', { structured: { verdict: 'approve', summary: 'Fixture', score: 95, findings: [] } });
     let trace: RunTrace | undefined;
     const repository = {
+      getIntent: vi.fn(async () => ({ headSha: 'H0', intent: { pr_id: 'pull-id', intent: 'Cached fixture purpose',
+        in_scope: [], out_of_scope: [], head_sha: 'H0' } })),
       getPrFiles: vi.fn(async () => []), persistOutcome: vi.fn(async (_review, _findings, _stats, _head, value: RunTrace) => { trace = value; return { review: { id: 'review-id' }, findings: [] }; }),
       markReviewed: vi.fn(async () => {}), completeAgentRun: vi.fn(async () => {}),
       saveRunTrace: vi.fn(async (_id: string, value: RunTrace) => { trace = value; }),
     } as unknown as ReviewRepository;
     const agents = { linkedSkills: vi.fn(async () => []) } as unknown as Container['agentsRepo'];
-    const container = { git, github: async () => github, llm: async () => provider, runBus: new RunBus(), agentsRepo: agents } as unknown as Container;
+    const projectContext = {
+      resolveForAgent: vi.fn(async () => ({ specs: [], trace: { reads: [], skipped: [], estimated_tokens: 0,
+        estimate_method: 'fixture empty block', bytes: 0, token_limit: 8000, document_byte_limit: 65536 } })),
+      measureBlock: vi.fn(() => ({ estimated_tokens: 0, estimate_method: 'fixture empty block', bytes: 0 })),
+    };
+    const container = { git, github: async () => github, llm: async () => provider, runBus: new RunBus(), agentsRepo: agents,
+      reviewRepo: repository, projectContext } as unknown as Container;
     const pull = { id: 'pull-id', repoId: 'repo-id', number: 1, title: 'Queued title', body: 'Saved model-visible description', base: 'main', headSha: 'H0' } as PullRow;
-    const agent = { id: 'agent-id', name: 'Fixture', provider: 'anthropic', model: 'fixture', systemPrompt: 'Review', version: 1,
+    const agent = { id: 'agent-id', workspaceId: 'workspace-id', name: 'Fixture', provider: 'anthropic', model: 'fixture', systemPrompt: 'Review', version: 1,
       strategy: 'single-pass', repoIntel: false, ciFailOn: 'critical' } as AgentRow;
     const repo = { id: 'repo-id', owner: 'fixture', name: 'repo' } as typeof t.repos.$inferSelect;
     await new ReviewRunExecutor(container, repository, agents).executeRuns('workspace-id', pull, repo, [{ agent, runId: 'run-id' }]);

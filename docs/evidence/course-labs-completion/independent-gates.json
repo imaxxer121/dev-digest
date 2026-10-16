@@ -1,0 +1,36 @@
+{
+  "baseline": "7dc2a005375b415a2f5619ebd19daf3705344ade",
+  "architecture": {
+    "initial": "PASS with medium finding",
+    "finding": "In-flight cached GET could replace successful POST Intent data",
+    "repair": "onSuccess awaits cancellation of exact mutation-origin query before cache write",
+    "regressions": "Two deferred GET/POST and navigation tests failed before fix, then focused hook/card 9/9 passed; client typecheck passed",
+    "rereview": "RESOLVED; PASS, no remaining scoped findings",
+    "scope": "T1-T4 L03/L05 source, contracts, migration, UI and harness profiles; not later eval package"
+  },
+  "plan_verifier": {
+    "implementation": "T1-T4 and deterministic checks pass",
+    "overall": "REVIEW pending T8 evidence at review time",
+    "remaining_at_review": "Live browser/model observations, final Brief byte recomputation, insight/retro/handoff artifacts",
+    "subsequent_evidence": "brief-byte-budget.json, intent-live-before-reload.json and intent-cached-reload.json now exist; Context live review still in progress"
+  },
+  "t7_iterations": 1,
+  "nested_worker_delegation": false,
+  "model_provenance": "Delegated workers inherit current Codex model; exact per-worker provider usage not exposed. No Claude inference claimed.",
+  "publication_hold": "User holds video upload/course submission; root code publication remains authorized.",
+  "final_t8": {
+    "verdict": "PASS",
+    "scope": "All 30 agreed L03/L05 criteria; delivery hold separately respected",
+    "reviewer": "completion_context, read-only plan-verifier",
+    "independent_measurement": "Guarded Context block recomputed as 1264 UTF-8 bytes / 316 estimated tokens; exactly 2 read paths, verbatim prompt inclusion",
+    "source_evidence": "Current report links, all 5 Brief source hashes and both verification-log hashes verified",
+    "limits": "Controlled fixture establishes mechanics/finding, not general model accuracy or attachment causality",
+    "earlier_review": "Historical REVIEW/checkpoint kept as chronological record",
+    "commands_executed_by_reviewer": false
+  },
+  "final_eval_package": {
+    "deterministic_tests": "29/29 zero skips",
+    "static_quality": "16 skills, 11 agents, 8 cases, 0 findings",
+    "actual_live": "Original 4/8 then 6/8 retained; rubric regression fixes separate; CLI named-spawn telemetry remains failed"
+  }
+}

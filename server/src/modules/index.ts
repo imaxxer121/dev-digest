@@ -11,6 +11,8 @@ import skills from './skills/routes.js';
 import conventions from './conventions/routes.js';
 import blast from './blast/routes.js';
 import context from './context/routes.js';
+import projectContext from './project-context/routes.js';
+import intent from './intent/routes.js';
 import brief from './brief/routes.js';
 import evals from './evals/routes.js';
 import ci from './ci/routes.js';
@@ -41,6 +43,8 @@ export const modules: Record<string, FastifyPluginAsync> = {
   conventions,
   blast,
   context,
+  projectContext,
+  intent,
   brief,
   evals,
   ci,

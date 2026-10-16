@@ -1,5 +1,11 @@
 # Writing agent prompts
 
+This directory describes the product's database-backed PR review agents. Local
+development file agents live in `.claude/agents/` and are documented in the
+[eleven-role development registry](../development-agent-registry.md). Editing a
+development profile does not update any database-backed review agent. The L03
+read-only planner and L05 spec/plan writers belong to that development workflow.
+
 How a review agent's `system_prompt` is turned into the messages a model sees, and
 the conventions that keep findings, scores, and verdicts consistent.
 

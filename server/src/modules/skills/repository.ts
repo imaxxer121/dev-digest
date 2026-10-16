@@ -11,6 +11,7 @@ import type { SkillRow, SkillVersionRow } from '../../db/rows.js';
 export type { SkillRow, SkillVersionRow };
 
 export interface InsertSkill {
+  attachedDocs?: { repo_id: string; path: string }[];
   workspaceId: string;
   name: string;
   description: string;
@@ -22,6 +23,7 @@ export interface InsertSkill {
 }
 
 export interface UpdateSkill {
+  attachedDocs?: { repo_id: string; path: string }[];
   name?: string;
   description?: string;
   type?: 'rubric' | 'convention' | 'security' | 'custom';
@@ -86,6 +88,7 @@ export class SkillsRepository {
           enabled: values.enabled ?? true,
           version: 1,
           evidenceFiles: values.evidenceFiles ?? null,
+          attachedDocs: values.attachedDocs ?? [],
         })
         .returning();
       await tx.insert(t.skillVersions).values({
@@ -124,6 +127,7 @@ export class SkillsRepository {
           ...(patch.source !== undefined ? { source: patch.source } : {}),
           ...(patch.body !== undefined ? { body: patch.body } : {}),
           ...(patch.enabled !== undefined ? { enabled: patch.enabled } : {}),
+          ...(patch.attachedDocs !== undefined ? { attachedDocs: patch.attachedDocs } : {}),
           ...(patch.evidenceFiles !== undefined ? { evidenceFiles: patch.evidenceFiles } : {}),
           ...(bodyChanged ? { version: nextVersion } : {}),
         })
