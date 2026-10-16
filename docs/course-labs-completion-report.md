@@ -118,6 +118,20 @@ generated Brief and does not conflate UTF-8 bytes with estimated tokens.
 
 ## Delivery
 
+[PR26](https://github.com/imaxxer121/dev-digest/pull/26) publishes the completed
+code and evidence. Hosted checks on `0fd035d` passed product tests, typecheck,
+PostgreSQL, browser flows, runner contract/bundle and all three static harness
+jobs. The three opt-in live-subscription jobs correctly skipped; they are not
+represented as model passes. The required
+[DevDigest review](https://github.com/imaxxer121/dev-digest/actions/runs/38916730410)
+failed **before inference** because this combined PR exceeds the existing
+conservative 24000-byte Ollama input budget. There is no generated finding or
+review-result artifact for that failure. PR26 remains open under the existing
+protection; no limit, gate or administrator protection was bypassed. A smaller
+reviewable change or a separately available larger-context runtime would be
+needed for that merge gate. This is distinct from PR22's earlier model false
+positive. Source/test acceptance is not called an all-green hosted model gate.
+
 L06's additional development-harness eval package is separate from the existing
 product finding evals. Its own deterministic and real-model outcomes, including
 failed attempts, are reported separately. [L07](l07-report.md) also retains its
