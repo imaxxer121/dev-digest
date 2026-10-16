@@ -5,7 +5,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@devdigest/ui";
-import type { RunTrace, FindingRecord } from "@devdigest/shared";
+import type { RunTrace, Finding } from "@devdigest/shared";
 import { PROMPT_COLORS } from "../../constants";
 import { formatSeconds, formatTokens } from "../../helpers";
 import { formatCost } from "@/lib/cost";
@@ -16,7 +16,7 @@ import { PromptBlock } from "../PromptBlock";
 import { FindingsSection } from "../FindingsSection";
 import { Row, Stat } from "../atoms";
 
-export function TraceBody({ trace, findings }: { trace: RunTrace; findings: FindingRecord[] }) {
+export function TraceBody({ trace, findings }: { trace: RunTrace; findings: Finding[] }) {
   const t = useTranslations("runs");
   const stats = trace.stats;
   return (

@@ -4,6 +4,14 @@ import { gateTriggered } from '@devdigest/reviewer-core';
 import type { CiArtifactEnvelope } from './ports.js';
 import { ValidationError } from '../../platform/errors.js';
 
+function workflowMatches(text: string, expectedDigest: string): boolean {
+  // Git may convert a Windows export from CRLF to LF. Preserve every other
+  // byte, including comments, indentation, permissions and shell commands.
+  const lf = text.replace(/\r\n/g, '\n');
+  return [text, lf, lf.replace(/\n/g, '\r\n')].some(value =>
+    createHash('sha256').update(value).digest('hex') === expectedDigest);
+}
+
 export function verifyArtifact(envelope: CiArtifactEnvelope, installation: { repo: string; agentId: string; manifestDigest: string; workflowDigest: string; runtimeProvider: string; runtimeModel: string; failOn: string; bundleDigests: Record<string, string> }) {
   const artifact = VerifiedCiArtifact.parse(envelope.artifact);
   if (envelope.event !== 'pull_request' || envelope.status !== 'completed' || envelope.workflowPath !== '.github/workflows/devdigest-review.yml' ||
@@ -11,7 +19,7 @@ export function verifyArtifact(envelope: CiArtifactEnvelope, installation: { rep
     artifact.github_run_id !== envelope.runId || artifact.github_run_attempt !== envelope.attempt || artifact.pr_number !== envelope.prNumber ||
     artifact.head_sha !== envelope.headSha || artifact.workflow_sha !== envelope.workflowSha || artifact.agent_id !== installation.agentId ||
     artifact.manifest_digest !== installation.manifestDigest || artifact.provider !== installation.runtimeProvider || artifact.model !== installation.runtimeModel ||
-    artifact.fail_on !== installation.failOn || createHash('sha256').update(envelope.workflow).digest('hex') !== installation.workflowDigest) {
+    artifact.fail_on !== installation.failOn || !workflowMatches(envelope.workflow, installation.workflowDigest)) {
     throw new ValidationError('GitHub artifact provenance does not match this installation');
   }
   if (!Object.keys(installation.bundleDigests).length || Object.entries(installation.bundleDigests).some(([path, digest]) => envelope.trustedFileDigests[path] !== digest)) throw new ValidationError('Trusted base runner or agent configuration differs from this installation');
