@@ -1,0 +1,12 @@
+# L07 CI gate fixture
+
+This isolated teaching example treats `request.query.name` as raw untrusted HTTP
+input. It is used to observe a real model review, a grounded CRITICAL finding and
+GitHub's required-check merge gate. The first revision deliberately constructs
+SQL through concatenation; the next revision binds the input as a parameter.
+
+The application never imports or executes this directory. Review results must
+come from the hosted model and reviewer-core, rather than a fabricated finding.
+
+The hosted review found a grounded CRITICAL issue in the first query. This
+revision binds the request value separately through a PostgreSQL placeholder.
